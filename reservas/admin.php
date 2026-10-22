@@ -1,0 +1,608 @@
+<?php
+/**
+ * Panel de reservas de Nutriendo Hábitos (solo para Andrea).
+ * La primera vez que se abre pide crear una contraseña; se guarda cifrada en reservas/datos/.
+ */
+declare(strict_types=1);
+require __DIR__ . '/lib.php';
+
+$seguro = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
+session_name('nh_panel');
+session_set_cookie_params(['lifetime' => 0, 'path' => rtrim(dirname($_SERVER['SCRIPT_NAME']), '/') . '/', 'secure' => $seguro, 'httponly' => true, 'samesite' => 'Strict']);
+session_start();
+
+header('X-Frame-Options: DENY');
+header('Referrer-Policy: same-origin');
+
+/* ======================= API del panel ======================= */
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $in = json_decode((string)file_get_contents('php://input'), true);
+    if (!is_array($in)) {
+        json_salida(['ok' => false, 'error' => 'peticion'], 400);
+    }
+    $accion = (string)($in['accion'] ?? '');
+    $cfg = cargar_config();
+    $configurado = $cfg['password'] !== '';
+    $dentro = !empty($_SESSION['dentro']);
+
+    if ($accion === 'estado') {
+        if (empty($_SESSION['csrf'])) {
+            $_SESSION['csrf'] = bin2hex(random_bytes(16));
+        }
+        json_salida(['ok' => true, 'configurado' => $configurado, 'dentro' => $dentro, 'csrf' => $_SESSION['csrf']]);
+    }
+
+    // A partir de aquí, todas las acciones exigen el token de la sesión
+    if (empty($_SESSION['csrf']) || !hash_equals($_SESSION['csrf'], (string)($_SERVER['HTTP_X_CSRF'] ?? ''))) {
+        json_salida(['ok' => false, 'error' => 'sesion'], 403);
+    }
+
+    if ($accion === 'crear_password') {
+        if ($configurado) {
+            json_salida(['ok' => false, 'error' => 'ya_configurado'], 409);
+        }
+        $p = (string)($in['password'] ?? '');
+        if (strlen($p) < 8) {
+            json_salida(['ok' => false, 'error' => 'corta'], 422);
+        }
+        con_cerrojo(function () use ($p) {
+            $c = cargar_config();
+            if ($c['password'] === '') {
+                $c['password'] = password_hash($p, PASSWORD_DEFAULT);
+                guardar_datos('config', $c);
+            }
+        });
+        session_regenerate_id(true);
+        $_SESSION['dentro'] = true;
+        json_salida(['ok' => true]);
+    }
+
+    if ($accion === 'entrar') {
+        if (!limitar('login', 6, 900)) {
+            json_salida(['ok' => false, 'error' => 'limite'], 429);
+        }
+        if (!$configurado || !password_verify((string)($in['password'] ?? ''), $cfg['password'])) {
+            json_salida(['ok' => false, 'error' => 'password'], 401);
+        }
+        session_regenerate_id(true);
+        $_SESSION['dentro'] = true;
+        json_salida(['ok' => true]);
+    }
+
+    if (!$dentro) {
+        json_salida(['ok' => false, 'error' => 'no_autorizado'], 401);
+    }
+
+    switch ($accion) {
+        case 'salir':
+            $_SESSION = [];
+            session_destroy();
+            json_salida(['ok' => true]);
+
+        case 'datos':
+            $desde = date('Y-m-d', strtotime('-30 days'));
+            $citas = array_values(array_filter(cargar_reservas(), fn($r) => $r['fecha'] >= $desde));
+            usort($citas, fn($a, $b) => strcmp($a['fecha'] . $a['hora'], $b['fecha'] . $b['hora']));
+            json_salida(['ok' => true,
+                'horario' => $cfg['horario'], 'bloqueos' => $cfg['bloqueos'],
+                'antelacion_horas' => $cfg['antelacion_horas'], 'dias_vista' => $cfg['dias_vista'],
+                'citas' => $citas, 'hoy' => date('Y-m-d'), 'duracion' => DURACION]);
+
+        case 'guardar_horario':
+            $horario = $in['horario'] ?? null;
+            $nuevo = [];
+            foreach (array_keys(MODALIDADES) as $m) {
+                for ($d = 1; $d <= 7; $d++) {
+                    $tramos = $horario[$m][(string)$d] ?? [];
+                    $limpios = [];
+                    foreach ((array)$tramos as $t) {
+                        $a = (string)($t[0] ?? '');
+                        $b = (string)($t[1] ?? '');
+                        if (!es_hora($a) || !es_hora($b) || minutos($a) >= minutos($b)) {
+                            json_salida(['ok' => false, 'error' => 'tramo', 'detalle' => "$m día $d"], 422);
+                        }
+                        $limpios[] = [$a, $b];
+                    }
+                    usort($limpios, fn($x, $y) => strcmp($x[0], $y[0]));
+                    $nuevo[$m][(string)$d] = $limpios;
+                }
+            }
+            $ant = max(0, min(168, (int)($in['antelacion_horas'] ?? 24)));
+            $vista = max(7, min(365, (int)($in['dias_vista'] ?? 60)));
+            con_cerrojo(function () use ($nuevo, $ant, $vista) {
+                $c = cargar_config();
+                $c['horario'] = $nuevo;
+                $c['antelacion_horas'] = $ant;
+                $c['dias_vista'] = $vista;
+                guardar_datos('config', $c);
+            });
+            json_salida(['ok' => true]);
+
+        case 'anadir_bloqueo':
+            $desde = (string)($in['desde'] ?? '');
+            $hasta = (string)($in['hasta'] ?? '') ?: $desde;
+            $mod = (string)($in['modalidad'] ?? 'todas');
+            if (!es_fecha($desde) || !es_fecha($hasta) || $hasta < $desde || !in_array($mod, ['todas', 'presencial', 'online'], true)) {
+                json_salida(['ok' => false, 'error' => 'datos'], 422);
+            }
+            $nota = limpiar((string)($in['nota'] ?? ''), 80);
+            con_cerrojo(function () use ($desde, $hasta, $mod, $nota) {
+                $c = cargar_config();
+                $c['bloqueos'][] = ['id' => bin2hex(random_bytes(5)), 'desde' => $desde, 'hasta' => $hasta, 'modalidad' => $mod, 'nota' => $nota];
+                usort($c['bloqueos'], fn($a, $b) => strcmp($a['desde'], $b['desde']));
+                guardar_datos('config', $c);
+            });
+            json_salida(['ok' => true]);
+
+        case 'quitar_bloqueo':
+            $id = (string)($in['id'] ?? '');
+            con_cerrojo(function () use ($id) {
+                $c = cargar_config();
+                $c['bloqueos'] = array_values(array_filter($c['bloqueos'], fn($b) => $b['id'] !== $id));
+                guardar_datos('config', $c);
+            });
+            json_salida(['ok' => true]);
+
+        case 'anadir_cita':
+            $fecha = (string)($in['fecha'] ?? '');
+            $hora = (string)($in['hora'] ?? '');
+            $mod = (string)($in['modalidad'] ?? '');
+            $nombre = limpiar((string)($in['nombre'] ?? ''));
+            if (!es_fecha($fecha) || !es_hora($hora) || !isset(MODALIDADES[$mod]) || $nombre === '') {
+                json_salida(['ok' => false, 'error' => 'datos'], 422);
+            }
+            $email = limpiar((string)($in['email'] ?? ''));
+            $cita = [
+                'id' => bin2hex(random_bytes(6)), 'fecha' => $fecha, 'hora' => $hora, 'modalidad' => $mod,
+                'nombre' => $nombre, 'apellidos' => limpiar((string)($in['apellidos'] ?? '')),
+                'telefono' => limpiar((string)($in['telefono'] ?? ''), 30),
+                'email' => filter_var($email, FILTER_VALIDATE_EMAIL) ? $email : '',
+                'nota' => limpiar((string)($in['nota'] ?? ''), 200),
+                'origen' => 'panel', 'estado' => 'confirmada', 'creada' => date('c'),
+            ];
+            $ok = con_cerrojo(function () use ($cita) {
+                $rs = cargar_reservas();
+                if (choca_con_cita($rs, $cita['fecha'], $cita['hora'])) {
+                    return false;
+                }
+                $rs[] = $cita;
+                guardar_datos('reservas', $rs);
+                return true;
+            });
+            if (!$ok) {
+                json_salida(['ok' => false, 'error' => 'ocupado'], 409);
+            }
+            json_salida(['ok' => true]);
+
+        case 'cancelar_cita':
+            $id = (string)($in['id'] ?? '');
+            $avisar = !empty($in['avisar']);
+            $cita = con_cerrojo(function () use ($id) {
+                $rs = cargar_reservas();
+                foreach ($rs as &$r) {
+                    if ($r['id'] === $id && $r['estado'] === 'confirmada') {
+                        $r['estado'] = 'cancelada';
+                        $r['cancelada'] = date('c');
+                        guardar_datos('reservas', $rs);
+                        return $r;
+                    }
+                }
+                return null;
+            });
+            if (!$cita) {
+                json_salida(['ok' => false, 'error' => 'no_encontrada'], 404);
+            }
+            $avisado = false;
+            if ($avisar && !empty($cita['email'])) {
+                $avisado = enviar_correo($cita['email'], 'Cita anulada · ' . NOMBRE_WEB,
+                    "Hola {$cita['nombre']}:\n\nTu cita ha quedado anulada.\n\n" . texto_cita($cita) . "\n"
+                    . "Si quieres buscar otro día, puedes reservar de nuevo en la web o llamarme al " . TELEFONO . ".\n\n"
+                    . "Un saludo,\nAndrea Argüello · " . NOMBRE_WEB . "\n", DESTINO);
+            }
+            json_salida(['ok' => true, 'avisado' => $avisado]);
+
+        case 'cambiar_password':
+            if (!password_verify((string)($in['actual'] ?? ''), $cfg['password'])) {
+                json_salida(['ok' => false, 'error' => 'password'], 401);
+            }
+            $n = (string)($in['nueva'] ?? '');
+            if (strlen($n) < 8) {
+                json_salida(['ok' => false, 'error' => 'corta'], 422);
+            }
+            con_cerrojo(function () use ($n) {
+                $c = cargar_config();
+                $c['password'] = password_hash($n, PASSWORD_DEFAULT);
+                guardar_datos('config', $c);
+            });
+            json_salida(['ok' => true]);
+    }
+    json_salida(['ok' => false, 'error' => 'accion'], 400);
+}
+
+/* ======================= Página del panel ======================= */
+header('Content-Type: text/html; charset=utf-8');
+header('Cache-Control: no-store');
+?><!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Panel de reservas · Nutriendo Hábitos</title>
+<link rel="icon" href="../img/favicon.webp">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Outfit:wght@300;400;500;600&display=swap">
+<style>
+:root{--bg:#FBFAF6;--fg:#2F302C;--card:#fff;--primary:#56704F;--primary-fg:#FBFAF6;--secondary:#E4F0D0;--secondary-fg:#3F523B;--muted:#F2EFEA;--muted-fg:#6B6660;--accent:#7D726A;--border:#E3E1D8;--leaf:#C2D8B9;--danger:#A6463B;--r:1rem}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:"Outfit",system-ui,sans-serif;font-size:15px;line-height:1.5}
+h1,h2,h3{font-family:"Fraunces",Georgia,serif;font-weight:400;margin:0;color:var(--primary)}
+button,input,select{font:inherit;color:inherit}
+[hidden]{display:none!important}
+.wrap{max-width:68rem;margin:0 auto;padding:0 max(1rem,env(safe-area-inset-left)) 4rem max(1rem,env(safe-area-inset-right))}
+header{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1rem 0;border-bottom:1px solid var(--border);margin-bottom:1.5rem}
+header .brand{display:flex;align-items:center;gap:.75rem}
+header img{width:3.2rem;height:3.2rem;object-fit:contain}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;height:2.4rem;padding:0 1.1rem;border-radius:999px;border:1px solid transparent;background:var(--primary);color:var(--primary-fg);font-weight:500;font-size:.9rem;cursor:pointer;white-space:nowrap}
+.btn:hover{filter:brightness(1.08)}
+.btn.sec{background:var(--card);color:var(--primary);border-color:var(--border)}
+.btn.sm{height:2rem;padding:0 .8rem;font-size:.82rem}
+.btn.danger{background:var(--card);color:var(--danger);border-color:color-mix(in oklab,var(--danger) 35%,var(--border))}
+.btn:disabled{opacity:.55;cursor:default}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1.25rem}
+.login{max-width:24rem;margin:4rem auto;display:grid;gap:1rem;text-align:center}
+.login img{width:7rem;margin:0 auto}
+label{display:grid;gap:.3rem;font-size:.82rem;font-weight:500;color:var(--secondary-fg)}
+input,select{height:2.4rem;border:1px solid var(--border);border-radius:.6rem;background:var(--bg);padding:0 .7rem;width:100%}
+.msg{font-size:.88rem;padding:.6rem .8rem;border-radius:.6rem}
+.msg.err{background:color-mix(in oklab,var(--danger) 12%,var(--card));color:var(--danger)}
+.msg.ok{background:var(--secondary);color:var(--secondary-fg)}
+.tabs{display:flex;flex-wrap:wrap;gap:.35rem;padding:.3rem;background:var(--secondary);border-radius:999px;width:fit-content;max-width:100%;margin-bottom:1.5rem}
+.tabs button{border:0;background:none;padding:.45rem 1rem;border-radius:999px;cursor:pointer;color:var(--secondary-fg);font-size:.9rem}
+.tabs button[aria-selected="true"]{background:var(--card);color:var(--fg);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.grid2{display:grid;gap:1.25rem}
+@media(min-width:860px){.grid2{grid-template-columns:1fr 1fr}}
+.grid2>*{min-width:0}
+.day{border-top:1px solid var(--border);padding:.9rem 0}
+.day:first-child{border-top:0}
+.day h3{font-size:1.05rem;margin-bottom:.5rem}
+.day h3::first-letter{text-transform:uppercase}
+.cita{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem 1rem;padding:.6rem .75rem;border-radius:.7rem;background:var(--muted);margin:.35rem 0}
+.cita .h{font-weight:600;font-variant-numeric:tabular-nums;min-width:3.2rem}
+.cita .who{flex:1;min-width:12rem}
+.cita .who small{display:block;color:var(--muted-fg)}
+.pill{font-size:.72rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:.2rem .55rem;border-radius:999px;background:var(--secondary);color:var(--secondary-fg)}
+.pill.online{background:#ECE8E3;color:#5E554F}
+.cita.cancelada{opacity:.55}
+.cita.cancelada .who{text-decoration:line-through}
+.week{display:grid;gap:.6rem}
+.wd{display:grid;grid-template-columns:6.5rem 1fr;gap:.6rem;align-items:start;padding:.55rem 0;border-top:1px solid var(--border)}
+.wd:first-child{border-top:0}
+.wd b{padding-top:.35rem;font-weight:500}
+.tramos{display:grid;gap:.4rem}
+.tramo{display:flex;flex-wrap:wrap;align-items:center;gap:.4rem}
+.tramo input{width:8.6rem}
+.x{border:0;background:none;color:var(--danger);cursor:pointer;font-size:1.2rem;line-height:1;padding:.2rem .4rem}
+.add{border:1px dashed var(--border);background:none;border-radius:.6rem;padding:.3rem .7rem;color:var(--primary);cursor:pointer;font-size:.82rem;width:fit-content}
+.row{display:flex;flex-wrap:wrap;gap:.75rem;align-items:end}
+.row>label{flex:1 1 9rem}
+.list li{display:flex;flex-wrap:wrap;gap:.5rem 1rem;align-items:center;justify-content:space-between;padding:.6rem 0;border-top:1px solid var(--border)}
+.list{list-style:none;margin:0;padding:0}
+.list li:first-child{border-top:0}
+.muted{color:var(--muted-fg);font-size:.88rem}
+.sticky{position:sticky;bottom:0;padding:.8rem 0;background:linear-gradient(transparent,var(--bg) 35%);display:flex;gap:.75rem;align-items:center;flex-wrap:wrap}
+.toast{position:fixed;left:50%;bottom:1.25rem;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:.6rem 1rem;border-radius:999px;font-size:.9rem;z-index:10}
+.dialog{position:fixed;inset:0;background:rgba(30,32,28,.45);display:grid;place-items:center;padding:1rem;z-index:20}
+.dialog .card{max-width:26rem;width:100%;display:grid;gap:.9rem}
+.chk{display:flex;gap:.5rem;align-items:center;font-weight:400;color:var(--fg)}
+.chk input{width:auto;height:auto}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <section id="v-login" class="login card" hidden>
+    <img src="../img/logo.webp" alt="Nutriendo Hábitos">
+    <h1 id="login-title">Panel de reservas</h1>
+    <p class="muted" id="login-sub">Escribe tu contraseña.</p>
+    <form id="f-login" style="display:grid;gap:.8rem;text-align:left">
+      <label for="l-pass">Contraseña<input id="l-pass" type="password" autocomplete="current-password" required></label>
+      <label for="l-pass2" id="l-pass2-w" hidden>Repite la contraseña<input id="l-pass2" type="password" autocomplete="new-password"></label>
+      <p class="msg err" id="l-err" hidden></p>
+      <button class="btn" type="submit" id="l-btn">Entrar</button>
+    </form>
+  </section>
+
+  <section id="v-panel" hidden>
+    <header>
+      <div class="brand"><img src="../img/logo.webp" alt=""><div><h1 style="font-size:1.4rem">Reservas</h1><span class="muted">Nutriendo Hábitos · citas de <span id="dur">45</span> min</span></div></div>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap"><a class="btn sec sm" href="../#reservar" target="_blank" rel="noopener">Ver calendario público</a><button class="btn sec sm" id="b-salir">Salir</button></div>
+    </header>
+
+    <div class="tabs" role="tablist">
+      <button role="tab" aria-selected="true" data-tab="citas">Citas</button>
+      <button role="tab" aria-selected="false" data-tab="horario">Horario</button>
+      <button role="tab" aria-selected="false" data-tab="bloqueos">Días bloqueados</button>
+      <button role="tab" aria-selected="false" data-tab="ajustes">Ajustes</button>
+    </div>
+
+    <!-- CITAS -->
+    <div data-panel="citas">
+      <div class="grid2">
+        <div class="card"><h2 style="font-size:1.3rem;margin-bottom:.5rem">Próximas citas</h2><div id="citas-prox"></div></div>
+        <div style="display:grid;gap:1.25rem;align-content:start">
+          <div class="card">
+            <h2 style="font-size:1.2rem;margin-bottom:.75rem">Añadir una cita a mano</h2>
+            <p class="muted" style="margin:0 0 .75rem">Para citas que te piden por teléfono o WhatsApp. Ese hueco deja de estar libre en la web.</p>
+            <form id="f-cita" style="display:grid;gap:.7rem">
+              <div class="row">
+                <label for="c-fecha">Día<input id="c-fecha" type="date" required></label>
+                <label for="c-hora">Hora<input id="c-hora" type="time" step="300" required></label>
+                <label for="c-mod">Consulta<select id="c-mod"><option value="presencial">Presencial</option><option value="online">Online</option></select></label>
+              </div>
+              <div class="row">
+                <label for="c-nombre">Nombre<input id="c-nombre" required></label>
+                <label for="c-ape">Apellidos<input id="c-ape"></label>
+              </div>
+              <div class="row">
+                <label for="c-tel">Teléfono<input id="c-tel" type="tel"></label>
+                <label for="c-email">Email<input id="c-email" type="email"></label>
+              </div>
+              <p class="msg err" id="c-err" hidden></p>
+              <button class="btn" type="submit">Añadir cita</button>
+            </form>
+          </div>
+          <div class="card"><h2 style="font-size:1.2rem;margin-bottom:.5rem">Citas pasadas (últimos 30 días)</h2><div id="citas-pas"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HORARIO -->
+    <div data-panel="horario" hidden>
+      <p class="muted" style="margin-top:0">Pon las horas en las que se puede reservar cada día. La web las divide en huecos de <span class="dur2">45</span> minutos. Si un día no tiene horas, ese día no se puede reservar. Una cita presencial también ocupa ese hueco en online, y al revés.</p>
+      <div class="grid2">
+        <div class="card"><h2 style="font-size:1.3rem;margin-bottom:.5rem">Presencial en Valladolid</h2><div class="week" id="w-presencial"></div></div>
+        <div class="card"><h2 style="font-size:1.3rem;margin-bottom:.5rem">Online</h2><div class="week" id="w-online"></div></div>
+      </div>
+      <div class="sticky"><button class="btn" id="b-guardar-h">Guardar horario</button><span class="muted" id="h-msg"></span></div>
+    </div>
+
+    <!-- BLOQUEOS -->
+    <div data-panel="bloqueos" hidden>
+      <div class="grid2">
+        <div class="card">
+          <h2 style="font-size:1.2rem;margin-bottom:.5rem">Bloquear días</h2>
+          <p class="muted" style="margin:0 0 .75rem">Vacaciones, festivos o días que no vas a pasar consulta. Para bloquear un solo día, deja «Hasta» vacío.</p>
+          <form id="f-bloq" style="display:grid;gap:.7rem">
+            <div class="row">
+              <label for="b-desde">Desde<input id="b-desde" type="date" required></label>
+              <label for="b-hasta">Hasta<input id="b-hasta" type="date"></label>
+            </div>
+            <div class="row">
+              <label for="b-mod">Afecta a<select id="b-mod"><option value="todas">Presencial y online</option><option value="presencial">Solo presencial</option><option value="online">Solo online</option></select></label>
+              <label for="b-nota">Nota (opcional)<input id="b-nota" maxlength="80" placeholder="Vacaciones, festivo…"></label>
+            </div>
+            <p class="msg err" id="b-err" hidden></p>
+            <button class="btn" type="submit">Bloquear</button>
+          </form>
+        </div>
+        <div class="card"><h2 style="font-size:1.2rem;margin-bottom:.5rem">Días bloqueados</h2><ul class="list" id="bloq-list"></ul></div>
+      </div>
+    </div>
+
+    <!-- AJUSTES -->
+    <div data-panel="ajustes" hidden>
+      <div class="grid2">
+        <div class="card" style="display:grid;gap:.8rem;align-content:start">
+          <h2 style="font-size:1.2rem">Reservas</h2>
+          <label for="a-ant">Antelación mínima (horas)<input id="a-ant" type="number" min="0" max="168"></label>
+          <p class="muted" style="margin:-.4rem 0 0">Nadie podrá reservar una cita que empiece antes de este tiempo.</p>
+          <label for="a-vista">Se puede reservar hasta (días por delante)<input id="a-vista" type="number" min="7" max="365"></label>
+          <div><button class="btn" id="b-guardar-a">Guardar ajustes</button> <span class="muted" id="a-msg"></span></div>
+        </div>
+        <div class="card">
+          <h2 style="font-size:1.2rem;margin-bottom:.75rem">Cambiar contraseña</h2>
+          <form id="f-pass" style="display:grid;gap:.7rem">
+            <label for="p-act">Contraseña actual<input id="p-act" type="password" autocomplete="current-password" required></label>
+            <label for="p-new">Nueva contraseña (mínimo 8 caracteres)<input id="p-new" type="password" autocomplete="new-password" minlength="8" required></label>
+            <p class="msg" id="p-msg" hidden></p>
+            <button class="btn" type="submit">Cambiar contraseña</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="dialog" id="dlg" hidden role="dialog" aria-modal="true" aria-labelledby="dlg-t">
+  <div class="card">
+    <h2 id="dlg-t" style="font-size:1.25rem">Anular cita</h2>
+    <p id="dlg-txt" style="margin:0"></p>
+    <label class="chk" for="dlg-avisar" id="dlg-avisar-w"><input id="dlg-avisar" type="checkbox" checked> Avisar al paciente por email</label>
+    <div style="display:flex;gap:.6rem;justify-content:flex-end;flex-wrap:wrap"><button class="btn sec" id="dlg-no">No, mantener</button><button class="btn danger" id="dlg-si">Anular cita</button></div>
+  </div>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(function(){
+  var CSRF = '', D = null, H = null;
+  var DIAS = ['', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+  var MOD = { presencial: 'Presencial', online: 'Online' };
+  function $(id){ return document.getElementById(id); }
+  function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function api(accion, datos){
+    var body = Object.assign({ accion: accion }, datos || {});
+    return fetch('admin.php', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json', 'X-CSRF': CSRF }, body: JSON.stringify(body) })
+      .then(function(r){ return r.json().catch(function(){ return { ok: false, error: 'red' }; }); });
+  }
+  function toast(t){ var e = $('toast'); e.textContent = t; e.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(function(){ e.hidden = true; }, 2600); }
+  function fechaLarga(f){
+    var d = new Date(f + 'T12:00:00');
+    return d.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  }
+  function fechaCorta(f){ var d = new Date(f + 'T12:00:00'); return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }); }
+  var ERR = { password: 'Contraseña incorrecta.', limite: 'Demasiados intentos. Espera 15 minutos y vuelve a probar.', corta: 'La contraseña debe tener al menos 8 caracteres.', ocupado: 'Ese hueco ya tiene una cita.', datos: 'Revisa los datos: falta algo o no es válido.', red: 'No hay conexión con el servidor.', sesion: 'La sesión ha caducado. Recarga la página.', no_autorizado: 'La sesión ha caducado. Recarga la página.', tramo: 'Hay un tramo con la hora de fin antes que la de inicio.' };
+  function errTxt(r){ return ERR[r && r.error] || 'No se ha podido guardar. Prueba otra vez.'; }
+
+  /* ---------- acceso ---------- */
+  var primeraVez = false;
+  function mostrarLogin(configurado){
+    primeraVez = !configurado;
+    $('v-panel').hidden = true; $('v-login').hidden = false;
+    $('login-title').textContent = primeraVez ? 'Crea tu contraseña' : 'Panel de reservas';
+    $('login-sub').textContent = primeraVez ? 'Es la primera vez que entras. Elige una contraseña de al menos 8 caracteres; solo tú podrás gestionar las citas.' : 'Escribe tu contraseña.';
+    $('l-pass2-w').hidden = !primeraVez; $('l-btn').textContent = primeraVez ? 'Crear y entrar' : 'Entrar';
+    $('l-pass').setAttribute('autocomplete', primeraVez ? 'new-password' : 'current-password');
+    $('l-pass').focus();
+  }
+  $('f-login').addEventListener('submit', function(e){
+    e.preventDefault(); var p = $('l-pass').value, err = $('l-err'); err.hidden = true;
+    if (primeraVez && p !== $('l-pass2').value) { err.textContent = 'Las dos contraseñas no coinciden.'; err.hidden = false; return; }
+    api(primeraVez ? 'crear_password' : 'entrar', { password: p }).then(function(r){
+      if (!r.ok) { err.textContent = errTxt(r); err.hidden = false; return; }
+      $('l-pass').value = ''; $('l-pass2').value = ''; cargar();
+    });
+  });
+  $('b-salir').addEventListener('click', function(){ api('salir').then(function(){ location.reload(); }); });
+
+  /* ---------- pestañas ---------- */
+  document.querySelectorAll('[data-tab]').forEach(function(b){
+    b.addEventListener('click', function(){
+      document.querySelectorAll('[data-tab]').forEach(function(x){ x.setAttribute('aria-selected', x === b); });
+      document.querySelectorAll('[data-panel]').forEach(function(p){ p.hidden = p.getAttribute('data-panel') !== b.getAttribute('data-tab'); });
+    });
+  });
+
+  /* ---------- datos ---------- */
+  function cargar(){
+    return api('datos').then(function(r){
+      if (!r.ok) { if (r.error === 'no_autorizado') return mostrarLogin(true); toast(errTxt(r)); return; }
+      D = r; H = JSON.parse(JSON.stringify(r.horario));
+      $('v-login').hidden = true; $('v-panel').hidden = false;
+      $('dur').textContent = r.duracion; document.querySelectorAll('.dur2').forEach(function(e){ e.textContent = r.duracion; });
+      pintarCitas(); pintarHorario(); pintarBloqueos();
+      $('a-ant').value = r.antelacion_horas; $('a-vista').value = r.dias_vista;
+      $('c-fecha').min = r.hoy;
+    });
+  }
+
+  function pintarCitas(){
+    var prox = D.citas.filter(function(c){ return c.fecha >= D.hoy; });
+    var pas = D.citas.filter(function(c){ return c.fecha < D.hoy; }).reverse();
+    $('citas-prox').innerHTML = agrupar(prox, true) || '<p class="muted">Todavía no hay citas reservadas.</p>';
+    $('citas-pas').innerHTML = agrupar(pas, false) || '<p class="muted">Sin citas en los últimos 30 días.</p>';
+  }
+  function agrupar(lista, conAcciones){
+    var html = '', dia = '';
+    lista.forEach(function(c){
+      if (c.fecha !== dia) { if (dia) html += '</div>'; dia = c.fecha; html += '<div class="day"><h3>' + esc(fechaLarga(c.fecha)) + '</h3>'; }
+      var canc = c.estado !== 'confirmada';
+      html += '<div class="cita' + (canc ? ' cancelada' : '') + '"><span class="h">' + esc(c.hora) + '</span>' +
+        '<span class="pill' + (c.modalidad === 'online' ? ' online' : '') + '">' + esc(MOD[c.modalidad]) + '</span>' +
+        '<span class="who">' + esc(c.nombre + ' ' + (c.apellidos || '')) + '<small>' + esc([c.telefono, c.email].filter(Boolean).join(' · ')) + (c.origen === 'panel' ? ' · añadida por ti' : '') + (canc ? ' · ANULADA' : '') + '</small></span>' +
+        (conAcciones && !canc ? '<button class="btn danger sm" data-cancel="' + esc(c.id) + '">Anular</button>' : '') + '</div>';
+    });
+    return html ? html + '</div>' : '';
+  }
+  document.addEventListener('click', function(e){
+    var b = e.target.closest('[data-cancel]'); if (!b) return;
+    var c = D.citas.find(function(x){ return x.id === b.getAttribute('data-cancel'); }); if (!c) return;
+    $('dlg-txt').textContent = c.nombre + ' ' + (c.apellidos || '') + ' · ' + fechaLarga(c.fecha) + ' a las ' + c.hora + ' (' + MOD[c.modalidad] + ')';
+    $('dlg-avisar-w').hidden = !c.email; $('dlg-avisar').checked = !!c.email;
+    $('dlg').hidden = false; $('dlg').dataset.id = c.id; $('dlg-no').focus();
+  });
+  $('dlg-no').addEventListener('click', function(){ $('dlg').hidden = true; });
+  $('dlg-si').addEventListener('click', function(){
+    var id = $('dlg').dataset.id, b = this; b.disabled = true;
+    api('cancelar_cita', { id: id, avisar: $('dlg-avisar').checked }).then(function(r){
+      b.disabled = false; $('dlg').hidden = true;
+      if (!r.ok) return toast(errTxt(r));
+      toast(r.avisado ? 'Cita anulada. Se ha avisado al paciente.' : 'Cita anulada. El hueco vuelve a estar libre.'); cargar();
+    });
+  });
+
+  $('f-cita').addEventListener('submit', function(e){
+    e.preventDefault(); var err = $('c-err'); err.hidden = true;
+    api('anadir_cita', { fecha: $('c-fecha').value, hora: $('c-hora').value, modalidad: $('c-mod').value, nombre: $('c-nombre').value, apellidos: $('c-ape').value, telefono: $('c-tel').value, email: $('c-email').value })
+      .then(function(r){ if (!r.ok) { err.textContent = errTxt(r); err.hidden = false; return; } e.target.reset(); toast('Cita añadida.'); cargar(); });
+  });
+
+  /* ---------- horario ---------- */
+  function pintarHorario(){
+    ['presencial', 'online'].forEach(function(m){
+      var cont = $('w-' + m), html = '';
+      for (var d = 1; d <= 7; d++) {
+        var tramos = H[m][d] || [];
+        html += '<div class="wd"><b>' + DIAS[d] + '</b><div class="tramos">' +
+          tramos.map(function(t, i){
+            return '<div class="tramo"><input type="time" step="300" aria-label="' + DIAS[d] + ' desde" value="' + t[0] + '" data-m="' + m + '" data-d="' + d + '" data-i="' + i + '" data-k="0"> a ' +
+              '<input type="time" step="300" aria-label="' + DIAS[d] + ' hasta" value="' + t[1] + '" data-m="' + m + '" data-d="' + d + '" data-i="' + i + '" data-k="1">' +
+              '<button class="x" type="button" title="Quitar tramo" aria-label="Quitar tramo" data-del="' + m + '|' + d + '|' + i + '">×</button></div>';
+          }).join('') +
+          (tramos.length ? '' : '<span class="muted" style="padding-top:.35rem">Cerrado</span>') +
+          '<button class="add" type="button" data-add="' + m + '|' + d + '">+ Añadir horas</button></div></div>';
+      }
+      cont.innerHTML = html;
+    });
+  }
+  document.addEventListener('input', function(e){
+    var t = e.target; if (!t.dataset || !t.dataset.m || t.type !== 'time') return;
+    H[t.dataset.m][t.dataset.d][+t.dataset.i][+t.dataset.k] = t.value; $('h-msg').textContent = 'Cambios sin guardar';
+  });
+  document.addEventListener('click', function(e){
+    var a = e.target.closest('[data-add]'), x = e.target.closest('[data-del]');
+    if (a) { var p = a.dataset.add.split('|'); var l = H[p[0]][p[1]] = H[p[0]][p[1]] || []; var last = l[l.length - 1];
+      l.push(last ? [last[1] < '16:00' ? '16:00' : last[1], last[1] < '16:00' ? '20:00' : '21:00'] : ['09:30', '14:00']); pintarHorario(); $('h-msg').textContent = 'Cambios sin guardar'; }
+    if (x) { var q = x.dataset.del.split('|'); H[q[0]][q[1]].splice(+q[2], 1); pintarHorario(); $('h-msg').textContent = 'Cambios sin guardar'; }
+  });
+  function guardarHorario(btn, msg){
+    btn.disabled = true;
+    return api('guardar_horario', { horario: H, antelacion_horas: +$('a-ant').value, dias_vista: +$('a-vista').value }).then(function(r){
+      btn.disabled = false;
+      if (!r.ok) { msg.textContent = errTxt(r) + (r.detalle ? ' (' + r.detalle + ')' : ''); return; }
+      msg.textContent = 'Guardado'; toast('Guardado. El calendario de la web ya está actualizado.'); cargar();
+    });
+  }
+  $('b-guardar-h').addEventListener('click', function(){ guardarHorario(this, $('h-msg')); });
+  $('b-guardar-a').addEventListener('click', function(){ guardarHorario(this, $('a-msg')); });
+
+  /* ---------- bloqueos ---------- */
+  function pintarBloqueos(){
+    var L = { todas: 'Presencial y online', presencial: 'Solo presencial', online: 'Solo online' };
+    var futuros = D.bloqueos.filter(function(b){ return b.hasta >= D.hoy; });
+    $('bloq-list').innerHTML = futuros.length ? futuros.map(function(b){
+      return '<li><span><b>' + esc(b.desde === b.hasta ? fechaCorta(b.desde) : fechaCorta(b.desde) + ' – ' + fechaCorta(b.hasta)) + '</b><br><span class="muted">' + esc(L[b.modalidad]) + (b.nota ? ' · ' + esc(b.nota) : '') + '</span></span>' +
+        '<button class="btn sec sm" data-unbloq="' + esc(b.id) + '">Desbloquear</button></li>';
+    }).join('') : '<li class="muted">No hay días bloqueados.</li>';
+  }
+  $('f-bloq').addEventListener('submit', function(e){
+    e.preventDefault(); var err = $('b-err'); err.hidden = true;
+    api('anadir_bloqueo', { desde: $('b-desde').value, hasta: $('b-hasta').value, modalidad: $('b-mod').value, nota: $('b-nota').value })
+      .then(function(r){ if (!r.ok) { err.textContent = errTxt(r); err.hidden = false; return; } e.target.reset(); toast('Días bloqueados.'); cargar(); });
+  });
+  document.addEventListener('click', function(e){
+    var b = e.target.closest('[data-unbloq]'); if (!b) return;
+    api('quitar_bloqueo', { id: b.getAttribute('data-unbloq') }).then(function(r){ if (!r.ok) return toast(errTxt(r)); toast('Desbloqueado.'); cargar(); });
+  });
+
+  /* ---------- contraseña ---------- */
+  $('f-pass').addEventListener('submit', function(e){
+    e.preventDefault(); var m = $('p-msg');
+    api('cambiar_password', { actual: $('p-act').value, nueva: $('p-new').value }).then(function(r){
+      m.hidden = false; m.className = 'msg ' + (r.ok ? 'ok' : 'err'); m.textContent = r.ok ? 'Contraseña cambiada.' : errTxt(r); if (r.ok) e.target.reset();
+    });
+  });
+
+  /* ---------- inicio ---------- */
+  api('estado').then(function(r){
+    if (!r.ok) { mostrarLogin(true); return; }
+    CSRF = r.csrf;
+    if (r.dentro) cargar(); else mostrarLogin(r.configurado);
+  });
+})();
+</script>
+</body>
+</html>

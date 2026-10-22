@@ -352,6 +352,55 @@ nav.main a[aria-current="page"]{color:var(--primary);text-decoration:underline;t
 .legal{padding-top:3rem;padding-bottom:4rem;font-size:.875rem}
 .legal p{margin:1rem 0;line-height:1.8}
 
+/* ---------- calendario de reservas ---------- */
+.bk{max-width:62rem;display:grid;gap:1.5rem}
+.bk-demo{border-left:3px solid var(--accent);background:var(--muted);padding:.8rem 1rem;border-radius:0 .75rem .75rem 0;font-size:.88rem;color:var(--muted-fg)}
+.bk-section{border-radius:var(--radius-2xl);border:1px solid color-mix(in oklab,var(--primary) 14%,transparent);background:var(--card);padding:1.5rem}
+.bk-h{display:flex;align-items:center;gap:.7rem;font-size:1.4rem;color:var(--primary);margin-bottom:1.1rem}
+.bk-n{display:grid;place-items:center;width:1.9rem;height:1.9rem;border-radius:999px;background:var(--secondary);color:var(--secondary-fg);font-family:var(--font-sans);font-size:.9rem;font-weight:600;flex:0 0 auto}
+.bk-mods{display:grid;gap:.8rem;grid-template-columns:repeat(auto-fit,minmax(min(100%,15rem),1fr))}
+.bk-mod{display:flex;align-items:center;gap:.9rem;text-align:left;padding:1rem;border-radius:1rem;border:1.5px solid var(--border);background:var(--background);transition:border-color .15s,background-color .15s}
+.bk-mod b{display:block;font-weight:600;font-size:1rem;color:var(--foreground)}
+.bk-mod small{display:block;color:var(--muted-fg);font-size:.82rem}
+.bk-mod:hover{border-color:var(--leaf)}
+.bk-mod[aria-checked="true"]{border-color:var(--primary);background:color-mix(in oklab,var(--secondary) 55%,var(--card))}
+.bk-grid{display:grid;gap:1.5rem}
+@media (min-width:820px){.bk-grid{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr)}}
+.bk-grid>*{min-width:0}
+.bk-cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem}
+.bk-cal-head span{font-family:var(--font-display);font-size:1.25rem;color:var(--primary);text-transform:capitalize}
+.bk-nav{display:grid;place-items:center;width:2.4rem;height:2.4rem;border-radius:999px;border:1px solid var(--border);color:var(--primary)}
+.bk-nav:hover:not(:disabled){background:var(--secondary)}
+.bk-nav:disabled{opacity:.35;cursor:default}
+.bk-dow,.bk-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:.3rem;text-align:center}
+.bk-dow span{font-size:.72rem;font-weight:600;letter-spacing:.08em;color:var(--muted-fg);padding:.3rem 0}
+.bk-day{aspect-ratio:1;max-width:100%;border-radius:.75rem;font-size:.95rem;font-variant-numeric:tabular-nums;color:color-mix(in oklab,var(--muted-fg) 55%,transparent);display:grid;place-items:center;position:relative}
+.bk-day.on{color:var(--foreground);background:var(--secondary);font-weight:500;cursor:pointer}
+.bk-day.on::after{content:"";position:absolute;bottom:.32rem;width:.3rem;height:.3rem;border-radius:999px;background:var(--primary)}
+.bk-day.on:hover{background:var(--leaf)}
+.bk-day.sel,.bk-day.sel:hover{background:var(--primary);color:var(--primary-fg)}
+.bk-day.sel::after{background:var(--primary-fg)}
+.bk-day.today{outline:1px solid var(--accent);outline-offset:-1px}
+.bk-legend{margin-top:.8rem;font-size:.78rem;color:var(--muted-fg);display:flex;align-items:center;gap:.4rem}
+.bk-legend .dot{width:.9rem;height:.9rem;border-radius:.3rem;background:var(--secondary);display:inline-block}
+.bk-slots h3{font-size:1.15rem;color:var(--primary);margin-bottom:.9rem}
+.bk-slots h3::first-letter{text-transform:uppercase}
+#bk-step1,#bk-slots,#bk-form,#bk-ok,#formulario{scroll-margin-top:7.5rem}
+.bk-hint{color:var(--muted-fg);font-size:.92rem;padding:1.2rem;border:1px dashed var(--border);border-radius:1rem;text-align:center}
+.bk-times{display:grid;gap:.5rem;grid-template-columns:repeat(auto-fill,minmax(5.2rem,1fr))}
+.bk-time{height:2.6rem;border-radius:.7rem;border:1px solid var(--border);background:var(--background);font-variant-numeric:tabular-nums;font-weight:500;color:var(--primary)}
+.bk-time:hover{border-color:var(--primary)}
+.bk-time[aria-pressed="true"]{background:var(--primary);color:var(--primary-fg);border-color:var(--primary)}
+.bk-sum{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem 1rem;background:var(--secondary);color:var(--secondary-fg);border-radius:1rem;padding:.8rem 1rem;font-weight:500;margin-bottom:.4rem}
+.bk-sum button{margin-left:auto;font-size:.82rem;text-decoration:underline;color:var(--primary)}
+.bk-ok{text-align:center;display:grid;gap:.8rem;justify-items:center;border-radius:var(--radius-2xl);background:var(--secondary);padding:2.5rem 1.5rem}
+.bk-okic{display:grid;place-items:center;width:3.5rem;height:3.5rem;border-radius:999px;background:var(--primary);color:var(--primary-fg)}
+.bk-okic svg{width:1.6rem;height:1.6rem}
+.bk-ok h2{font-size:2rem;color:var(--primary)}
+.bk-oksum{font-family:var(--font-display);font-size:1.25rem;color:var(--secondary-fg)}
+.bk-ok p{max-width:34rem}
+.bk-loading{opacity:.5;pointer-events:none}
+
 /* ---------- shared CTA + next ---------- */
 .cta-band{background:var(--primary);color:var(--primary-fg);text-align:center}
 .cta-band .in{max-width:48rem;margin:0 auto;padding:4rem var(--gutter-r) 4rem var(--gutter-l)}
@@ -405,7 +454,7 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
     <a class="logo" href="#inicio" aria-label="Nutriendo Hábitos"><img src="img/logo.webp" alt="Nutriendo Hábitos"></a>
     <nav class="main" aria-label="Principal"></nav>
     <div style="display:flex;gap:.5rem;align-items:center">
-      <a class="btn btn-primary" href="#contacto">Pide cita <svg class="i" viewBox="0 0 24 24"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg></a>
+      <a class="btn btn-primary" href="#reservar">Pide cita <svg class="i" viewBox="0 0 24 24"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg></a>
       <button class="menu-btn" id="menu-btn" aria-label="Abrir menú" aria-expanded="false"><svg class="i" viewBox="0 0 24 24"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></svg></button>
     </div>
   </div>
@@ -424,7 +473,7 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
       <p class="tag">No es hacer dieta, es aprender a comer.</p>
       <p class="body">Desde hace tiempo estamos demostrando que el éxito no se consigue llevando a cabo una dieta estricta, si no cambiando y consolidando hábitos. Es posible y yo puedo ayudarte a alcanzar tus metas.</p>
       <div class="ctas">
-        <a class="btn btn-accent btn-lg" href="#formulario">Encuentra tu consulta <svg class="i" viewBox="0 0 24 24" data-ic="arrow"></svg></a>
+        <a class="btn btn-accent btn-lg" href="#reservar">Encuentra tu consulta <svg class="i" viewBox="0 0 24 24" data-ic="arrow"></svg></a>
         <a class="ghost-light" href="#especialidades">Mis especialidades <svg class="i" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg></a>
       </div>
     </div>
@@ -716,7 +765,7 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
           <div><svg class="i" viewBox="0 0 24 24" data-ic="wa"></svg><a href="https://wa.me/34669877052?text=Hola%20Andrea%2C%20me%20gustar%C3%ADa%20consultar%20sobre%20nutrici%C3%B3n." target="_blank" rel="noopener">WhatsApp</a></div>
         </div>
         <p class="small" style="line-height:1.7">Cuéntame qué necesitas: si la consulta presencial u online encaja contigo lo vemos juntas al hablar.</p>
-        <div><a class="btn btn-primary btn-sm" href="#formulario">Encuentra tu consulta <svg class="i" viewBox="0 0 24 24" data-ic="arrow"></svg></a></div>
+        <div><a class="btn btn-primary btn-sm" href="#reservar">Reservar cita <svg class="i" viewBox="0 0 24 24" data-ic="arrow"></svg></a></div>
       </article>
     </div>
     <article class="contact-card mail-card" id="formulario">
@@ -724,7 +773,7 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
         <span class="card-icon" data-ic2="send"></span>
         <h2 style="margin-top:1rem">Escríbeme por correo</h2>
         <p>Rellena el formulario y pulsa enviar: me llega directamente y te respondo personalmente. Si lo prefieres, envíamelo por WhatsApp o llámame.</p>
-        <p class="tiny">La cita se acuerda al contactar. No se reserva una consulta desde esta página.</p>
+        <p class="tiny">¿Prefieres elegir tú el día y la hora? <a href="#reservar" style="color:var(--primary);text-decoration:underline">Reserva en el calendario de citas</a>.</p>
       </div>
       <form class="rform" id="rform" novalidate>
         <div class="frow">
@@ -815,10 +864,71 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
       <article class="stmt"><div class="left"><span class="card-icon sq" data-ic2="cal"></span><h3 class="card-title">Seguimiento y educación nutricional</h3></div>
         <div class="oc small"><p>Las revisiones sirven para saber cómo estás, resolver dudas y valorar tu evolución. Revisamos la composición corporal y adaptamos las pautas. Aprender a comer forma parte del proceso: la alimentación debe encajar contigo, no al revés.</p></div></article>
       <article class="stmt"><div class="left"><span class="card-icon sq" data-ic2="video"></span><h3 class="card-title">Consulta presencial en Valladolid u online</h3></div>
-        <div class="oc small"><p>Puedes trabajar conmigo en consulta presencial o mediante <a href="#nutricionista-online">consulta de nutrición online</a>. Si no sabes qué modalidad elegir, escríbeme y lo vemos al hablar.</p><p>Para solicitar información o acordar una cita, contacta en el <strong>669 87 70 52</strong> o en <strong>nutricion.arguello@gmail.com</strong>. La cita se acuerda al contactar; esta página no confirma una reserva.</p></div></article>
+        <div class="oc small"><p>Puedes trabajar conmigo en consulta presencial o mediante <a href="#nutricionista-online">consulta de nutrición online</a>. Si no sabes qué modalidad elegir, escríbeme y lo vemos al hablar.</p><p>Para solicitar información o acordar una cita, contacta en el <strong>669 87 70 52</strong> o en <strong>nutricion.arguello@gmail.com</strong>. También puedes <a href="#reservar">reservar tu cita directamente en el calendario</a>.</p></div></article>
     </div>
   </div>
   <div data-cta data-next="servicios,online,cursos"></div>
+</div>
+
+<!-- ================= RESERVAR CITA ================= -->
+<div data-page="reservar" hidden>
+  <section class="page-hero" data-hero="contacto" data-crumb="Reservar cita" data-ey="Calendario de citas" data-h1="Reserva tu cita" data-lead="Elige consulta presencial en Valladolid u online, el día y la hora. La cita queda confirmada al momento y te llega un email con los detalles." data-extra="booking"></section>
+  <div class="wrap editorial">
+    <div class="bk" id="bk">
+      <p class="bk-demo" id="bk-demo" hidden><strong>Vista previa:</strong> los días y horas son de ejemplo y no se guarda ninguna reserva. El calendario real funciona cuando la web está subida a tu hosting.</p>
+
+      <div class="bk-section" id="bk-step1">
+        <h2 class="bk-h"><span class="bk-n">1</span>¿Dónde nos vemos?</h2>
+        <div class="bk-mods" role="radiogroup" aria-label="Tipo de consulta">
+          <button type="button" class="bk-mod" role="radio" aria-checked="true" data-mod="presencial"><span class="card-icon" data-ic2="pin"></span><span><b>Presencial</b><small>Calle Gregorio Fernández, 4 · Valladolid</small></span></button>
+          <button type="button" class="bk-mod" role="radio" aria-checked="false" data-mod="online"><span class="card-icon" data-ic2="video"></span><span><b>Online</b><small>Por videollamada, desde donde estés</small></span></button>
+        </div>
+      </div>
+
+      <div class="bk-section">
+        <h2 class="bk-h"><span class="bk-n">2</span>Elige día y hora</h2>
+        <div class="bk-grid">
+          <div class="bk-cal" aria-live="polite">
+            <div class="bk-cal-head">
+              <button type="button" class="bk-nav" id="bk-prev" aria-label="Mes anterior"><svg class="i" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>
+              <span id="bk-mes"></span>
+              <button type="button" class="bk-nav" id="bk-next" aria-label="Mes siguiente"><svg class="i" viewBox="0 0 24 24" data-ic="chev"></svg></button>
+            </div>
+            <div class="bk-dow"><span>L</span><span>M</span><span>X</span><span>J</span><span>V</span><span>S</span><span>D</span></div>
+            <div class="bk-days" id="bk-days"></div>
+            <p class="bk-legend"><span class="dot"></span> Días con horas libres · citas de 45 minutos</p>
+          </div>
+          <div class="bk-slots" id="bk-slots"><p class="bk-hint">Elige un día marcado en el calendario para ver las horas libres.</p></div>
+        </div>
+      </div>
+
+      <form class="bk-section rform" id="bk-form" novalidate hidden>
+        <h2 class="bk-h"><span class="bk-n">3</span>Tus datos</h2>
+        <p class="bk-sum" id="bk-sum"></p>
+        <div class="frow">
+          <label for="bk-nombre">Nombre<input id="bk-nombre" name="nombre" autocomplete="given-name" required></label>
+          <label for="bk-apellidos">Apellidos<input id="bk-apellidos" name="apellidos" autocomplete="family-name" required></label>
+        </div>
+        <div class="frow">
+          <label for="bk-tel">Teléfono<input id="bk-tel" name="telefono" type="tel" autocomplete="tel" required></label>
+          <label for="bk-email">Email (te llegará la confirmación)<input id="bk-email" name="email" type="email" autocomplete="email" required></label>
+        </div>
+        <label class="chk" for="bk-priv"><input id="bk-priv" name="privacidad" value="si" type="checkbox" required> He leído la <a href="#proteccion-de-datos">información sobre protección de datos</a>.</label>
+        <label class="hp" for="bk-web" aria-hidden="true">No rellenar<input id="bk-web" name="web" tabindex="-1" autocomplete="off"></label>
+        <p class="ferr" id="bk-err" hidden></p>
+        <div class="fbtns"><button class="btn btn-primary btn-lg" type="submit" id="bk-send">Confirmar cita <svg class="i" viewBox="0 0 24 24" data-ic="check"></svg></button></div>
+      </form>
+
+      <div class="bk-ok" id="bk-ok" hidden role="status">
+        <span class="bk-okic"><svg class="i" viewBox="0 0 24 24" data-ic="check"></svg></span>
+        <h2>¡Cita confirmada!</h2>
+        <p class="bk-oksum" id="bk-oksum"></p>
+        <p id="bk-okmsg">Te he enviado un email con los detalles. Si necesitas cambiarla o anularla, llámame o escríbeme por WhatsApp al 669 87 70 52.</p>
+        <div class="fbtns" style="justify-content:center"><a class="btn btn-outline" href="#inicio">Volver al inicio</a><button type="button" class="btn btn-primary" id="bk-otra">Reservar otra cita</button></div>
+      </div>
+    </div>
+  </div>
+  <div data-cta data-nocta data-next="servicios,online,cursos"></div>
 </div>
 
 <!-- ================= PROTECCIÓN DE DATOS ================= -->
@@ -950,9 +1060,11 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
   var WA = 'https://wa.me/34669877052?text=Hola%20Andrea%2C%20me%20gustar%C3%ADa%20pedir%20cita.%20%C2%BFQu%C3%A9%20huecos%20tienes%20disponibles%3F';
   var MAPS = 'https://maps.google.com/maps?q=Calle%20Gregorio%20Fernandez%204%2C%20Valladolid';
   document.querySelectorAll('.page-hero').forEach(function(h){
-    var d = h.dataset, chips = d.chips.split('|').map(function(c){ return '<li>'+c+'</li>'; }).join('');
-    var ctas = '<a class="btn btn-secondary" href="#formulario">Encuentra tu consulta '+svg('arrow')+'</a>';
-    if (d.extra === 'contact') {
+    var d = h.dataset;
+    var ctas = '<a class="btn btn-secondary" href="#reservar">Encuentra tu consulta '+svg('arrow')+'</a>';
+    if (d.extra === 'booking') {
+      ctas = '<a class="btn btn-wa" href="'+WA+'" target="_blank" rel="noopener">'+svg('wa')+' Escribir por WhatsApp</a><a class="btn btn-outline-light" href="tel:+34669877052">'+svg('phone')+' Llamar</a>';
+    } else if (d.extra === 'contact') {
       ctas += '<a class="btn btn-outline-light" href="'+MAPS+'" target="_blank" rel="noopener">Ver ubicación</a><a class="btn btn-wa" href="'+WA+'" target="_blank" rel="noopener">'+svg('wa')+' Escribir por WhatsApp</a>';
     } else {
       ctas += '<a class="btn btn-outline-light" href="#contacto">Pide tu cita</a>';
@@ -972,7 +1084,7 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
   document.querySelectorAll('[data-cta]').forEach(function(el){
     var html = '';
     if (!el.hasAttribute('data-nocta')) {
-      html += '<section class="cta-band"><div class="in"><p class="ey">Siguiente paso</p><h2>¿Empezamos?</h2><p>Cuéntame qué necesitas y vemos si la consulta presencial u online encaja contigo. La cita se acuerda al contactar: desde aquí no se reserva nada.</p><div class="ctas"><a class="btn btn-secondary" href="#formulario">Encuentra tu consulta '+svg('arrow')+'</a><a class="btn btn-outline-light" href="#contacto">Ir a contacto</a></div></div></section>';
+      html += '<section class="cta-band"><div class="in"><p class="ey">Siguiente paso</p><h2>¿Empezamos?</h2><p>Elige día y hora en el calendario, presencial en Valladolid u online, y la cita queda confirmada al momento. Si tienes dudas, escríbeme.</p><div class="ctas"><a class="btn btn-secondary" href="#reservar">Reservar cita '+svg('arrow')+'</a><a class="btn btn-outline-light" href="#contacto">Ir a contacto</a></div></div></section>';
     }
     html += '<section class="next"><div class="wrap"><p class="ey">Sigue explorando</p><h2>¿Por dónde seguimos?</h2><div class="next-grid">' +
       el.getAttribute('data-next').split(',').map(function(k){ var n = NEXT[k];
@@ -1094,10 +1206,161 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
     rwaopen.click();
   });
 
+  // ---------- calendario de reservas (reservas/api.php) ----------
+  (function(){
+    var API = 'reservas/api.php';
+    var PREVIEW = !/(^|\.)nutriendohabitos\.es$/i.test(location.hostname);
+    var MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+    var NOMBRE_MOD = { presencial: 'Presencial en Valladolid', online: 'Online' };
+    var st = { mod: 'presencial', ym: '', cache: {}, fecha: '', hora: '', hoy: '', hasta: '', demo: false };
+    var $ = function(id){ return document.getElementById(id); };
+    function pad(n){ return (n < 10 ? '0' : '') + n; }
+    function ymOf(d){ return d.getFullYear() + '-' + pad(d.getMonth() + 1); }
+    function iso(d){ return ymOf(d) + '-' + pad(d.getDate()); }
+    function addMonths(ym, n){ var p = ym.split('-'); var d = new Date(+p[0], +p[1] - 1 + n, 1); return ymOf(d); }
+    function fechaLarga(f){ return new Date(f + 'T12:00:00').toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }); }
+    var hoy = new Date(); st.ym = ymOf(hoy); st.hoy = iso(hoy);
+
+    // Datos de ejemplo solo para la vista previa (fuera de nutriendohabitos.es)
+    function demoMes(mod, ym){
+      var p = ym.split('-'), y = +p[0], m = +p[1] - 1, dias = {}, n = new Date(y, m + 1, 0).getDate();
+      var lim = new Date(); lim.setDate(lim.getDate() + 60); var man = new Date(); man.setDate(man.getDate() + 1);
+      var H = mod === 'presencial'
+        ? { 1: [['09:30','13:15'],['16:30','19:30']], 2: [['09:30','13:15']], 4: [['16:30','19:30']] }
+        : { 3: [['10:00','13:45'],['17:00','19:15']], 5: [['10:00','12:15']] };
+      for (var d = 1; d <= n; d++) {
+        var f = new Date(y, m, d); if (f < man || f > lim) continue;
+        var w = f.getDay() || 7, tr = H[w]; if (!tr) continue;
+        var slots = [];
+        tr.forEach(function(t){ var a = +t[0].slice(0,2)*60 + +t[0].slice(3), b = +t[1].slice(0,2)*60 + +t[1].slice(3);
+          for (var x = a; x + 45 <= b; x += 45) if ((d * 7 + x) % 4 !== 0) slots.push(pad(Math.floor(x/60)) + ':' + pad(x%60)); });
+        if (slots.length) dias[iso(f)] = slots;
+      }
+      return { ok: true, dias: dias, hoy: st.hoy, hasta: iso(lim) };
+    }
+
+    function cargarMes(){
+      var key = st.mod + '|' + st.ym;
+      if (st.cache[key]) return Promise.resolve(st.cache[key]);
+      $('bk').classList.add('bk-loading');
+      return fetch(API + '?accion=mes&modalidad=' + st.mod + '&mes=' + st.ym, { headers: { 'Accept': 'application/json' }, cache: 'no-store' })
+        .then(function(r){ if (!r.ok) throw new Error('http'); return r.json(); })
+        .then(function(res){ if (!res || !res.ok) throw new Error('api'); return res; })
+        .catch(function(){
+          if (!PREVIEW) return { ok: false };
+          st.demo = true; $('bk-demo').hidden = false; return demoMes(st.mod, st.ym);
+        })
+        .then(function(res){ $('bk').classList.remove('bk-loading'); if (res.ok) { st.cache[key] = res; st.hoy = res.hoy || st.hoy; st.hasta = res.hasta || st.hasta; } return res; });
+    }
+
+    function pintarMes(){
+      var p = st.ym.split('-'), y = +p[0], m = +p[1] - 1;
+      $('bk-mes').textContent = MESES[m] + ' ' + y;
+      $('bk-prev').disabled = st.ym <= ymOf(new Date());
+      return cargarMes().then(function(res){
+        var cont = $('bk-days');
+        if (!res.ok) {
+          cont.innerHTML = ''; $('bk-slots').innerHTML = '<p class="bk-hint">Ahora mismo no se puede cargar el calendario. Llámame al <a href="tel:+34669877052">669 87 70 52</a> o escríbeme por WhatsApp y buscamos un hueco.</p>';
+          return;
+        }
+        $('bk-next').disabled = !!st.hasta && addMonths(st.ym, 1) > st.hasta.slice(0, 7);
+        var first = new Date(y, m, 1), offset = (first.getDay() + 6) % 7, n = new Date(y, m + 1, 0).getDate(), html = '';
+        for (var i = 0; i < offset; i++) html += '<span></span>';
+        var libres = 0;
+        for (var d = 1; d <= n; d++) {
+          var f = st.ym + '-' + pad(d), on = !!(res.dias[f] && res.dias[f].length);
+          if (on) libres++;
+          var cls = 'bk-day' + (on ? ' on' : '') + (f === st.fecha ? ' sel' : '') + (f === st.hoy ? ' today' : '');
+          html += on ? '<button type="button" class="' + cls + '" data-f="' + f + '" aria-label="' + fechaLarga(f) + ', ' + res.dias[f].length + ' horas libres">' + d + '</button>'
+                     : '<span class="' + cls + '" aria-hidden="true">' + d + '</span>';
+        }
+        cont.innerHTML = html;
+        if (!st.fecha || st.fecha.slice(0, 7) !== st.ym) {
+          $('bk-slots').innerHTML = '<p class="bk-hint">' + (libres ? 'Elige un día marcado en el calendario para ver las horas libres.' : 'No quedan horas libres en ' + MESES[m] + (st.mod === 'online' ? ' para consulta online' : ' para consulta presencial') + '. Prueba el mes siguiente' + (st.mod === 'presencial' ? ' o la consulta online.' : ' o la consulta presencial.')) + '</p>';
+        } else pintarHoras();
+      });
+    }
+
+    function pintarHoras(){
+      var res = st.cache[st.mod + '|' + st.ym], horas = (res && res.dias[st.fecha]) || [];
+      if (!horas.length) { st.fecha = ''; st.hora = ''; return pintarMes(); }
+      $('bk-slots').innerHTML = '<h3>' + fechaLarga(st.fecha) + '</h3><div class="bk-times">' +
+        horas.map(function(h){ return '<button type="button" class="bk-time" data-h="' + h + '" aria-pressed="' + (h === st.hora) + '">' + h + '</button>'; }).join('') + '</div>';
+    }
+
+    function resumen(){
+      $('bk-sum').innerHTML = '<span>' + fechaLarga(st.fecha).replace(/^./, function(c){ return c.toUpperCase(); }) + ' · ' + st.hora + ' · ' + NOMBRE_MOD[st.mod] + '</span><button type="button" id="bk-cambiar">Cambiar</button>';
+      $('bk-cambiar').addEventListener('click', function(){ $('bk-form').hidden = true; $('bk-slots').scrollIntoView({ behavior: 'smooth', block: 'center' }); });
+    }
+
+    function reiniciar(){ st.fecha = ''; st.hora = ''; $('bk-form').hidden = true; $('bk-err').hidden = true; }
+
+    document.querySelectorAll('.bk-mod').forEach(function(b){
+      b.addEventListener('click', function(){
+        if (st.mod === b.dataset.mod) return;
+        st.mod = b.dataset.mod; document.querySelectorAll('.bk-mod').forEach(function(x){ x.setAttribute('aria-checked', x === b); });
+        reiniciar(); pintarMes();
+      });
+    });
+    $('bk-prev').addEventListener('click', function(){ st.ym = addMonths(st.ym, -1); pintarMes(); });
+    $('bk-next').addEventListener('click', function(){ st.ym = addMonths(st.ym, 1); pintarMes(); });
+    $('bk-days').addEventListener('click', function(e){
+      var b = e.target.closest('[data-f]'); if (!b) return;
+      st.fecha = b.dataset.f; st.hora = ''; $('bk-form').hidden = true;
+      document.querySelectorAll('.bk-day.sel').forEach(function(x){ x.classList.remove('sel'); }); b.classList.add('sel');
+      pintarHoras();
+      if (window.innerWidth < 820) $('bk-slots').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    $('bk-slots').addEventListener('click', function(e){
+      var b = e.target.closest('[data-h]'); if (!b) return;
+      st.hora = b.dataset.h;
+      document.querySelectorAll('.bk-time').forEach(function(x){ x.setAttribute('aria-pressed', x === b); });
+      resumen(); $('bk-form').hidden = false; $('bk-err').hidden = true;
+      setTimeout(function(){ $('bk-form').scrollIntoView({ behavior: 'smooth', block: 'start' }); $('bk-nombre').focus({ preventScroll: true }); }, 60);
+    });
+
+    $('bk-form').addEventListener('submit', function(e){
+      e.preventDefault();
+      var v = function(id){ return $(id).value.trim(); }, miss = [], err = $('bk-err');
+      if (!v('bk-nombre')) miss.push('nombre');
+      if (!v('bk-apellidos')) miss.push('apellidos');
+      if (!/^[0-9+()\s.-]{6,30}$/.test(v('bk-tel'))) miss.push('un teléfono válido');
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v('bk-email'))) miss.push('un email válido');
+      if (!$('bk-priv').checked) miss.push('aceptar la protección de datos');
+      if (miss.length) { err.textContent = 'Falta: ' + miss.join(', ') + '.'; err.hidden = false; return; }
+      err.hidden = true;
+      var btn = $('bk-send'), label = btn.innerHTML; btn.disabled = true; btn.textContent = 'Reservando…';
+      var fd = new FormData($('bk-form')); fd.append('accion', 'reservar'); fd.append('modalidad', st.mod); fd.append('fecha', st.fecha); fd.append('hora', st.hora);
+      var envio = st.demo ? new Promise(function(r){ setTimeout(function(){ r({ ok: true, demo: true }); }, 500); })
+        : fetch(API, { method: 'POST', body: fd, headers: { 'Accept': 'application/json' } }).then(function(r){ return r.json().catch(function(){ return { ok: false }; }); });
+      envio.then(function(res){
+        btn.disabled = false; btn.innerHTML = label;
+        if (!res || !res.ok) {
+          var MSG = { ocupado: 'Vaya, esa hora se acaba de ocupar. Elige otra, por favor.', limite: 'Has hecho varias reservas seguidas. Si necesitas otra cita, llámame al 669 87 70 52.', datos: 'Revisa tus datos: falta algo o no es válido.' };
+          err.textContent = MSG[res && res.error] || 'No se ha podido reservar. Prueba otra vez o llámame al 669 87 70 52.'; err.hidden = false;
+          if (res && res.error === 'ocupado') { delete st.cache[st.mod + '|' + st.ym]; st.hora = ''; $('bk-form').hidden = true; pintarMes(); }
+          return;
+        }
+        $('bk-oksum').textContent = fechaLarga(st.fecha).replace(/^./, function(c){ return c.toUpperCase(); }) + ' a las ' + st.hora + ' · ' + NOMBRE_MOD[st.mod];
+        $('bk-okmsg').textContent = res.demo ? 'Esto es una vista previa: no se ha guardado ni enviado nada. En la web real, el paciente recibe un email de confirmación y a ti te llega un aviso con el asunto «RESERVA WEB».' : 'Te he enviado un email con los detalles. Si necesitas cambiarla o anularla, llámame o escríbeme por WhatsApp al 669 87 70 52.';
+        document.querySelectorAll('#bk > .bk-section, #bk-form').forEach(function(x){ x.hidden = true; });
+        $('bk-ok').hidden = false; $('bk-ok').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        delete st.cache[st.mod + '|' + st.ym]; $('bk-form').reset();
+      });
+    });
+    $('bk-otra').addEventListener('click', function(){
+      $('bk-ok').hidden = true; document.querySelectorAll('#bk > .bk-section').forEach(function(x){ x.hidden = false; });
+      reiniciar(); pintarMes(); $('bk-step1').scrollIntoView({ behavior: 'smooth' });
+    });
+
+    var iniciado = false;
+    window.__bkInit = function(){ if (iniciado) return; iniciado = true; pintarMes(); };
+  })();
+
   // ---------- routing ----------
   var pages = [].slice.call(document.querySelectorAll('[data-page]'));
   var names = pages.map(function(p){ return p.getAttribute('data-page'); });
-  var ALIAS = {'servicios':'dietista-nutricionista-en-valladolid','online':'nutricionista-online','asesoria':'asesoria-externa','colaboraciones':'publicaciones','cursos':'cursos-talleres','blog':'blog-nutricion','todos-los-servicios':'nuestros-servicios','nutricion-deportiva':'nutricion-deportiva-valladolid','privacidad':'proteccion-de-datos'};
+  var ALIAS = {'reserva':'reservar','cita':'reservar','servicios':'dietista-nutricionista-en-valladolid','online':'nutricionista-online','asesoria':'asesoria-externa','colaboraciones':'publicaciones','cursos':'cursos-talleres','blog':'blog-nutricion','todos-los-servicios':'nuestros-servicios','nutricion-deportiva':'nutricion-deportiva-valladolid','privacidad':'proteccion-de-datos'};
   var NAVMAP = {'nuestros-servicios':'dietista-nutricionista-en-valladolid','nutricion-deportiva-valladolid':'dietista-nutricionista-en-valladolid','tips':'blog-nutricion'};
   var current = null;
   function route(){
@@ -1111,6 +1374,7 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
     if (target !== current) {
       pages.forEach(function(p){ var on = p.getAttribute('data-page') === target; p.hidden = !on; if(on){ p.style.animation='none'; void p.offsetWidth; p.style.animation=''; } });
       current = target;
+      if (target === 'reservar' && window.__bkInit) window.__bkInit();
     }
     var navKey = NAVMAP[target] || target;
     document.querySelectorAll('[data-nav]').forEach(function(a){ if (a.getAttribute('data-nav') === navKey) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current'); });
