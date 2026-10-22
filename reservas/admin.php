@@ -79,6 +79,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             session_destroy();
             json_salida(['ok' => true]);
 
+        case 'historial':
+            $todas = cargar_reservas();
+            usort($todas, fn($a, $b) => strcmp($b['fecha'] . $b['hora'], $a['fecha'] . $a['hora']));
+            json_salida(['ok' => true, 'citas' => $todas, 'hoy' => date('Y-m-d')]);
+
         case 'datos':
             $desde = date('Y-m-d', strtotime('-30 days'));
             $citas = array_values(array_filter(cargar_reservas(), fn($r) => $r['fecha'] >= $desde));
@@ -219,6 +224,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     json_salida(['ok' => false, 'error' => 'accion'], 400);
 }
 
+/* ======================= Descargar citas (Excel / CSV) ======================= */
+if (isset($_GET['exportar'])) {
+    if (empty($_SESSION['dentro'])) {
+        http_response_code(401);
+        header('Content-Type: text/plain; charset=utf-8');
+        echo 'Tienes que entrar en el panel para descargar las citas.';
+        exit;
+    }
+    $citas = cargar_reservas();
+    usort($citas, fn($a, $b) => strcmp($b['fecha'] . $b['hora'], $a['fecha'] . $a['hora']));
+    // Evita que Excel interprete un campo como fórmula
+    $celda = function ($v): string {
+        $v = (string)$v;
+        if ($v !== '' && strpbrk($v[0], '=+-@') !== false) {
+            $v = "'" . $v;
+        }
+        return $v;
+    };
+    header('Content-Type: text/csv; charset=utf-8');
+    header('Content-Disposition: attachment; filename="citas-nutriendo-habitos-' . date('Y-m-d') . '.csv"');
+    header('Cache-Control: no-store');
+    $out = fopen('php://output', 'w');
+    fwrite($out, "\xEF\xBB\xBF"); // para que Excel lea bien las tildes
+    fputcsv($out, ['Fecha', 'Día', 'Hora', 'Consulta', 'Nombre', 'Apellidos', 'Teléfono', 'Email', 'Estado', 'Origen', 'Reservada el', 'Anulada el'], ';');
+    $dias = ['', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'];
+    foreach ($citas as $c) {
+        fputcsv($out, array_map($celda, [
+            date('d/m/Y', strtotime($c['fecha'])),
+            $dias[(int)date('N', strtotime($c['fecha'] . ' 12:00'))],
+            $c['hora'],
+            MODALIDADES[$c['modalidad']] ?? $c['modalidad'],
+            $c['nombre'] ?? '', $c['apellidos'] ?? '', $c['telefono'] ?? '', $c['email'] ?? '',
+            ($c['estado'] ?? '') === 'confirmada' ? 'Confirmada' : 'Anulada',
+            ($c['origen'] ?? '') === 'panel' ? 'Añadida en el panel' : 'Web',
+            !empty($c['creada']) ? date('d/m/Y H:i', strtotime($c['creada'])) : '',
+            !empty($c['cancelada']) ? date('d/m/Y H:i', strtotime($c['cancelada'])) : '',
+        ]), ';');
+    }
+    fclose($out);
+    exit;
+}
+
 /* ======================= Página del panel ======================= */
 header('Content-Type: text/html; charset=utf-8');
 header('Cache-Control: no-store');
@@ -244,7 +291,7 @@ button,input,select{font:inherit;color:inherit}
 header{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1rem 0;border-bottom:1px solid var(--border);margin-bottom:1.5rem}
 header .brand{display:flex;align-items:center;gap:.75rem}
 header img{width:3.2rem;height:3.2rem;object-fit:contain}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;height:2.4rem;padding:0 1.1rem;border-radius:999px;border:1px solid transparent;background:var(--primary);color:var(--primary-fg);font-weight:500;font-size:.9rem;cursor:pointer;white-space:nowrap}
+.btn{text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:.4rem;height:2.4rem;padding:0 1.1rem;border-radius:999px;border:1px solid transparent;background:var(--primary);color:var(--primary-fg);font-weight:500;font-size:.9rem;cursor:pointer;white-space:nowrap}
 .btn:hover{filter:brightness(1.08)}
 .btn.sec{background:var(--card);color:var(--primary);border-color:var(--border)}
 .btn.sm{height:2rem;padding:0 .8rem;font-size:.82rem}
@@ -291,6 +338,16 @@ input,select{height:2.4rem;border:1px solid var(--border);border-radius:.6rem;ba
 .list li{display:flex;flex-wrap:wrap;gap:.5rem 1rem;align-items:center;justify-content:space-between;padding:.6rem 0;border-top:1px solid var(--border)}
 .list{list-style:none;margin:0;padding:0}
 .list li:first-child{border-top:0}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:.8rem}
+.tbl{width:100%;border-collapse:collapse;font-size:.88rem;min-width:44rem}
+.tbl th{text-align:left;font-weight:600;font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-fg);background:var(--muted);padding:.6rem .75rem;position:sticky;top:0}
+.tbl td{padding:.6rem .75rem;border-top:1px solid var(--border);vertical-align:top}
+.tbl td.n{font-variant-numeric:tabular-nums;white-space:nowrap}
+.tbl tr.anulada td{color:var(--muted-fg)}
+.tbl tr.anulada td.p{text-decoration:line-through}
+.tbl mark{background:var(--secondary);color:inherit;border-radius:.2rem;padding:0 .1rem}
+.est{font-size:.72rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:.15rem .5rem;border-radius:999px;background:var(--secondary);color:var(--secondary-fg);white-space:nowrap}
+.est.no{background:#F3E4E1;color:var(--danger)}
 .muted{color:var(--muted-fg);font-size:.88rem}
 .sticky{position:sticky;bottom:0;padding:.8rem 0;background:linear-gradient(transparent,var(--bg) 35%);display:flex;gap:.75rem;align-items:center;flex-wrap:wrap}
 .toast{position:fixed;left:50%;bottom:1.25rem;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:.6rem 1rem;border-radius:999px;font-size:.9rem;z-index:10}
@@ -325,6 +382,7 @@ input,select{height:2.4rem;border:1px solid var(--border);border-radius:.6rem;ba
       <button role="tab" aria-selected="true" data-tab="citas">Citas</button>
       <button role="tab" aria-selected="false" data-tab="horario">Horario</button>
       <button role="tab" aria-selected="false" data-tab="bloqueos">Días bloqueados</button>
+      <button role="tab" aria-selected="false" data-tab="historial">Historial</button>
       <button role="tab" aria-selected="false" data-tab="ajustes">Ajustes</button>
     </div>
 
@@ -389,6 +447,24 @@ input,select{height:2.4rem;border:1px solid var(--border);border-radius:.6rem;ba
           </form>
         </div>
         <div class="card"><h2 style="font-size:1.2rem;margin-bottom:.5rem">Días bloqueados</h2><ul class="list" id="bloq-list"></ul></div>
+      </div>
+    </div>
+
+    <!-- HISTORIAL -->
+    <div data-panel="historial" hidden>
+      <div class="card" style="display:grid;gap:1rem">
+        <div class="row" style="align-items:end">
+          <label for="h-q" style="flex:2 1 16rem">Buscar paciente<input id="h-q" type="search" placeholder="Nombre, apellidos, teléfono o email" autocomplete="off"></label>
+          <label for="h-est" style="flex:1 1 10rem">Mostrar<select id="h-est"><option value="todas">Todas</option><option value="confirmada">Confirmadas</option><option value="cancelada">Anuladas</option></select></label>
+          <label for="h-cuando" style="flex:1 1 10rem">Fechas<select id="h-cuando"><option value="todas">Todas</option><option value="pasadas">Pasadas</option><option value="proximas">Próximas</option></select></label>
+          <a class="btn" href="admin.php?exportar=1" id="h-excel" style="flex:0 0 auto">Descargar en Excel</a>
+        </div>
+        <p class="muted" id="h-count" style="margin:0"></p>
+        <div class="tbl-wrap"><table class="tbl">
+          <thead><tr><th>Fecha</th><th>Hora</th><th>Consulta</th><th>Paciente</th><th>Contacto</th><th>Estado</th></tr></thead>
+          <tbody id="h-body"></tbody>
+        </table></div>
+        <p class="muted" style="margin:0">El archivo de Excel incluye todas las citas, también las anuladas. Guárdalo de vez en cuando como copia de seguridad.</p>
       </div>
     </div>
 
@@ -587,6 +663,40 @@ input,select{height:2.4rem;border:1px solid var(--border);border-radius:.6rem;ba
     var b = e.target.closest('[data-unbloq]'); if (!b) return;
     api('quitar_bloqueo', { id: b.getAttribute('data-unbloq') }).then(function(r){ if (!r.ok) return toast(errTxt(r)); toast('Desbloqueado.'); cargar(); });
   });
+
+  /* ---------- historial ---------- */
+  var HIST = null;
+  function norm(t){ return String(t || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, ' '); }
+  function cargarHistorial(){
+    return api('historial').then(function(r){ if (!r.ok) return toast(errTxt(r)); HIST = r; pintarHistorial(); });
+  }
+  function resaltar(texto, q){
+    var t = esc(texto); if (!q) return t;
+    var i = norm(texto).indexOf(q); if (i < 0) return t;
+    return esc(texto.slice(0, i)) + '<mark>' + esc(texto.slice(i, i + q.length)) + '</mark>' + esc(texto.slice(i + q.length));
+  }
+  function pintarHistorial(){
+    if (!HIST) return;
+    var q = norm($('h-q').value.trim()), est = $('h-est').value, cuando = $('h-cuando').value;
+    var lista = HIST.citas.filter(function(c){
+      if (est !== 'todas' && c.estado !== est) return false;
+      if (cuando === 'pasadas' && c.fecha >= HIST.hoy) return false;
+      if (cuando === 'proximas' && c.fecha < HIST.hoy) return false;
+      if (!q) return true;
+      return norm([c.nombre, c.apellidos, c.telefono, c.email].join(' ')).indexOf(q) >= 0 || norm(c.telefono).replace(/\D/g, '').indexOf(q.replace(/\D/g, '') || '§') >= 0;
+    });
+    var conf = lista.filter(function(c){ return c.estado === 'confirmada'; }).length;
+    $('h-count').textContent = lista.length ? lista.length + (lista.length === 1 ? ' cita' : ' citas') + ' · ' + conf + ' confirmada' + (conf === 1 ? '' : 's') + ', ' + (lista.length - conf) + ' anulada' + (lista.length - conf === 1 ? '' : 's') : '';
+    $('h-body').innerHTML = lista.length ? lista.map(function(c){
+      var ok = c.estado === 'confirmada', nombre = (c.nombre + ' ' + (c.apellidos || '')).trim();
+      return '<tr class="' + (ok ? '' : 'anulada') + '"><td class="n">' + esc(fechaCorta(c.fecha)) + '</td><td class="n">' + esc(c.hora) + '</td><td>' + esc(MOD[c.modalidad]) + '</td>' +
+        '<td class="p">' + resaltar(nombre, q) + (c.origen === 'panel' ? '<br><span class="muted">Añadida por ti</span>' : '') + '</td>' +
+        '<td>' + resaltar(c.telefono || '', q) + (c.email ? '<br>' + resaltar(c.email, q) : '') + '</td>' +
+        '<td><span class="est' + (ok ? '' : ' no') + '">' + (ok ? 'Confirmada' : 'Anulada') + '</span></td></tr>';
+    }).join('') : '<tr><td colspan="6" class="muted" style="text-align:center;padding:1.5rem">' + (HIST.citas.length ? 'No hay citas que coincidan con la búsqueda.' : 'Todavía no hay ninguna cita.') + '</td></tr>';
+  }
+  ['h-q', 'h-est', 'h-cuando'].forEach(function(id){ $(id).addEventListener('input', pintarHistorial); });
+  document.querySelector('[data-tab="historial"]').addEventListener('click', cargarHistorial);
 
   /* ---------- contraseña ---------- */
   $('f-pass').addEventListener('submit', function(e){
