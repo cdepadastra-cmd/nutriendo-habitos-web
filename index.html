@@ -342,6 +342,8 @@ nav.main a[aria-current="page"]{color:var(--primary);text-decoration:underline;t
 .rform .chk input{margin-top:.2rem;accent-color:var(--primary)}
 .rform .chk a{color:var(--primary);text-decoration:underline}
 .fbtns{display:flex;flex-wrap:wrap;gap:.6rem}
+.rform .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.rform{position:relative}
 [hidden]{display:none!important}
 .ferr{font-size:.85rem;color:oklch(50% .17 27)}
 .fdone{display:grid;gap:.7rem;border-radius:1rem;background:var(--secondary);padding:1rem;font-size:.88rem;line-height:1.6}
@@ -721,7 +723,7 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
       <div class="txt">
         <span class="card-icon" data-ic2="send"></span>
         <h2 style="margin-top:1rem">Escríbeme por correo</h2>
-        <p>Rellena el formulario y elige cómo enviármelo: por email o por WhatsApp. El mensaje llega ya con tus datos y te respondo personalmente.</p>
+        <p>Rellena el formulario y pulsa enviar: me llega directamente y te respondo personalmente. Si lo prefieres, envíamelo por WhatsApp o llámame.</p>
         <p class="tiny">La cita se acuerda al contactar. No se reserva una consulta desde esta página.</p>
       </div>
       <form class="rform" id="rform" novalidate>
@@ -739,16 +741,16 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
           <label for="rf-tema">¿Qué te gustaría trabajar?
             <select id="rf-tema" name="tema"><option>Tratamiento de patologías</option><option>Sobrepeso, obesidad y ganancia de peso</option><option>Nutrición deportiva</option><option>Vegetariana y vegana</option><option>Otros</option></select></label>
         </div>
-        <label class="chk" for="rf-priv"><input id="rf-priv" type="checkbox" required> He leído la <a href="#proteccion-de-datos">información sobre protección de datos</a>.</label>
+        <label class="chk" for="rf-priv"><input id="rf-priv" name="privacidad" value="si" type="checkbox" required> He leído la <a href="#proteccion-de-datos">información sobre protección de datos</a>.</label>
+        <label class="hp" for="rf-web" aria-hidden="true">No rellenar<input id="rf-web" name="web" type="text" tabindex="-1" autocomplete="off"></label>
         <p class="ferr" id="rf-err" hidden></p>
-        <div class="fbtns"><button class="btn btn-primary" type="submit" id="rf-send-mail">Enviar por email <svg class="i" viewBox="0 0 24 24" data-ic="mail"></svg></button><button class="btn btn-wa" type="button" id="rf-send-wa"><svg class="i" viewBox="0 0 24 24" data-ic="wa"></svg> Enviar por WhatsApp</button></div>
-        <div class="fdone" id="rf-wadone" hidden><p><strong>Se ha abierto WhatsApp con tu mensaje.</strong> Revisa que esté todo bien y pulsa enviar.</p><div><a class="btn btn-wa btn-sm" id="rf-wa-open" href="#" target="_blank" rel="noopener">Abrir WhatsApp otra vez</a></div></div>
-        <div class="fdone" id="rf-done" hidden>
-          <p><strong>Tu mensaje está preparado.</strong> Se ha abierto tu programa de correo con el asunto «RESERVA WEB». Solo tienes que pulsar enviar.</p>
-          <p>¿No se ha abierto? Copia el mensaje y envíalo a <span class="sel">nutricion.arguello@gmail.com</span> con el asunto «RESERVA WEB».</p>
-          <div style="display:flex;flex-wrap:wrap;gap:.5rem"><button class="btn btn-outline btn-sm" type="button" id="rf-copy">Copiar mensaje</button><a class="btn btn-outline btn-sm" id="rf-open" href="#">Abrir el correo otra vez</a></div>
-          <pre id="rf-preview"></pre>
+        <div class="fbtns">
+          <button class="btn btn-primary" type="submit" id="rf-send-mail">Enviar <svg class="i" viewBox="0 0 24 24" data-ic="send"></svg></button>
+          <button class="btn btn-wa" type="button" id="rf-send-wa"><svg class="i" viewBox="0 0 24 24" data-ic="wa"></svg> Enviar por WhatsApp</button>
+          <a class="btn btn-outline" href="tel:+34669877052"><svg class="i" viewBox="0 0 24 24" data-ic="phone"></svg> Llamar al 669 87 70 52</a>
         </div>
+        <div class="fdone" id="rf-wadone" hidden><p><strong>Se ha abierto WhatsApp con tu mensaje.</strong> Revisa que esté todo bien y pulsa enviar.</p><div><a class="btn btn-wa btn-sm" id="rf-wa-open" href="#" target="_blank" rel="noopener">Abrir WhatsApp otra vez</a></div></div>
+        <div class="fdone" id="rf-done" hidden role="status"><p><strong>¡Mensaje enviado!</strong> Gracias, te contestaré lo antes posible para acordar la cita.</p></div>
       </form>
     </article>
   </div>
@@ -1047,10 +1049,9 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
   function ctab(p){ ctp.setAttribute('aria-selected',p); ctq.setAttribute('aria-selected',!p); document.getElementById('cp-prox').hidden=!p; document.getElementById('cp-past').hidden=p; }
   ctp.addEventListener('click', function(){ ctab(true); }); ctq.addEventListener('click', function(){ ctab(false); });
 
-  // ---------- formulario de reserva -> correo con asunto "RESERVA WEB" ----------
+  // ---------- formulario de reserva: se envía con enviar.php (asunto "RESERVA WEB") o por WhatsApp ----------
   var TO = 'nutricion.arguello@gmail.com', SUBJECT = 'RESERVA WEB';
   var rf = document.getElementById('rform'), rerr = document.getElementById('rf-err'), rdone = document.getElementById('rf-done');
-  var ropen = document.getElementById('rf-open'), rprev = document.getElementById('rf-preview');
   function v(id){ return document.getElementById(id).value.trim(); }
   var rwadone = document.getElementById('rf-wadone'), rwaopen = document.getElementById('rf-wa-open');
   function check(needEmail){
@@ -1067,14 +1068,23 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
     return 'Nombre: ' + v('rf-nombre') + '\nApellidos: ' + v('rf-apellidos') + '\nTeléfono: ' + v('rf-tel') +
       (v('rf-email') ? '\nEmail: ' + v('rf-email') : '') + '\nConsulta: ' + v('rf-modo') + '\nQuiero trabajar: ' + v('rf-tema');
   }
+  var rsend = document.getElementById('rf-send-mail');
   rf.addEventListener('submit', function(e){
     e.preventDefault();
     if (!check(true)) return;
-    var body = datos();
-    ropen.href = 'mailto:' + TO + '?subject=' + encodeURIComponent(SUBJECT) + '&body=' + encodeURIComponent(body);
-    rprev.textContent = 'Para: ' + TO + '\nAsunto: ' + SUBJECT + '\n\n' + body;
-    rwadone.hidden = true; rdone.hidden = false;
-    ropen.click();
+    rdone.hidden = true; rwadone.hidden = true;
+    var label = rsend.innerHTML; rsend.disabled = true; rsend.textContent = 'Enviando…';
+    fetch('enviar.php', { method: 'POST', body: new FormData(rf), headers: { 'Accept': 'application/json' } })
+      .then(function(r){ return r.json().catch(function(){ return { ok: false }; }); })
+      .then(function(res){
+        if (!res || !res.ok) throw new Error('fallo');
+        rf.reset(); rdone.hidden = false;
+      })
+      .catch(function(){
+        rerr.textContent = 'No se ha podido enviar el mensaje. Prueba otra vez, escríbeme por WhatsApp o llámame al 669 87 70 52.';
+        rerr.hidden = false;
+      })
+      .then(function(){ rsend.disabled = false; rsend.innerHTML = label; });
   });
   document.getElementById('rf-send-wa').addEventListener('click', function(){
     if (!check(false)) return;
@@ -1082,12 +1092,6 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
     rwaopen.href = 'https://wa.me/34669877052?text=' + encodeURIComponent(text);
     rdone.hidden = true; rwadone.hidden = false;
     rwaopen.click();
-  });
-  document.getElementById('rf-copy').addEventListener('click', function(){
-    var b = this, t = rprev.textContent;
-    function ok(){ b.textContent = 'Copiado'; setTimeout(function(){ b.textContent = 'Copiar mensaje'; }, 1800); }
-    function fb(){ var r=document.createRange(); r.selectNodeContents(rprev); var s=getSelection(); s.removeAllRanges(); s.addRange(r); }
-    try { navigator.clipboard.writeText(t).then(ok, fb); } catch(e){ fb(); }
   });
 
   // ---------- routing ----------
