@@ -15,6 +15,19 @@ const DURACION    = 45;                     // minutos por cita
 const TELEFONO    = '669 87 70 52';
 const DIRECCION   = 'Calle Gregorio Fernández, nº4, 47006 Valladolid';
 const MODALIDADES = ['presencial' => 'Presencial en Valladolid', 'online' => 'Online'];
+const MOTIVOS     = [
+    'Nutrición deportiva',
+    'Nutrición oncológica',
+    'Pérdida de peso / adelgazamiento',
+    'Ganancia de peso',
+    'Patología digestiva (SIBO, intolerancias, celiaquía…)',
+    'Diabetes y otras patologías',
+    'Trastornos de la conducta alimentaria (TCA)',
+    'Alimentación vegetariana o vegana',
+    'Alimentación infantil',
+    'Educación nutricional / hábitos saludables',
+    'Otros',
+];
 const DIR_DATOS   = __DIR__ . '/datos';
 const CABECERA_PROTEGIDA = "<?php http_response_code(404); exit; ?>\n";
 
@@ -74,6 +87,8 @@ function config_por_defecto(): array {
         'password'         => '',
         'horario'          => ['presencial' => $semana, 'online' => $semana],
         'bloqueos'         => [],   // [{id, desde, hasta, modalidad: todas|presencial|online, nota}]
+        'especiales'       => [],   // días con horario distinto al semanal: [{id, fecha, modalidad, tramos: [[ini, fin], ...]}]
+        'abierto_hasta'    => '',   // última fecha que se puede reservar (vacío = usar dias_vista)
         'antelacion_horas' => 24,   // no se puede reservar con menos antelación
         'dias_vista'       => 60,   // cuántos días hacia delante se puede reservar
     ];
@@ -131,6 +146,28 @@ function json_salida(array $datos, int $codigo = 200): void {
 
 /* ---------- disponibilidad ---------- */
 
+/**
+ * Última fecha reservable. Si Andrea ha puesto «Reservas abiertas hasta», manda esa fecha
+ * (como mucho un año); si no, se usan los «días por delante» de Ajustes.
+ */
+function fecha_limite(array $cfg): string {
+    $hasta = (string)($cfg['abierto_hasta'] ?? '');
+    if (es_fecha($hasta)) {
+        return min($hasta, date('Y-m-d', strtotime('+365 days')));
+    }
+    return date('Y-m-d', strtotime('+' . (int)$cfg['dias_vista'] . ' days'));
+}
+
+/** Tramos de un día: los del horario especial de esa fecha si existe; si no, los del horario semanal. */
+function tramos_del_dia(array $cfg, string $fecha, string $modalidad): array {
+    foreach ($cfg['especiales'] ?? [] as $e) {
+        if ($e['fecha'] === $fecha && $e['modalidad'] === $modalidad) {
+            return $e['tramos'];
+        }
+    }
+    return $cfg['horario'][$modalidad][date('N', strtotime($fecha . ' 12:00'))] ?? [];
+}
+
 function dia_bloqueado(array $cfg, string $fecha, string $modalidad): bool {
     foreach ($cfg['bloqueos'] as $b) {
         if ($fecha >= $b['desde'] && $fecha <= $b['hasta']
@@ -150,17 +187,16 @@ function huecos_del_dia(array $cfg, array $reservas, string $fecha, string $moda
         return [];
     }
     $hoy = date('Y-m-d');
-    $limite = date('Y-m-d', strtotime('+' . (int)$cfg['dias_vista'] . ' days'));
+    $limite = fecha_limite($cfg);
     if ($fecha < $hoy || $fecha > $limite) {
         return [];
     }
-    $diaSemana = date('N', strtotime($fecha . ' 12:00'));
-    $tramos = $cfg['horario'][$modalidad][$diaSemana] ?? [];
+    $tramos = tramos_del_dia($cfg, $fecha, $modalidad);
     $minimo = time() + (int)$cfg['antelacion_horas'] * 3600;
 
     $ocupado = [];
     foreach ($reservas as $r) {
-        if ($r['fecha'] === $fecha && ($r['estado'] ?? '') === 'confirmada') {
+        if ($r['fecha'] === $fecha && ocupa_hueco($r)) {
             $ini = minutos($r['hora']);
             $ocupado[] = [$ini, $ini + DURACION];
         }
@@ -186,11 +222,16 @@ function huecos_del_dia(array $cfg, array $reservas, string $fecha, string $moda
     return array_values(array_unique($libres));
 }
 
-/** Comprueba si un hueco choca con otra cita confirmada (para citas añadidas a mano). */
+/** Una cita pendiente de confirmar también ocupa el hueco, para que nadie más lo coja. */
+function ocupa_hueco(array $r): bool {
+    return in_array($r['estado'] ?? '', ['pendiente', 'confirmada'], true);
+}
+
+/** Comprueba si un hueco choca con otra cita pendiente o confirmada (para citas añadidas a mano). */
 function choca_con_cita(array $reservas, string $fecha, string $hora, string $ignorarId = ''): bool {
     $t = minutos($hora);
     foreach ($reservas as $r) {
-        if ($r['id'] === $ignorarId || $r['fecha'] !== $fecha || ($r['estado'] ?? '') !== 'confirmada') {
+        if ($r['id'] === $ignorarId || $r['fecha'] !== $fecha || !ocupa_hueco($r)) {
             continue;
         }
         $a = minutos($r['hora']);
@@ -219,7 +260,30 @@ function enviar_correo(string $para, string $asunto, string $cuerpo, string $res
 function texto_cita(array $r): string {
     return "Día: " . fecha_larga($r['fecha']) . "\n"
          . "Hora: " . $r['hora'] . " (" . DURACION . " minutos)\n"
-         . "Consulta: " . MODALIDADES[$r['modalidad']] . "\n";
+         . "Consulta: " . MODALIDADES[$r['modalidad']] . "\n"
+         . (!empty($r['motivo']) ? "Motivo: " . $r['motivo'] . "\n" : '');
+}
+
+/** Correo de confirmación definitiva para el paciente (lo envía Andrea desde el panel). */
+function correo_confirmacion(array $cita): bool {
+    if (empty($cita['email'])) {
+        return false;
+    }
+    $lugar = $cita['modalidad'] === 'presencial'
+        ? "Lugar: " . DIRECCION . "\n"
+        : "Antes de la cita te enviaré el enlace de la videollamada.\n";
+    return enviar_correo($cita['email'], 'Cita confirmada · ' . NOMBRE_WEB,
+        "Hola {$cita['nombre']}:\n\nTu cita con Andrea Argüello ha quedado confirmada.\n\n"
+        . texto_cita($cita) . $lugar . "\n"
+        . "Si necesitas cambiarla o anularla, llámame o escríbeme por WhatsApp al " . TELEFONO . ".\n\n"
+        . "Un saludo,\nAndrea Argüello · " . NOMBRE_WEB . "\n",
+        DESTINO);
+}
+
+function url_panel(): string {
+    $host = preg_replace('/[^a-z0-9.\-:]/i', '', (string)($_SERVER['HTTP_HOST'] ?? 'nutriendohabitos.es'));
+    $dir = rtrim(str_replace('\\', '/', dirname((string)($_SERVER['SCRIPT_NAME'] ?? '/reservas/api.php'))), '/');
+    return 'https://' . $host . $dir . '/admin.php';
 }
 
 /* ---------- límite de peticiones por IP ---------- */

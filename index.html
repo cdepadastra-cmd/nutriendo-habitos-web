@@ -872,7 +872,7 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
 
 <!-- ================= RESERVAR CITA ================= -->
 <div data-page="reservar" hidden>
-  <section class="page-hero" data-hero="contacto" data-crumb="Reservar cita" data-ey="Calendario de citas" data-h1="Reserva tu cita" data-lead="Elige consulta presencial en Valladolid u online, el día y la hora. La cita queda confirmada al momento y te llega un email con los detalles." data-extra="booking"></section>
+  <section class="page-hero" data-hero="contacto" data-crumb="Reservar cita" data-ey="Calendario de citas" data-h1="Reserva tu cita" data-lead="Elige consulta presencial en Valladolid u online, el día y la hora. Tu hora queda reservada al momento y te confirmo la cita por email." data-extra="booking"></section>
   <div class="wrap editorial">
     <div class="bk" id="bk">
       <p class="bk-demo" id="bk-demo" hidden><strong>Vista previa:</strong> los días y horas son de ejemplo y no se guarda ninguna reserva. El calendario real funciona cuando la web está subida a tu hosting.</p>
@@ -913,17 +913,31 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
           <label for="bk-tel">Teléfono<input id="bk-tel" name="telefono" type="tel" autocomplete="tel" required></label>
           <label for="bk-email">Email (te llegará la confirmación)<input id="bk-email" name="email" type="email" autocomplete="email" required></label>
         </div>
+        <label for="bk-motivo">Motivo de la consulta<select id="bk-motivo" name="motivo" required>
+          <option value="">Elige una opción</option>
+          <option>Nutrición deportiva</option>
+          <option>Nutrición oncológica</option>
+          <option>Pérdida de peso / adelgazamiento</option>
+          <option>Ganancia de peso</option>
+          <option>Patología digestiva (SIBO, intolerancias, celiaquía…)</option>
+          <option>Diabetes y otras patologías</option>
+          <option>Trastornos de la conducta alimentaria (TCA)</option>
+          <option>Alimentación vegetariana o vegana</option>
+          <option>Alimentación infantil</option>
+          <option>Educación nutricional / hábitos saludables</option>
+          <option>Otros</option>
+        </select></label>
         <label class="chk" for="bk-priv"><input id="bk-priv" name="privacidad" value="si" type="checkbox" required> He leído la <a href="#proteccion-de-datos">información sobre protección de datos</a>.</label>
         <label class="hp" for="bk-web" aria-hidden="true">No rellenar<input id="bk-web" name="web" tabindex="-1" autocomplete="off"></label>
         <p class="ferr" id="bk-err" hidden></p>
-        <div class="fbtns"><button class="btn btn-primary btn-lg" type="submit" id="bk-send">Confirmar cita <svg class="i" viewBox="0 0 24 24" data-ic="check"></svg></button></div>
+        <div class="fbtns"><button class="btn btn-primary btn-lg" type="submit" id="bk-send">Reservar cita <svg class="i" viewBox="0 0 24 24" data-ic="check"></svg></button></div>
       </form>
 
       <div class="bk-ok" id="bk-ok" hidden role="status">
         <span class="bk-okic"><svg class="i" viewBox="0 0 24 24" data-ic="check"></svg></span>
-        <h2>¡Cita confirmada!</h2>
+        <h2>¡Hora reservada!</h2>
         <p class="bk-oksum" id="bk-oksum"></p>
-        <p id="bk-okmsg">Te he enviado un email con los detalles. Si necesitas cambiarla o anularla, llámame o escríbeme por WhatsApp al 669 87 70 52.</p>
+        <p id="bk-okmsg">Esa hora queda reservada para ti. Te he enviado un email con los datos y en cuanto la revise te llegará otro con la confirmación definitiva.</p>
         <div class="fbtns" style="justify-content:center"><a class="btn btn-outline" href="#inicio">Volver al inicio</a><button type="button" class="btn btn-primary" id="bk-otra">Reservar otra cita</button></div>
       </div>
     </div>
@@ -1084,7 +1098,7 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
   document.querySelectorAll('[data-cta]').forEach(function(el){
     var html = '';
     if (!el.hasAttribute('data-nocta')) {
-      html += '<section class="cta-band"><div class="in"><p class="ey">Siguiente paso</p><h2>¿Empezamos?</h2><p>Elige día y hora en el calendario, presencial en Valladolid u online, y la cita queda confirmada al momento. Si tienes dudas, escríbeme.</p><div class="ctas"><a class="btn btn-secondary" href="#reservar">Reservar cita '+svg('arrow')+'</a><a class="btn btn-outline-light" href="#contacto">Ir a contacto</a></div></div></section>';
+      html += '<section class="cta-band"><div class="in"><p class="ey">Siguiente paso</p><h2>¿Empezamos?</h2><p>Elige día y hora en el calendario, presencial en Valladolid u online. Tu hora queda reservada al momento y te confirmo la cita por email.</p><div class="ctas"><a class="btn btn-secondary" href="#reservar">Reservar cita '+svg('arrow')+'</a><a class="btn btn-outline-light" href="#contacto">Ir a contacto</a></div></div></section>';
     }
     html += '<section class="next"><div class="wrap"><p class="ey">Sigue explorando</p><h2>¿Por dónde seguimos?</h2><div class="next-grid">' +
       el.getAttribute('data-next').split(',').map(function(k){ var n = NEXT[k];
@@ -1326,6 +1340,7 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
       if (!v('bk-apellidos')) miss.push('apellidos');
       if (!/^[0-9+()\s.-]{6,30}$/.test(v('bk-tel'))) miss.push('un teléfono válido');
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v('bk-email'))) miss.push('un email válido');
+      if (!$('bk-motivo').value) miss.push('el motivo de la consulta');
       if (!$('bk-priv').checked) miss.push('aceptar la protección de datos');
       if (miss.length) { err.textContent = 'Falta: ' + miss.join(', ') + '.'; err.hidden = false; return; }
       err.hidden = true;
@@ -1342,12 +1357,13 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
           return;
         }
         $('bk-oksum').textContent = fechaLarga(st.fecha).replace(/^./, function(c){ return c.toUpperCase(); }) + ' a las ' + st.hora + ' · ' + NOMBRE_MOD[st.mod];
-        $('bk-okmsg').textContent = res.demo ? 'Esto es una vista previa: no se ha guardado ni enviado nada. En la web real, el paciente recibe un email de confirmación y a ti te llega un aviso con el asunto «RESERVA WEB».' : 'Te he enviado un email con los detalles. Si necesitas cambiarla o anularla, llámame o escríbeme por WhatsApp al 669 87 70 52.';
+        $('bk-okmsg').textContent = res.demo ? 'Esto es una vista previa: no se ha guardado ni enviado nada. En la web real, la hora queda bloqueada, al paciente le llega un email de «solicitud recibida» y a ti el aviso «RESERVA WEB». La confirmación definitiva le llega cuando tú la confirmas en el panel.' : 'Esa hora queda reservada para ti. Te he enviado un email con los datos y en cuanto la revise te llegará otro con la confirmación definitiva. Si tienes dudas, llámame o escríbeme por WhatsApp al 669 87 70 52.';
         document.querySelectorAll('#bk > .bk-section, #bk-form').forEach(function(x){ x.hidden = true; });
         $('bk-ok').hidden = false; $('bk-ok').scrollIntoView({ behavior: 'smooth', block: 'center' });
         delete st.cache[st.mod + '|' + st.ym]; $('bk-form').reset();
       });
     });
+    $('bk-form').addEventListener('input', function(){ $('bk-err').hidden = true; });
     $('bk-otra').addEventListener('click', function(){
       $('bk-ok').hidden = true; document.querySelectorAll('#bk > .bk-section').forEach(function(x){ x.hidden = false; });
       reiniciar(); pintarMes(); $('bk-step1').scrollIntoView({ behavior: 'smooth' });

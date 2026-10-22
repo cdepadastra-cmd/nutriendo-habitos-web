@@ -91,7 +91,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             json_salida(['ok' => true,
                 'horario' => $cfg['horario'], 'bloqueos' => $cfg['bloqueos'],
                 'antelacion_horas' => $cfg['antelacion_horas'], 'dias_vista' => $cfg['dias_vista'],
-                'citas' => $citas, 'hoy' => date('Y-m-d'), 'duracion' => DURACION]);
+                'abierto_hasta' => $cfg['abierto_hasta'], 'limite' => fecha_limite($cfg), 'especiales' => $cfg['especiales'],
+                'citas' => $citas, 'hoy' => date('Y-m-d'), 'duracion' => DURACION, 'motivos' => MOTIVOS]);
 
         case 'guardar_horario':
             $horario = $in['horario'] ?? null;
@@ -114,11 +115,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             $ant = max(0, min(168, (int)($in['antelacion_horas'] ?? 24)));
             $vista = max(7, min(365, (int)($in['dias_vista'] ?? 60)));
-            con_cerrojo(function () use ($nuevo, $ant, $vista) {
+            $abierto = (string)($in['abierto_hasta'] ?? '');
+            if ($abierto !== '' && !es_fecha($abierto)) {
+                json_salida(['ok' => false, 'error' => 'datos'], 422);
+            }
+            con_cerrojo(function () use ($nuevo, $ant, $vista, $abierto) {
                 $c = cargar_config();
                 $c['horario'] = $nuevo;
                 $c['antelacion_horas'] = $ant;
                 $c['dias_vista'] = $vista;
+                $c['abierto_hasta'] = $abierto;
+                guardar_datos('config', $c);
+            });
+            json_salida(['ok' => true]);
+
+        case 'anadir_especial':
+            $fecha = (string)($in['fecha'] ?? '');
+            $mod = (string)($in['modalidad'] ?? '');
+            $tramos = [];
+            foreach ((array)($in['tramos'] ?? []) as $t) {
+                $a = (string)($t[0] ?? '');
+                $b = (string)($t[1] ?? '');
+                if ($a === '' && $b === '') {
+                    continue;
+                }
+                if (!es_hora($a) || !es_hora($b) || minutos($a) >= minutos($b)) {
+                    json_salida(['ok' => false, 'error' => 'tramo'], 422);
+                }
+                $tramos[] = [$a, $b];
+            }
+            if (!es_fecha($fecha) || !isset(MODALIDADES[$mod]) || !$tramos) {
+                json_salida(['ok' => false, 'error' => 'datos'], 422);
+            }
+            usort($tramos, fn($x, $y) => strcmp($x[0], $y[0]));
+            con_cerrojo(function () use ($fecha, $mod, $tramos) {
+                $c = cargar_config();
+                // Un solo horario especial por día y modalidad: el nuevo sustituye al anterior
+                $c['especiales'] = array_values(array_filter($c['especiales'], fn($e) => !($e['fecha'] === $fecha && $e['modalidad'] === $mod)));
+                $c['especiales'][] = ['id' => bin2hex(random_bytes(5)), 'fecha' => $fecha, 'modalidad' => $mod, 'tramos' => $tramos];
+                usort($c['especiales'], fn($a, $b) => strcmp($a['fecha'] . $a['modalidad'], $b['fecha'] . $b['modalidad']));
+                guardar_datos('config', $c);
+            });
+            json_salida(['ok' => true]);
+
+        case 'quitar_especial':
+            $id = (string)($in['id'] ?? '');
+            con_cerrojo(function () use ($id) {
+                $c = cargar_config();
+                $c['especiales'] = array_values(array_filter($c['especiales'], fn($e) => $e['id'] !== $id));
                 guardar_datos('config', $c);
             });
             json_salida(['ok' => true]);
@@ -163,6 +207,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'telefono' => limpiar((string)($in['telefono'] ?? ''), 30),
                 'email' => filter_var($email, FILTER_VALIDATE_EMAIL) ? $email : '',
                 'nota' => limpiar((string)($in['nota'] ?? ''), 200),
+                'motivo' => in_array((string)($in['motivo'] ?? ''), MOTIVOS, true) ? (string)$in['motivo'] : '',
                 'origen' => 'panel', 'estado' => 'confirmada', 'creada' => date('c'),
             ];
             $ok = con_cerrojo(function () use ($cita) {
@@ -179,13 +224,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             json_salida(['ok' => true]);
 
+        case 'confirmar_cita':
+            $id = (string)($in['id'] ?? '');
+            $cita = con_cerrojo(function () use ($id) {
+                $rs = cargar_reservas();
+                foreach ($rs as &$r) {
+                    if ($r['id'] === $id && $r['estado'] === 'pendiente') {
+                        $r['estado'] = 'confirmada';
+                        $r['confirmada'] = date('c');
+                        guardar_datos('reservas', $rs);
+                        return $r;
+                    }
+                }
+                return null;
+            });
+            if (!$cita) {
+                json_salida(['ok' => false, 'error' => 'no_encontrada'], 404);
+            }
+            json_salida(['ok' => true, 'avisado' => correo_confirmacion($cita)]);
+
         case 'cancelar_cita':
             $id = (string)($in['id'] ?? '');
             $avisar = !empty($in['avisar']);
             $cita = con_cerrojo(function () use ($id) {
                 $rs = cargar_reservas();
                 foreach ($rs as &$r) {
-                    if ($r['id'] === $id && $r['estado'] === 'confirmada') {
+                    if ($r['id'] === $id && ocupa_hueco($r)) {
+                        $r['estado_previo'] = $r['estado'];
                         $r['estado'] = 'cancelada';
                         $r['cancelada'] = date('c');
                         guardar_datos('reservas', $rs);
@@ -198,7 +263,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 json_salida(['ok' => false, 'error' => 'no_encontrada'], 404);
             }
             $avisado = false;
-            if ($avisar && !empty($cita['email'])) {
+            if ($avisar && !empty($cita['email']) && ($cita['estado_previo'] ?? '') === 'pendiente') {
+                $avisado = enviar_correo($cita['email'], 'Solicitud de cita no confirmada · ' . NOMBRE_WEB,
+                    "Hola {$cita['nombre']}:\n\nLo siento, no puedo confirmarte la cita que solicitaste.\n\n" . texto_cita($cita) . "\n"
+                    . "Puedes elegir otro día y hora en el calendario de la web, o llamarme o escribirme por WhatsApp al " . TELEFONO . " y lo buscamos juntas.\n\n"
+                    . "Un saludo,\nAndrea Argüello · " . NOMBRE_WEB . "\n", DESTINO);
+            } elseif ($avisar && !empty($cita['email'])) {
                 $avisado = enviar_correo($cita['email'], 'Cita anulada · ' . NOMBRE_WEB,
                     "Hola {$cita['nombre']}:\n\nTu cita ha quedado anulada.\n\n" . texto_cita($cita) . "\n"
                     . "Si quieres buscar otro día, puedes reservar de nuevo en la web o llamarme al " . TELEFONO . ".\n\n"
@@ -247,7 +317,8 @@ if (isset($_GET['exportar'])) {
     header('Cache-Control: no-store');
     $out = fopen('php://output', 'w');
     fwrite($out, "\xEF\xBB\xBF"); // para que Excel lea bien las tildes
-    fputcsv($out, ['Fecha', 'Día', 'Hora', 'Consulta', 'Nombre', 'Apellidos', 'Teléfono', 'Email', 'Estado', 'Origen', 'Reservada el', 'Anulada el'], ';');
+    fputcsv($out, ['Fecha', 'Día', 'Hora', 'Consulta', 'Motivo', 'Nombre', 'Apellidos', 'Teléfono', 'Email', 'Estado', 'Origen', 'Reservada el', 'Confirmada el', 'Anulada el'], ';');
+    $estados = ['pendiente' => 'Pendiente de confirmar', 'confirmada' => 'Confirmada', 'cancelada' => 'Anulada / rechazada'];
     $dias = ['', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'];
     foreach ($citas as $c) {
         fputcsv($out, array_map($celda, [
@@ -255,10 +326,12 @@ if (isset($_GET['exportar'])) {
             $dias[(int)date('N', strtotime($c['fecha'] . ' 12:00'))],
             $c['hora'],
             MODALIDADES[$c['modalidad']] ?? $c['modalidad'],
+            $c['motivo'] ?? '',
             $c['nombre'] ?? '', $c['apellidos'] ?? '', $c['telefono'] ?? '', $c['email'] ?? '',
-            ($c['estado'] ?? '') === 'confirmada' ? 'Confirmada' : 'Anulada',
+            $estados[$c['estado'] ?? ''] ?? '',
             ($c['origen'] ?? '') === 'panel' ? 'Añadida en el panel' : 'Web',
             !empty($c['creada']) ? date('d/m/Y H:i', strtotime($c['creada'])) : '',
+            !empty($c['confirmada']) ? date('d/m/Y H:i', strtotime($c['confirmada'])) : '',
             !empty($c['cancelada']) ? date('d/m/Y H:i', strtotime($c['cancelada'])) : '',
         ]), ';');
     }
@@ -348,6 +421,13 @@ input,select{height:2.4rem;border:1px solid var(--border);border-radius:.6rem;ba
 .tbl mark{background:var(--secondary);color:inherit;border-radius:.2rem;padding:0 .1rem}
 .est{font-size:.72rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:.15rem .5rem;border-radius:999px;background:var(--secondary);color:var(--secondary-fg);white-space:nowrap}
 .est.no{background:#F3E4E1;color:var(--danger)}
+.est.pe{background:#F6EBD6;color:#7A5A1F}
+.badge{display:inline-grid;place-items:center;min-width:1.3rem;height:1.3rem;padding:0 .35rem;border-radius:999px;background:#C98A2B;color:#fff;font-size:.72rem;font-weight:600;margin-left:.25rem}
+.pend{border-color:#E8CF9F;background:#FFFBF2}
+.cita.pendiente{background:#FBF1DE}
+.cita .acts{display:flex;gap:.4rem;flex-wrap:wrap}
+.motivo{display:block;color:var(--secondary-fg);font-size:.82rem}
+.abierto{display:flex;flex-wrap:wrap;gap:1rem 1.5rem;align-items:end;border-color:var(--leaf);background:color-mix(in oklab,var(--secondary) 40%,var(--card))}
 .muted{color:var(--muted-fg);font-size:.88rem}
 .sticky{position:sticky;bottom:0;padding:.8rem 0;background:linear-gradient(transparent,var(--bg) 35%);display:flex;gap:.75rem;align-items:center;flex-wrap:wrap}
 .toast{position:fixed;left:50%;bottom:1.25rem;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:.6rem 1rem;border-radius:999px;font-size:.9rem;z-index:10}
@@ -379,7 +459,7 @@ input,select{height:2.4rem;border:1px solid var(--border);border-radius:.6rem;ba
     </header>
 
     <div class="tabs" role="tablist">
-      <button role="tab" aria-selected="true" data-tab="citas">Citas</button>
+      <button role="tab" aria-selected="true" data-tab="citas">Citas <span class="badge" id="n-pend" hidden></span></button>
       <button role="tab" aria-selected="false" data-tab="horario">Horario</button>
       <button role="tab" aria-selected="false" data-tab="bloqueos">Días bloqueados</button>
       <button role="tab" aria-selected="false" data-tab="historial">Historial</button>
@@ -389,7 +469,10 @@ input,select{height:2.4rem;border:1px solid var(--border);border-radius:.6rem;ba
     <!-- CITAS -->
     <div data-panel="citas">
       <div class="grid2">
-        <div class="card"><h2 style="font-size:1.3rem;margin-bottom:.5rem">Próximas citas</h2><div id="citas-prox"></div></div>
+        <div style="display:grid;gap:1.25rem;align-content:start">
+          <div class="card pend" id="pend-card" hidden><h2 style="font-size:1.3rem;margin-bottom:.25rem">Pendientes de confirmar</h2><p class="muted" style="margin:0 0 .5rem">Estos huecos ya están bloqueados en la web. Al confirmar, al paciente le llega el email de confirmación definitiva.</p><div id="citas-pend"></div></div>
+          <div class="card"><h2 style="font-size:1.3rem;margin-bottom:.5rem">Próximas citas confirmadas</h2><div id="citas-prox"></div></div>
+        </div>
         <div style="display:grid;gap:1.25rem;align-content:start">
           <div class="card">
             <h2 style="font-size:1.2rem;margin-bottom:.75rem">Añadir una cita a mano</h2>
@@ -400,6 +483,7 @@ input,select{height:2.4rem;border:1px solid var(--border);border-radius:.6rem;ba
                 <label for="c-hora">Hora<input id="c-hora" type="time" step="300" required></label>
                 <label for="c-mod">Consulta<select id="c-mod"><option value="presencial">Presencial</option><option value="online">Online</option></select></label>
               </div>
+              <label for="c-motivo">Motivo<select id="c-motivo"><option value="">Sin indicar</option></select></label>
               <div class="row">
                 <label for="c-nombre">Nombre<input id="c-nombre" required></label>
                 <label for="c-ape">Apellidos<input id="c-ape"></label>
@@ -419,12 +503,50 @@ input,select{height:2.4rem;border:1px solid var(--border);border-radius:.6rem;ba
 
     <!-- HORARIO -->
     <div data-panel="horario" hidden>
-      <p class="muted" style="margin-top:0">Pon las horas en las que se puede reservar cada día. La web las divide en huecos de <span class="dur2">45</span> minutos. Si un día no tiene horas, ese día no se puede reservar. Una cita presencial también ocupa ese hueco en online, y al revés.</p>
+      <div class="card abierto">
+        <div style="display:grid;gap:.35rem;min-width:0;flex:1 1 18rem">
+          <h2 style="font-size:1.3rem">Reservas abiertas hasta</h2>
+          <p class="muted" style="margin:0">Los pacientes solo pueden reservar hasta este día. Ve abriendo mes a mes, o de dos en dos, cuando tengas planificado tu horario.</p>
+          <p style="margin:.2rem 0 0;font-weight:500;color:var(--secondary-fg)" id="lim-txt"></p>
+        </div>
+        <div class="row" style="flex:1 1 20rem;align-items:end">
+          <label for="h-abierto" style="flex:1 1 10rem">Último día que se puede reservar<input id="h-abierto" type="date"></label>
+          <button class="btn sec sm" type="button" data-mas="1">+1 mes</button>
+          <button class="btn sec sm" type="button" data-mas="2">+2 meses</button>
+        </div>
+      </div>
+
+      <h2 style="font-size:1.3rem;margin:1.6rem 0 .3rem">Horario habitual</h2>
+      <p class="muted" style="margin-top:0">Las horas de cada día de la semana. La web las divide en huecos de <span class="dur2">45</span> minutos. Si un día no tiene horas, ese día no se puede reservar. Una cita presencial también ocupa ese hueco en online, y al revés.</p>
       <div class="grid2">
         <div class="card"><h2 style="font-size:1.3rem;margin-bottom:.5rem">Presencial en Valladolid</h2><div class="week" id="w-presencial"></div></div>
         <div class="card"><h2 style="font-size:1.3rem;margin-bottom:.5rem">Online</h2><div class="week" id="w-online"></div></div>
       </div>
       <div class="sticky"><button class="btn" id="b-guardar-h">Guardar horario</button><span class="muted" id="h-msg"></span></div>
+
+      <div class="grid2" style="margin-top:1.25rem">
+        <div class="card">
+          <h2 style="font-size:1.2rem;margin-bottom:.5rem">Día con horario especial</h2>
+          <p class="muted" style="margin:0 0 .75rem">Para un día concreto con horas distintas a las habituales, o para abrir un día que normalmente está cerrado. Para cerrar un día entero, usa «Días bloqueados».</p>
+          <form id="f-esp" style="display:grid;gap:.7rem">
+            <div class="row">
+              <label for="e-fecha">Día<input id="e-fecha" type="date" required></label>
+              <label for="e-mod">Consulta<select id="e-mod"><option value="presencial">Presencial</option><option value="online">Online</option></select></label>
+            </div>
+            <div class="row">
+              <label for="e-a1">Mañana desde<input id="e-a1" type="time" step="300"></label>
+              <label for="e-b1">hasta<input id="e-b1" type="time" step="300"></label>
+            </div>
+            <div class="row">
+              <label for="e-a2">Tarde desde<input id="e-a2" type="time" step="300"></label>
+              <label for="e-b2">hasta<input id="e-b2" type="time" step="300"></label>
+            </div>
+            <p class="msg err" id="e-err" hidden></p>
+            <button class="btn" type="submit">Guardar día especial</button>
+          </form>
+        </div>
+        <div class="card"><h2 style="font-size:1.2rem;margin-bottom:.5rem">Días con horario especial</h2><ul class="list" id="esp-list"></ul></div>
+      </div>
     </div>
 
     <!-- BLOQUEOS -->
@@ -455,7 +577,7 @@ input,select{height:2.4rem;border:1px solid var(--border);border-radius:.6rem;ba
       <div class="card" style="display:grid;gap:1rem">
         <div class="row" style="align-items:end">
           <label for="h-q" style="flex:2 1 16rem">Buscar paciente<input id="h-q" type="search" placeholder="Nombre, apellidos, teléfono o email" autocomplete="off"></label>
-          <label for="h-est" style="flex:1 1 10rem">Mostrar<select id="h-est"><option value="todas">Todas</option><option value="confirmada">Confirmadas</option><option value="cancelada">Anuladas</option></select></label>
+          <label for="h-est" style="flex:1 1 10rem">Mostrar<select id="h-est"><option value="todas">Todas</option><option value="pendiente">Pendientes</option><option value="confirmada">Confirmadas</option><option value="cancelada">Anuladas</option></select></label>
           <label for="h-cuando" style="flex:1 1 10rem">Fechas<select id="h-cuando"><option value="todas">Todas</option><option value="pasadas">Pasadas</option><option value="proximas">Próximas</option></select></label>
           <a class="btn" href="admin.php?exportar=1" id="h-excel" style="flex:0 0 auto">Descargar en Excel</a>
         </div>
@@ -559,14 +681,19 @@ input,select{height:2.4rem;border:1px solid var(--border);border-radius:.6rem;ba
       D = r; H = JSON.parse(JSON.stringify(r.horario));
       $('v-login').hidden = true; $('v-panel').hidden = false;
       $('dur').textContent = r.duracion; document.querySelectorAll('.dur2').forEach(function(e){ e.textContent = r.duracion; });
+      if ($('c-motivo').options.length < 2) (r.motivos || []).forEach(function(m){ var o = document.createElement('option'); o.value = o.textContent = m; $('c-motivo').appendChild(o); });
       pintarCitas(); pintarHorario(); pintarBloqueos();
       $('a-ant').value = r.antelacion_horas; $('a-vista').value = r.dias_vista;
+      $('h-abierto').value = r.abierto_hasta || ''; $('h-abierto').min = r.hoy; pintarLimite(); pintarEspeciales();
       $('c-fecha').min = r.hoy;
     });
   }
 
   function pintarCitas(){
-    var prox = D.citas.filter(function(c){ return c.fecha >= D.hoy; });
+    var pend = D.citas.filter(function(c){ return c.estado === 'pendiente' && c.fecha >= D.hoy; });
+    $('pend-card').hidden = !pend.length; $('citas-pend').innerHTML = agrupar(pend, true);
+    $('n-pend').hidden = !pend.length; $('n-pend').textContent = pend.length;
+    var prox = D.citas.filter(function(c){ return c.fecha >= D.hoy && c.estado !== 'pendiente'; });
     var pas = D.citas.filter(function(c){ return c.fecha < D.hoy; }).reverse();
     $('citas-prox').innerHTML = agrupar(prox, true) || '<p class="muted">Todavía no hay citas reservadas.</p>';
     $('citas-pas').innerHTML = agrupar(pas, false) || '<p class="muted">Sin citas en los últimos 30 días.</p>';
@@ -575,18 +702,24 @@ input,select{height:2.4rem;border:1px solid var(--border);border-radius:.6rem;ba
     var html = '', dia = '';
     lista.forEach(function(c){
       if (c.fecha !== dia) { if (dia) html += '</div>'; dia = c.fecha; html += '<div class="day"><h3>' + esc(fechaLarga(c.fecha)) + '</h3>'; }
-      var canc = c.estado !== 'confirmada';
-      html += '<div class="cita' + (canc ? ' cancelada' : '') + '"><span class="h">' + esc(c.hora) + '</span>' +
+      var canc = c.estado === 'cancelada', pend = c.estado === 'pendiente';
+      var acts = '';
+      if (conAcciones && pend) acts = '<span class="acts"><button class="btn sm" data-confirm="' + esc(c.id) + '">Confirmar</button><button class="btn danger sm" data-cancel="' + esc(c.id) + '">Rechazar</button></span>';
+      else if (conAcciones && !canc) acts = '<button class="btn danger sm" data-cancel="' + esc(c.id) + '">Anular</button>';
+      html += '<div class="cita' + (canc ? ' cancelada' : '') + (pend ? ' pendiente' : '') + '"><span class="h">' + esc(c.hora) + '</span>' +
         '<span class="pill' + (c.modalidad === 'online' ? ' online' : '') + '">' + esc(MOD[c.modalidad]) + '</span>' +
-        '<span class="who">' + esc(c.nombre + ' ' + (c.apellidos || '')) + '<small>' + esc([c.telefono, c.email].filter(Boolean).join(' · ')) + (c.origen === 'panel' ? ' · añadida por ti' : '') + (canc ? ' · ANULADA' : '') + '</small></span>' +
-        (conAcciones && !canc ? '<button class="btn danger sm" data-cancel="' + esc(c.id) + '">Anular</button>' : '') + '</div>';
+        '<span class="who">' + esc(c.nombre + ' ' + (c.apellidos || '')) + (c.motivo ? '<span class="motivo">' + esc(c.motivo) + '</span>' : '') + '<small>' + esc([c.telefono, c.email].filter(Boolean).join(' · ')) + (c.origen === 'panel' ? ' · añadida por ti' : '') + (canc ? (c.estado_previo === 'pendiente' ? ' · RECHAZADA' : ' · ANULADA') : '') + '</small></span>' +
+        acts + '</div>';
     });
     return html ? html + '</div>' : '';
   }
   document.addEventListener('click', function(e){
     var b = e.target.closest('[data-cancel]'); if (!b) return;
     var c = D.citas.find(function(x){ return x.id === b.getAttribute('data-cancel'); }); if (!c) return;
-    $('dlg-txt').textContent = c.nombre + ' ' + (c.apellidos || '') + ' · ' + fechaLarga(c.fecha) + ' a las ' + c.hora + ' (' + MOD[c.modalidad] + ')';
+    var pend = c.estado === 'pendiente';
+    $('dlg-t').textContent = pend ? 'Rechazar solicitud' : 'Anular cita';
+    $('dlg-si').textContent = pend ? 'Rechazar' : 'Anular cita';
+    $('dlg-txt').textContent = c.nombre + ' ' + (c.apellidos || '') + ' · ' + fechaLarga(c.fecha) + ' a las ' + c.hora + ' (' + MOD[c.modalidad] + '). El hueco vuelve a quedar libre en la web.';
     $('dlg-avisar-w').hidden = !c.email; $('dlg-avisar').checked = !!c.email;
     $('dlg').hidden = false; $('dlg').dataset.id = c.id; $('dlg-no').focus();
   });
@@ -596,13 +729,22 @@ input,select{height:2.4rem;border:1px solid var(--border);border-radius:.6rem;ba
     api('cancelar_cita', { id: id, avisar: $('dlg-avisar').checked }).then(function(r){
       b.disabled = false; $('dlg').hidden = true;
       if (!r.ok) return toast(errTxt(r));
-      toast(r.avisado ? 'Cita anulada. Se ha avisado al paciente.' : 'Cita anulada. El hueco vuelve a estar libre.'); cargar();
+      toast(r.avisado ? 'Hecho. Se ha avisado al paciente y el hueco vuelve a estar libre.' : 'Hecho. El hueco vuelve a estar libre.'); cargar();
+    });
+  });
+
+  document.addEventListener('click', function(e){
+    var b = e.target.closest('[data-confirm]'); if (!b) return;
+    b.disabled = true; b.textContent = 'Confirmando…';
+    api('confirmar_cita', { id: b.getAttribute('data-confirm') }).then(function(r){
+      if (!r.ok) { b.disabled = false; b.textContent = 'Confirmar'; return toast(errTxt(r)); }
+      toast(r.avisado ? 'Cita confirmada. Se ha enviado el email de confirmación al paciente.' : 'Cita confirmada. No se ha podido enviar el email: avísale por teléfono.'); cargar();
     });
   });
 
   $('f-cita').addEventListener('submit', function(e){
     e.preventDefault(); var err = $('c-err'); err.hidden = true;
-    api('anadir_cita', { fecha: $('c-fecha').value, hora: $('c-hora').value, modalidad: $('c-mod').value, nombre: $('c-nombre').value, apellidos: $('c-ape').value, telefono: $('c-tel').value, email: $('c-email').value })
+    api('anadir_cita', { fecha: $('c-fecha').value, hora: $('c-hora').value, modalidad: $('c-mod').value, nombre: $('c-nombre').value, apellidos: $('c-ape').value, telefono: $('c-tel').value, email: $('c-email').value, motivo: $('c-motivo').value })
       .then(function(r){ if (!r.ok) { err.textContent = errTxt(r); err.hidden = false; return; } e.target.reset(); toast('Cita añadida.'); cargar(); });
   });
 
@@ -636,7 +778,7 @@ input,select{height:2.4rem;border:1px solid var(--border);border-radius:.6rem;ba
   });
   function guardarHorario(btn, msg){
     btn.disabled = true;
-    return api('guardar_horario', { horario: H, antelacion_horas: +$('a-ant').value, dias_vista: +$('a-vista').value }).then(function(r){
+    return api('guardar_horario', { horario: H, antelacion_horas: +$('a-ant').value, dias_vista: +$('a-vista').value, abierto_hasta: $('h-abierto').value }).then(function(r){
       btn.disabled = false;
       if (!r.ok) { msg.textContent = errTxt(r) + (r.detalle ? ' (' + r.detalle + ')' : ''); return; }
       msg.textContent = 'Guardado'; toast('Guardado. El calendario de la web ya está actualizado.'); cargar();
@@ -644,6 +786,41 @@ input,select{height:2.4rem;border:1px solid var(--border);border-radius:.6rem;ba
   }
   $('b-guardar-h').addEventListener('click', function(){ guardarHorario(this, $('h-msg')); });
   $('b-guardar-a').addEventListener('click', function(){ guardarHorario(this, $('a-msg')); });
+
+  /* ---------- reservas abiertas hasta ---------- */
+  function pintarLimite(){
+    var v = $('h-abierto').value;
+    $('lim-txt').textContent = v ? 'Ahora se puede reservar hasta el ' + fechaLarga(v) + '.' + (v < D.hoy ? ' Esa fecha ya ha pasado: nadie puede reservar.' : '')
+      : 'Sin fecha puesta: se puede reservar hasta ' + D.dias_vista + ' días por delante (lo cambias en Ajustes).';
+  }
+  function finDeMes(y, m){ var d = new Date(y, m + 1, 0); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+  document.addEventListener('click', function(e){
+    var b = e.target.closest('[data-mas]'); if (!b) return;
+    var base = $('h-abierto').value && $('h-abierto').value >= D.hoy ? $('h-abierto').value : D.hoy;
+    var d = new Date(base + 'T12:00:00');
+    // Abre hasta el final del mes siguiente (+1) o del de después (+2)
+    $('h-abierto').value = finDeMes(d.getFullYear(), d.getMonth() + (+b.dataset.mas));
+    pintarLimite(); $('h-msg').textContent = 'Cambios sin guardar · pulsa «Guardar horario»';
+  });
+  $('h-abierto').addEventListener('input', function(){ pintarLimite(); $('h-msg').textContent = 'Cambios sin guardar · pulsa «Guardar horario»'; });
+
+  /* ---------- días con horario especial ---------- */
+  function pintarEspeciales(){
+    var futuros = (D.especiales || []).filter(function(e){ return e.fecha >= D.hoy; });
+    $('esp-list').innerHTML = futuros.length ? futuros.map(function(e){
+      return '<li><span><b>' + esc(fechaLarga(e.fecha)) + '</b><br><span class="muted">' + esc(MOD[e.modalidad]) + ' · ' + e.tramos.map(function(t){ return t[0] + '–' + t[1]; }).join(' y ') + '</span></span>' +
+        '<button class="btn sec sm" data-unesp="' + esc(e.id) + '">Quitar</button></li>';
+    }).join('') : '<li class="muted">No hay días con horario especial.</li>';
+  }
+  $('f-esp').addEventListener('submit', function(e){
+    e.preventDefault(); var err = $('e-err'); err.hidden = true;
+    api('anadir_especial', { fecha: $('e-fecha').value, modalidad: $('e-mod').value, tramos: [[$('e-a1').value, $('e-b1').value], [$('e-a2').value, $('e-b2').value]] })
+      .then(function(r){ if (!r.ok) { err.textContent = r.error === 'datos' ? 'Pon el día y al menos un tramo de horas.' : errTxt(r); err.hidden = false; return; } e.target.reset(); toast('Día especial guardado.'); cargar(); });
+  });
+  document.addEventListener('click', function(e){
+    var b = e.target.closest('[data-unesp]'); if (!b) return;
+    api('quitar_especial', { id: b.getAttribute('data-unesp') }).then(function(r){ if (!r.ok) return toast(errTxt(r)); toast('Quitado. Ese día vuelve al horario habitual.'); cargar(); });
+  });
 
   /* ---------- bloqueos ---------- */
   function pintarBloqueos(){
@@ -685,14 +862,16 @@ input,select{height:2.4rem;border:1px solid var(--border);border-radius:.6rem;ba
       if (!q) return true;
       return norm([c.nombre, c.apellidos, c.telefono, c.email].join(' ')).indexOf(q) >= 0 || norm(c.telefono).replace(/\D/g, '').indexOf(q.replace(/\D/g, '') || '§') >= 0;
     });
-    var conf = lista.filter(function(c){ return c.estado === 'confirmada'; }).length;
-    $('h-count').textContent = lista.length ? lista.length + (lista.length === 1 ? ' cita' : ' citas') + ' · ' + conf + ' confirmada' + (conf === 1 ? '' : 's') + ', ' + (lista.length - conf) + ' anulada' + (lista.length - conf === 1 ? '' : 's') : '';
+    var n = function(e){ return lista.filter(function(c){ return c.estado === e; }).length; };
+    var conf = n('confirmada'), pe = n('pendiente'), an = n('cancelada');
+    $('h-count').textContent = lista.length ? lista.length + (lista.length === 1 ? ' cita' : ' citas') + ' · ' + conf + ' confirmada' + (conf === 1 ? '' : 's') + ', ' + pe + ' pendiente' + (pe === 1 ? '' : 's') + ', ' + an + ' anulada' + (an === 1 ? '' : 's') : '';
     $('h-body').innerHTML = lista.length ? lista.map(function(c){
-      var ok = c.estado === 'confirmada', nombre = (c.nombre + ' ' + (c.apellidos || '')).trim();
+      var ok = c.estado !== 'cancelada', nombre = (c.nombre + ' ' + (c.apellidos || '')).trim();
+      var EST = { pendiente: ['pe', 'Pendiente'], confirmada: ['', 'Confirmada'], cancelada: ['no', c.estado_previo === 'pendiente' ? 'Rechazada' : 'Anulada'] }[c.estado] || ['', c.estado];
       return '<tr class="' + (ok ? '' : 'anulada') + '"><td class="n">' + esc(fechaCorta(c.fecha)) + '</td><td class="n">' + esc(c.hora) + '</td><td>' + esc(MOD[c.modalidad]) + '</td>' +
-        '<td class="p">' + resaltar(nombre, q) + (c.origen === 'panel' ? '<br><span class="muted">Añadida por ti</span>' : '') + '</td>' +
+        '<td class="p">' + resaltar(nombre, q) + (c.motivo ? '<span class="motivo">' + esc(c.motivo) + '</span>' : '') + (c.origen === 'panel' ? '<span class="muted" style="display:block">Añadida por ti</span>' : '') + '</td>' +
         '<td>' + resaltar(c.telefono || '', q) + (c.email ? '<br>' + resaltar(c.email, q) : '') + '</td>' +
-        '<td><span class="est' + (ok ? '' : ' no') + '">' + (ok ? 'Confirmada' : 'Anulada') + '</span></td></tr>';
+        '<td><span class="est ' + EST[0] + '">' + EST[1] + '</span></td></tr>';
     }).join('') : '<tr><td colspan="6" class="muted" style="text-align:center;padding:1.5rem">' + (HIST.citas.length ? 'No hay citas que coincidan con la búsqueda.' : 'Todavía no hay ninguna cita.') + '</td></tr>';
   }
   ['h-q', 'h-est', 'h-cuando'].forEach(function(id){ $(id).addEventListener('input', pintarHistorial); });

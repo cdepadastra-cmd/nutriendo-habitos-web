@@ -30,8 +30,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $accion === 'mes') {
         'ok'       => true,
         'dias'     => (object)$dias,
         'hoy'      => date('Y-m-d'),
-        'hasta'    => date('Y-m-d', strtotime('+' . (int)$cfg['dias_vista'] . ' days')),
+        'hasta'    => fecha_limite($cfg),
         'duracion' => DURACION,
+        'motivos'  => MOTIVOS,
     ]);
 }
 
@@ -47,11 +48,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $accion === 'reservar') {
     $apellidos = limpiar((string)($_POST['apellidos'] ?? ''));
     $telefono  = limpiar((string)($_POST['telefono'] ?? ''), 30);
     $email     = limpiar((string)($_POST['email'] ?? ''));
+    $motivo    = limpiar((string)($_POST['motivo'] ?? ''), 80);
 
     if (!isset(MODALIDADES[$modalidad]) || !es_fecha($fecha) || !es_hora($hora)
         || $nombre === '' || $apellidos === ''
         || !preg_match('/^[0-9+()\s.-]{6,30}$/', $telefono)
         || !filter_var($email, FILTER_VALIDATE_EMAIL)
+        || !in_array($motivo, MOTIVOS, true)
         || empty($_POST['privacidad'])) {
         json_salida(['ok' => false, 'error' => 'datos'], 422);
     }
@@ -59,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $accion === 'reservar') {
         json_salida(['ok' => false, 'error' => 'limite'], 429);
     }
 
-    $resultado = con_cerrojo(function () use ($modalidad, $fecha, $hora, $nombre, $apellidos, $telefono, $email) {
+    $resultado = con_cerrojo(function () use ($modalidad, $fecha, $hora, $nombre, $apellidos, $telefono, $email, $motivo) {
         $cfg = cargar_config();
         $reservas = cargar_reservas();
         if (!in_array($hora, huecos_del_dia($cfg, $reservas, $fecha, $modalidad), true)) {
@@ -74,8 +77,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $accion === 'reservar') {
             'apellidos' => $apellidos,
             'telefono'  => $telefono,
             'email'     => $email,
+            'motivo'    => $motivo,
             'origen'    => 'web',
-            'estado'    => 'confirmada',
+            'estado'    => 'pendiente',   // el hueco queda bloqueado hasta que Andrea confirme o rechace
             'creada'    => date('c'),
         ];
         $reservas[] = $cita;
@@ -90,26 +94,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $accion === 'reservar') {
     $cita = $resultado;
     // Aviso para Andrea
     enviar_correo(DESTINO, 'RESERVA WEB',
-        "Nueva cita reservada desde la web\n\n" . texto_cita($cita) . "\n"
+        "Nueva solicitud de cita desde la web (PENDIENTE DE CONFIRMAR)\n\n" . texto_cita($cita) . "\n"
         . "Nombre: {$cita['nombre']}\nApellidos: {$cita['apellidos']}\n"
         . "Teléfono: {$cita['telefono']}\nEmail: {$cita['email']}\n\n"
-        . "Puedes ver y gestionar las citas en el panel de reservas.\n",
+        . "El hueco ya está bloqueado en el calendario. Para confirmarla o rechazarla, entra en el panel:\n"
+        . url_panel() . "\n",
         $cita['email']);
 
-    // Confirmación para el paciente
-    $lugar = $cita['modalidad'] === 'presencial'
-        ? "Lugar: " . DIRECCION . "\n"
-        : "Antes de la cita te enviaré el enlace de la videollamada.\n";
-    enviar_correo($cita['email'], 'Cita confirmada · ' . NOMBRE_WEB,
-        "Hola {$cita['nombre']}:\n\nTu cita con Andrea Argüello ha quedado confirmada.\n\n"
-        . texto_cita($cita) . $lugar . "\n"
-        . "Si necesitas cambiarla o anularla, llámame o escríbeme por WhatsApp al " . TELEFONO . ".\n\n"
+    // Acuse de recibo para el paciente (la confirmación definitiva llega cuando Andrea la confirma)
+    enviar_correo($cita['email'], 'Solicitud de cita recibida · ' . NOMBRE_WEB,
+        "Hola {$cita['nombre']}:\n\nHe recibido tu solicitud de cita. Ese hueco queda reservado para ti mientras la reviso.\n\n"
+        . texto_cita($cita) . "\n"
+        . "Te enviaré un email con la confirmación definitiva lo antes posible.\n"
+        . "Si tienes cualquier duda, llámame o escríbeme por WhatsApp al " . TELEFONO . ".\n\n"
         . "Un saludo,\nAndrea Argüello · " . NOMBRE_WEB . "\n",
         DESTINO);
 
     json_salida(['ok' => true, 'cita' => [
         'fecha' => $cita['fecha'], 'fecha_texto' => fecha_larga($cita['fecha']),
-        'hora' => $cita['hora'], 'modalidad' => MODALIDADES[$cita['modalidad']],
+        'hora' => $cita['hora'], 'modalidad' => MODALIDADES[$cita['modalidad']], 'estado' => 'pendiente',
     ]]);
 }
 
