@@ -91,6 +91,8 @@ function config_por_defecto(): array {
         'abierto_hasta'    => '',   // última fecha que se puede reservar (vacío = usar dias_vista)
         'antelacion_horas' => 24,   // no se puede reservar con menos antelación
         'dias_vista'       => 60,   // cuántos días hacia delante se puede reservar
+        'recordatorios'    => true, // email automático el día antes de la cita
+        'clave_cron'       => '',   // clave aleatoria para la tarea programada (se crea sola)
     ];
 }
 
@@ -278,6 +280,82 @@ function correo_confirmacion(array $cita): bool {
         . "Si necesitas cambiarla o anularla, llámame o escríbeme por WhatsApp al " . TELEFONO . ".\n\n"
         . "Un saludo,\nAndrea Argüello · " . NOMBRE_WEB . "\n",
         DESTINO);
+}
+
+/** Recordatorio por email el día antes. */
+function correo_recordatorio(array $cita): bool {
+    if (empty($cita['email'])) {
+        return false;
+    }
+    $lugar = $cita['modalidad'] === 'presencial'
+        ? "Lugar: " . DIRECCION . "\n"
+        : "Es una consulta online: te enviaré el enlace de la videollamada.\n";
+    return enviar_correo($cita['email'], 'Recordatorio: tu cita es mañana · ' . NOMBRE_WEB,
+        "Hola {$cita['nombre']}:\n\nTe recuerdo que mañana tienes cita conmigo.\n\n"
+        . texto_cita($cita) . $lugar . "\n"
+        . "Si no puedes venir, avísame cuanto antes por teléfono o WhatsApp al " . TELEFONO . " y buscamos otro día.\n\n"
+        . "Un saludo,\nAndrea Argüello · " . NOMBRE_WEB . "\n",
+        DESTINO);
+}
+
+/**
+ * Envía el recordatorio a todas las citas confirmadas de mañana que tengan email y aún no lo hayan recibido.
+ * Se puede ejecutar varias veces: nunca manda dos recordatorios a la misma cita.
+ */
+function enviar_recordatorios(): array {
+    $manana = date('Y-m-d', strtotime('tomorrow'));
+    $toca = array_values(array_filter(cargar_reservas(), fn($r) => $r['fecha'] === $manana
+        && $r['estado'] === 'confirmada' && !empty($r['email']) && empty($r['recordado'])));
+    $enviados = 0;
+    foreach ($toca as $cita) {
+        if (correo_recordatorio($cita)) {
+            $enviados++;
+            $id = $cita['id'];
+            con_cerrojo(function () use ($id) {
+                $rs = cargar_reservas();
+                foreach ($rs as &$r) {
+                    if ($r['id'] === $id) {
+                        $r['recordado'] = date('c');
+                    }
+                }
+                guardar_datos('reservas', $rs);
+            });
+        }
+    }
+    return ['fecha' => $manana, 'pendientes' => count($toca), 'enviados' => $enviados];
+}
+
+/** Clave de la tarea programada (se genera la primera vez). */
+function clave_cron(): string {
+    return con_cerrojo(function () {
+        $c = cargar_config();
+        if (!preg_match('/^[a-f0-9]{32}$/', (string)$c['clave_cron'])) {
+            $c['clave_cron'] = bin2hex(random_bytes(16));
+            guardar_datos('config', $c);
+        }
+        return $c['clave_cron'];
+    });
+}
+
+/** Valida y prepara una cita añadida desde el panel. Devuelve null si faltan datos. */
+function cita_del_panel(array $in): ?array {
+    $fecha = (string)($in['fecha'] ?? '');
+    $hora = (string)($in['hora'] ?? '');
+    $mod = (string)($in['modalidad'] ?? '');
+    $nombre = limpiar((string)($in['nombre'] ?? ''));
+    if (!es_fecha($fecha) || !es_hora($hora) || !isset(MODALIDADES[$mod]) || $nombre === '') {
+        return null;
+    }
+    $email = limpiar((string)($in['email'] ?? ''));
+    return [
+        'id' => bin2hex(random_bytes(6)), 'fecha' => $fecha, 'hora' => $hora, 'modalidad' => $mod,
+        'nombre' => $nombre, 'apellidos' => limpiar((string)($in['apellidos'] ?? '')),
+        'telefono' => limpiar((string)($in['telefono'] ?? ''), 30),
+        'email' => filter_var($email, FILTER_VALIDATE_EMAIL) ? $email : '',
+        'nota' => limpiar((string)($in['nota'] ?? ''), 200),
+        'motivo' => in_array((string)($in['motivo'] ?? ''), MOTIVOS, true) ? (string)$in['motivo'] : '',
+        'origen' => 'panel', 'estado' => 'confirmada', 'creada' => date('c'),
+    ];
 }
 
 function url_panel(): string {
