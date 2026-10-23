@@ -6,10 +6,44 @@
 declare(strict_types=1);
 require __DIR__ . '/lib.php';
 
-$seguro = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
-session_name('nh_panel');
-session_set_cookie_params(['lifetime' => 0, 'path' => rtrim(dirname($_SERVER['SCRIPT_NAME']), '/') . '/', 'secure' => $seguro, 'httponly' => true, 'samesite' => 'Strict']);
-session_start();
+/*
+ * Acceso: al entrar se crea una clave aleatoria de sesión que el navegador guarda solo en esa pestaña
+ * y envía en cada petición. En el servidor se guarda solo su huella (hash) en datos/, con caducidad.
+ * No usa cookies ni las sesiones de PHP (en algunos hostings no se conservan entre peticiones).
+ */
+const SESION_HORAS = 12;
+
+function sesiones_vigentes(array $ss): array {
+    return array_values(array_filter($ss, fn($x) => is_array($x) && ($x['exp'] ?? 0) > time()));
+}
+function sesion_valida(string $t): bool {
+    if (!preg_match('/^[a-f0-9]{64}$/', $t)) {
+        return false;
+    }
+    $h = hash('sha256', $t);
+    foreach (sesiones_vigentes(leer_datos('sesiones', [])) as $x) {
+        if (hash_equals($x['h'], $h)) {
+            return true;
+        }
+    }
+    return false;
+}
+function crear_sesion(): string {
+    $t = bin2hex(random_bytes(32));
+    con_cerrojo(function () use ($t) {
+        $ss = sesiones_vigentes(leer_datos('sesiones', []));
+        $ss[] = ['h' => hash('sha256', $t), 'exp' => time() + SESION_HORAS * 3600];
+        guardar_datos('sesiones', array_slice($ss, -20));
+    });
+    return $t;
+}
+function borrar_sesiones(string $t = ''): void {
+    con_cerrojo(function () use ($t) {
+        $h = hash('sha256', $t);
+        $ss = $t === '' ? [] : array_values(array_filter(sesiones_vigentes(leer_datos('sesiones', [])), fn($x) => !hash_equals($x['h'], $h)));
+        guardar_datos('sesiones', $ss);
+    });
+}
 
 header('X-Frame-Options: DENY');
 header('Referrer-Policy: same-origin');
@@ -23,18 +57,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $accion = (string)($in['accion'] ?? '');
     $cfg = cargar_config();
     $configurado = $cfg['password'] !== '';
-    $dentro = !empty($_SESSION['dentro']);
+    $token = (string)($in['_t'] ?? ($_SERVER['HTTP_X_TOKEN'] ?? ''));
+    $dentro = sesion_valida($token);
 
     if ($accion === 'estado') {
-        if (empty($_SESSION['csrf'])) {
-            $_SESSION['csrf'] = bin2hex(random_bytes(16));
-        }
-        json_salida(['ok' => true, 'configurado' => $configurado, 'dentro' => $dentro, 'csrf' => $_SESSION['csrf']]);
-    }
-
-    // A partir de aquí, todas las acciones exigen el token de la sesión
-    if (empty($_SESSION['csrf']) || !hash_equals($_SESSION['csrf'], (string)($_SERVER['HTTP_X_CSRF'] ?? ''))) {
-        json_salida(['ok' => false, 'error' => 'sesion'], 403);
+        json_salida(['ok' => true, 'configurado' => $configurado, 'dentro' => $dentro, 'escribible' => datos_escribibles(), 'php' => PHP_VERSION]);
     }
 
     if ($accion === 'crear_password') {
@@ -52,9 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 guardar_datos('config', $c);
             }
         });
-        session_regenerate_id(true);
-        $_SESSION['dentro'] = true;
-        json_salida(['ok' => true]);
+        json_salida(['ok' => true, 'token' => crear_sesion()]);
     }
 
     if ($accion === 'entrar') {
@@ -64,9 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!$configurado || !password_verify((string)($in['password'] ?? ''), $cfg['password'])) {
             json_salida(['ok' => false, 'error' => 'password'], 401);
         }
-        session_regenerate_id(true);
-        $_SESSION['dentro'] = true;
-        json_salida(['ok' => true]);
+        json_salida(['ok' => true, 'token' => crear_sesion()]);
     }
 
     if (!$dentro) {
@@ -75,9 +98,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     switch ($accion) {
         case 'salir':
-            $_SESSION = [];
-            session_destroy();
+            borrar_sesiones($token);
             json_salida(['ok' => true]);
+
+        case 'exportar':
+            exportar_csv();
 
         case 'historial':
             $todas = cargar_reservas();
@@ -417,19 +442,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $c['password'] = password_hash($n, PASSWORD_DEFAULT);
                 guardar_datos('config', $c);
             });
-            json_salida(['ok' => true]);
+            borrar_sesiones();   // cierra cualquier otra sesión abierta
+            json_salida(['ok' => true, 'token' => crear_sesion()]);
     }
     json_salida(['ok' => false, 'error' => 'accion'], 400);
 }
 
 /* ======================= Descargar citas (Excel / CSV) ======================= */
-if (isset($_GET['exportar'])) {
-    if (empty($_SESSION['dentro'])) {
-        http_response_code(401);
-        header('Content-Type: text/plain; charset=utf-8');
-        echo 'Tienes que entrar en el panel para descargar las citas.';
-        exit;
-    }
+function exportar_csv(): void {
     $citas = cargar_reservas();
     usort($citas, fn($a, $b) => strcmp($b['fecha'] . $b['hora'], $a['fecha'] . $a['hora']));
     // Evita que Excel interprete un campo como fórmula
@@ -771,7 +791,7 @@ Viernes 14/11
           <label for="h-q" style="flex:2 1 16rem">Buscar paciente<input id="h-q" type="search" placeholder="Nombre, apellidos, teléfono o email" autocomplete="off"></label>
           <label for="h-est" style="flex:1 1 10rem">Mostrar<select id="h-est"><option value="todas">Todas</option><option value="pendiente">Pendientes</option><option value="confirmada">Confirmadas</option><option value="cancelada">Anuladas</option></select></label>
           <label for="h-cuando" style="flex:1 1 10rem">Fechas<select id="h-cuando"><option value="todas">Todas</option><option value="pasadas">Pasadas</option><option value="proximas">Próximas</option></select></label>
-          <a class="btn" href="admin.php?exportar=1" id="h-excel" style="flex:0 0 auto">Descargar en Excel</a>
+          <button class="btn" type="button" id="h-excel" style="flex:0 0 auto">Descargar en Excel</button>
         </div>
         <p class="muted" id="h-count" style="margin:0"></p>
         <div class="tbl-wrap"><table class="tbl">
@@ -825,15 +845,18 @@ Viernes 14/11
 
 <script>
 (function(){
-  var CSRF = '', D = null, H = null;
+  var TOKEN = '', D = null, H = null;
+  try { TOKEN = sessionStorage.getItem('nh_t') || ''; } catch (e) {}
+  function ponerToken(t){ TOKEN = t || ''; try { if (TOKEN) sessionStorage.setItem('nh_t', TOKEN); else sessionStorage.removeItem('nh_t'); } catch (e) {} }
   var DIAS = ['', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
   var MOD = { presencial: 'Presencial', online: 'Online' };
   function $(id){ return document.getElementById(id); }
   function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
   function api(accion, datos){
-    var body = Object.assign({ accion: accion }, datos || {});
-    return fetch('admin.php', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json', 'X-CSRF': CSRF }, body: JSON.stringify(body) })
-      .then(function(r){ return r.json().catch(function(){ return { ok: false, error: 'red' }; }); });
+    var body = Object.assign({ accion: accion, _t: TOKEN }, datos || {});
+    return fetch('admin.php', { method: 'POST', credentials: 'omit', cache: 'no-store', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+      .then(function(r){ return r.json().catch(function(){ return { ok: false, error: 'red' }; }); }, function(){ return { ok: false, error: 'red' }; })
+      .then(function(r){ if (r && r.error === 'no_autorizado' && accion !== 'estado') { ponerToken(''); mostrarLogin(true); } return r; });
   }
   function toast(t){ var e = $('toast'); e.textContent = t; e.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(function(){ e.hidden = true; }, 2600); }
   function fechaLarga(f){
@@ -841,7 +864,7 @@ Viernes 14/11
     return d.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
   }
   function fechaCorta(f){ var d = new Date(f + 'T12:00:00'); return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }); }
-  var ERR = { password: 'Contraseña incorrecta.', limite: 'Demasiados intentos. Espera 15 minutos y vuelve a probar.', corta: 'La contraseña debe tener al menos 8 caracteres.', ocupado: 'Ese hueco ya tiene una cita.', datos: 'Revisa los datos: falta algo o no es válido.', red: 'No hay conexión con el servidor.', sesion: 'La sesión ha caducado. Recarga la página.', no_autorizado: 'La sesión ha caducado. Recarga la página.', tramo: 'Hay un tramo con la hora de fin antes que la de inicio.' };
+  var ERR = { password: 'Contraseña incorrecta.', limite: 'Demasiados intentos. Espera 15 minutos y vuelve a probar.', corta: 'La contraseña debe tener al menos 8 caracteres.', ocupado: 'Ese hueco ya tiene una cita.', datos: 'Revisa los datos: falta algo o no es válido.', red: 'No hay conexión con el servidor.', sesion: 'La sesión ha caducado. Recarga la página.', no_autorizado: 'La sesión ha caducado. Recarga la página.', tramo: 'Hay un tramo con la hora de fin antes que la de inicio.', escritura: 'El servidor no deja guardar datos en la carpeta reservas/datos. En el administrador de archivos de DonDominio, pon permisos 755 a las carpetas «reservas» y «datos».', servidor: 'Ha fallado algo en el servidor. Prueba otra vez en un momento.' };
   function errTxt(r){ return ERR[r && r.error] || 'No se ha podido guardar. Prueba otra vez.'; }
 
   /* ---------- acceso ---------- */
@@ -860,10 +883,10 @@ Viernes 14/11
     if (primeraVez && p !== $('l-pass2').value) { err.textContent = 'Las dos contraseñas no coinciden.'; err.hidden = false; return; }
     api(primeraVez ? 'crear_password' : 'entrar', { password: p }).then(function(r){
       if (!r.ok) { err.textContent = errTxt(r); err.hidden = false; return; }
-      $('l-pass').value = ''; $('l-pass2').value = ''; cargar();
+      ponerToken(r.token); $('l-pass').value = ''; $('l-pass2').value = ''; cargar();
     });
   });
-  $('b-salir').addEventListener('click', function(){ api('salir').then(function(){ location.reload(); }); });
+  $('b-salir').addEventListener('click', function(){ api('salir').then(function(){ ponerToken(''); location.reload(); }); });
 
   /* ---------- pestañas ---------- */
   document.querySelectorAll('[data-tab]').forEach(function(b){
@@ -876,7 +899,7 @@ Viernes 14/11
   /* ---------- datos ---------- */
   function cargar(){
     return api('datos').then(function(r){
-      if (!r.ok) { if (r.error === 'no_autorizado') return mostrarLogin(true); toast(errTxt(r)); return; }
+      if (!r.ok) { if (r.error !== 'no_autorizado') toast(errTxt(r)); return; }
       D = r; H = unir(r.horario);
       $('v-login').hidden = true; $('v-panel').hidden = false;
       $('dur').textContent = r.duracion; document.querySelectorAll('.dur2').forEach(function(e){ e.textContent = r.duracion; });
@@ -1278,15 +1301,24 @@ Viernes 14/11
   $('f-pass').addEventListener('submit', function(e){
     e.preventDefault(); var m = $('p-msg');
     api('cambiar_password', { actual: $('p-act').value, nueva: $('p-new').value }).then(function(r){
-      m.hidden = false; m.className = 'msg ' + (r.ok ? 'ok' : 'err'); m.textContent = r.ok ? 'Contraseña cambiada.' : errTxt(r); if (r.ok) e.target.reset();
+      m.hidden = false; m.className = 'msg ' + (r.ok ? 'ok' : 'err'); m.textContent = r.ok ? 'Contraseña cambiada.' : errTxt(r); if (r.ok) { ponerToken(r.token); e.target.reset(); }
     });
+  });
+
+  $('h-excel').addEventListener('click', function(){
+    var b = this; b.disabled = true;
+    fetch('admin.php', { method: 'POST', credentials: 'omit', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ accion: 'exportar', _t: TOKEN }) })
+      .then(function(r){ if (!r.ok) throw 0; return r.blob(); })
+      .then(function(bl){ var a = document.createElement('a'); a.href = URL.createObjectURL(bl); a.download = 'citas-nutriendo-habitos-' + D.hoy + '.csv'; document.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 1000); })
+      .catch(function(){ toast('No se ha podido descargar. Vuelve a entrar y prueba otra vez.'); })
+      .then(function(){ b.disabled = false; });
   });
 
   /* ---------- inicio ---------- */
   api('estado').then(function(r){
-    if (!r.ok) { mostrarLogin(true); return; }
-    CSRF = r.csrf;
-    if (r.dentro) cargar(); else mostrarLogin(r.configurado);
+    if (!r.ok) { $('l-err').textContent = errTxt(r); $('l-err').hidden = false; mostrarLogin(true); return; }
+    if (r.dentro) cargar(); else { ponerToken(''); mostrarLogin(r.configurado); }
+    if (r.escribible === false) { $('l-err').textContent = ERR.escritura; $('l-err').hidden = false; }
   });
 })();
 </script>

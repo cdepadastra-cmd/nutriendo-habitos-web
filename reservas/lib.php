@@ -33,16 +33,41 @@ const CABECERA_PROTEGIDA = "<?php http_response_code(404); exit; ?>\n";
 
 /* ---------- almacenamiento ---------- */
 
+/** Error al guardar en reservas/datos (normalmente, permisos de la carpeta en el hosting). */
+class ErrorEscritura extends RuntimeException {}
+
+/** Comprueba de verdad si PHP puede crear archivos en reservas/datos. */
+function datos_escribibles(): bool {
+    if (!is_dir(DIR_DATOS) && !@mkdir(DIR_DATOS, 0755, true)) {
+        return false;
+    }
+    $f = DIR_DATOS . '/.prueba_' . bin2hex(random_bytes(3));
+    $ok = @file_put_contents($f, 'ok') === 2;
+    @unlink($f);
+    return $ok;
+}
+
+// Cualquier fallo inesperado responde con un mensaje claro en vez de una página en blanco
+set_exception_handler(function (Throwable $e) {
+    $esc = $e instanceof ErrorEscritura;
+    error_log('Reservas Nutriendo Hábitos: ' . $e->getMessage());
+    if (!headers_sent()) {
+        http_response_code(500);
+        header('Content-Type: application/json; charset=utf-8');
+    }
+    echo json_encode(['ok' => false, 'error' => $esc ? 'escritura' : 'servidor'], JSON_UNESCAPED_UNICODE);
+});
+
 function asegurar_datos(): void {
-    if (!is_dir(DIR_DATOS)) {
-        mkdir(DIR_DATOS, 0750, true);
+    if (!is_dir(DIR_DATOS) && !@mkdir(DIR_DATOS, 0755, true)) {
+        throw new ErrorEscritura('No se puede crear la carpeta datos');
     }
     $ht = DIR_DATOS . '/.htaccess';
     if (!is_file($ht)) {
-        file_put_contents($ht, "<IfModule mod_authz_core.c>\n  Require all denied\n</IfModule>\n<IfModule !mod_authz_core.c>\n  Deny from all\n</IfModule>\n");
+        @file_put_contents($ht, "<IfModule mod_authz_core.c>\n  Require all denied\n</IfModule>\n<IfModule !mod_authz_core.c>\n  Deny from all\n</IfModule>\n");
     }
     if (!is_file(DIR_DATOS . '/index.html')) {
-        file_put_contents(DIR_DATOS . '/index.html', '');
+        @file_put_contents(DIR_DATOS . '/index.html', '');
     }
 }
 
@@ -64,14 +89,20 @@ function guardar_datos(string $nombre, array $datos): void {
     asegurar_datos();
     $f = ruta_datos($nombre);
     $tmp = $f . '.' . bin2hex(random_bytes(4)) . '.tmp';
-    file_put_contents($tmp, CABECERA_PROTEGIDA . json_encode($datos, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT), LOCK_EX);
-    rename($tmp, $f);
+    $txt = CABECERA_PROTEGIDA . json_encode($datos, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+    if (@file_put_contents($tmp, $txt, LOCK_EX) !== strlen($txt) || !@rename($tmp, $f)) {
+        @unlink($tmp);
+        throw new ErrorEscritura('No se puede guardar ' . $nombre);
+    }
 }
 
 /** Ejecuta $fn con un cerrojo exclusivo, para que dos reservas simultáneas no cojan el mismo hueco. */
 function con_cerrojo(callable $fn) {
     asegurar_datos();
-    $fh = fopen(DIR_DATOS . '/.cerrojo', 'c');
+    $fh = @fopen(DIR_DATOS . '/.cerrojo', 'c');
+    if (!$fh) {
+        throw new ErrorEscritura('No se puede abrir el cerrojo');
+    }
     flock($fh, LOCK_EX);
     try {
         return $fn();
