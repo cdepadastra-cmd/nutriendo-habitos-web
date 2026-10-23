@@ -32,7 +32,7 @@ PAGINAS = {
         'Nutricionista deportiva en Valladolid y online: alimentación antes, durante y después del entrenamiento, escalada y composición corporal con Andrea Argüello.', '0.9'),
     'nutricion-oncologica-valladolid': ('nutricion-oncologica-valladolid.html',
         'Nutrición oncológica en Valladolid y online | Nutriendo Hábitos',
-        'Nutricionista oncológica en Valladolid y online: alimentación antes, durante y después del tratamiento del cáncer, coordinada con tu equipo médico.', '0.9'),
+        'Nutricionista oncológica en Valladolid y online, con Máster en Nutrición Oncológica: alimentación antes, durante y después del tratamiento del cáncer, junto a tu equipo médico.', '0.9'),
     'nutricionista-online': ('nutricionista-online.html',
         'Nutricionista online · Consulta por videollamada | Nutriendo Hábitos',
         'Consulta de nutrición online con Andrea Argüello: dietas personalizadas y seguimiento por videollamada desde cualquier punto de España.', '0.8'),
@@ -173,7 +173,11 @@ NEGOCIO = {
 ANDREA = {'@type': 'Person', '@id': BASE + '#andrea', 'name': 'Andrea Argüello Arbe', 'jobTitle': 'Dietista-nutricionista',
           'worksFor': {'@id': BASE + '#negocio'},
           'alumniOf': [{'@type': 'CollegeOrUniversity', 'name': 'Universidad de Valladolid'},
-                       {'@type': 'CollegeOrUniversity', 'name': 'Universidad de Barcelona'}]}
+                       {'@type': 'CollegeOrUniversity', 'name': 'Universidad de Barcelona'}],
+          'hasCredential': [
+              {'@type': 'EducationalOccupationalCredential', 'credentialCategory': 'degree', 'name': 'Diplomatura en Nutrición Humana y Dietética', 'recognizedBy': {'@type': 'CollegeOrUniversity', 'name': 'Universidad de Valladolid'}},
+              {'@type': 'EducationalOccupationalCredential', 'credentialCategory': 'Máster', 'name': 'Máster en Nutrición', 'recognizedBy': {'@type': 'CollegeOrUniversity', 'name': 'Universidad de Barcelona'}},
+              {'@type': 'EducationalOccupationalCredential', 'credentialCategory': 'Máster', 'name': 'Máster en Nutrición Oncológica', 'dateCreated': '2026'}]}
 WEB = {'@type': 'WebSite', '@id': BASE + '#web', 'url': BASE, 'name': 'Nutriendo Hábitos', 'inLanguage': 'es-ES', 'publisher': {'@id': BASE + '#negocio'}}
 
 SERVICIOS = {

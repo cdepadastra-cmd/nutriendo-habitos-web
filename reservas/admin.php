@@ -553,6 +553,14 @@ input,select{height:2.4rem;border:1px solid var(--border);border-radius:.6rem;ba
 .ej pre{background:var(--muted);border-radius:.6rem;padding:.6rem .75rem;font-size:.8rem;white-space:pre-wrap;margin:0}
 #imp-txt{width:100%;font:inherit;font-size:.9rem;border:1px solid var(--border);border-radius:.7rem;padding:.6rem .75rem;background:var(--card);resize:vertical;margin-top:.6rem}
 .tbl-wrap{overflow-x:auto;margin:.8rem 0}
+.foto-box{display:flex;flex-wrap:wrap;gap:.8rem;align-items:end}
+.foto-box label.btn{cursor:pointer}
+.dia-foto{flex:1 1 12rem;font-size:.85rem}
+.foto-prev{display:flex;gap:.8rem;align-items:center;margin-top:.8rem;padding:.6rem;border-radius:.8rem;background:var(--muted)}
+.foto-prev img{width:4.5rem;height:4.5rem;object-fit:cover;border-radius:.5rem;flex:none}
+.foto-prev>div{flex:1;min-width:0}
+.barra{height:.4rem;border-radius:999px;background:var(--border);overflow:hidden;margin-top:.4rem}
+.barra span{display:block;height:100%;width:0;background:var(--primary);transition:width .3s}
 table.imp{width:100%;border-collapse:collapse;font-size:.85rem}
 table.imp th{text-align:left;font-weight:600;color:var(--muted-fg);font-size:.75rem;padding:.3rem .4rem;border-bottom:1px solid var(--border)}
 table.imp td{padding:.4rem;border-bottom:1px solid var(--border);vertical-align:top}
@@ -669,7 +677,14 @@ table.imp td.ie{font-size:.78rem;color:#9A3B2E;min-width:9rem}table.imp td.ie sm
         <div style="display:grid;gap:1.25rem;align-content:start">
           <div class="card" id="imp-card">
             <h2 style="font-size:1.2rem;margin-bottom:.4rem">Pasar citas de tu agenda</h2>
-            <p class="muted" style="margin:0 0 .6rem">Pega aquí las citas que tienes apuntadas (una por línea) y se crean todas de golpe. Puedes copiar el texto de la foto de tu agenda con el móvil: <b>iPhone</b> → abre la foto en Fotos, mantén pulsado el texto y «Copiar»; <b>Android</b> → Google Fotos o Google Lens → «Texto» → «Copiar».</p>
+            <p class="muted" style="margin:0 0 .8rem">Haz una foto a la página de la agenda y el panel lee las citas. Tú revisas lo que ha entendido, corriges si hace falta y pulsas «Añadir citas». La foto se lee en tu propio móvil u ordenador: no se envía a ningún sitio.</p>
+            <div class="foto-box">
+              <label class="btn" for="imp-foto"><svg viewBox="0 0 24 24" aria-hidden="true" style="width:1.1rem;height:1.1rem;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg> Foto de la agenda</label>
+              <input id="imp-foto" type="file" accept="image/*" class="sr">
+              <label for="imp-dia" class="dia-foto">Día de la página (si es de un solo día)<input id="imp-dia" type="date"></label>
+            </div>
+            <div class="foto-prev" id="foto-prev" hidden><img id="foto-img" alt="Foto de la agenda"><div><p id="foto-est" style="margin:0;font-weight:500"></p><div class="barra"><span id="foto-barra"></span></div><p class="muted" id="foto-txt" style="margin:.3rem 0 0;font-size:.8rem"></p></div></div>
+            <p class="muted" style="margin:.8rem 0 0;font-size:.85rem">O pega o escribe las citas, una por línea:</p>
             <details class="ej"><summary>Ver cómo escribirlas</summary>
               <pre>12/11 10:00 María López García 600123456
 12/11 10:45 Juan Pérez online
@@ -1031,7 +1046,7 @@ Viernes 14/11
       var f = '', h = '', m, malDia = false;
       // día: 12/11, 12-11-2026 o «12 de noviembre»
       if ((m = l.match(/(^|[^\d:])(\d{1,2})\s*[\/-]\s*(\d{1,2})(?:\s*[\/-]\s*(\d{2,4}))?(?!\d)/))) { f = fechaDe(+m[2], +m[3], m[4] ? +m[4] : 0); if (f) l = l.replace(m[0], m[1] + ' '); else malDia = +m[3] > 0 && +m[3] <= 12; }
-      else if ((m = l.match(/(^|\D)(\d{1,2})\s*(?:de\s+)?(ene|feb|mar|abr|may|jun|jul|ago|sep|set|oct|nov|dic)[a-zé]*\.?(?:\s*(?:de\s+)?(\d{4}))?/i))) { f = fechaDe(+m[2], MESES[m[3].toLowerCase()], m[4] ? +m[4] : 0); if (f) l = l.replace(m[0], m[1] + ' '); else malDia = true; }
+      else if ((m = l.match(/(^|[^\d:.])(\d{1,2})\s*(?:de\s+)?(ene(?:ro)?|feb(?:rero)?|mar(?:zo)?|abr(?:il)?|may(?:o)?|jun(?:io)?|jul(?:io)?|ago(?:sto)?|sep(?:tiembre)?|set(?:iembre)?|oct(?:ubre)?|nov(?:iembre)?|dic(?:iembre)?)\.?(?![a-záéíóúñ])(?:\s*(?:de\s+)?(\d{4}))?/i))) { f = fechaDe(+m[2], MESES[m[3].toLowerCase().slice(0, 3)], m[4] ? +m[4] : 0); if (f) l = l.replace(m[0], m[1] + ' '); else malDia = true; }
       // hora: 10:00, 10.30, 10h, 10:00h
       if ((m = l.match(/(^|\D)([01]?\d|2[0-3])\s*(?:[:.h]\s*([0-5]\d))\s*h?(?!\d)|(^|\D)([01]?\d|2[0-3])\s*h(?![a-z])/i))) {
         var hh = m[2] || m[5], mm = m[3] || '00'; h = String(hh).padStart(2, '0') + ':' + mm; l = l.replace(m[0], (m[1] || m[4] || '') + ' ');
@@ -1045,6 +1060,7 @@ Viernes 14/11
       l = l.replace(/\b(online|on-line|videollamada|video|presencial|lunes|martes|mi[eé]rcoles|jueves|viernes|s[aá]bado|domingo|tel[eé]fono|tlf|tfno|m[oó]vil)\b\.?/gi, ' ')
            .replace(/[|·,;:()\[\]-]+/g, ' ').replace(/\s+/g, ' ').trim();
       var partes = l.split(' ').filter(Boolean);
+      if (h && !partes.length && !tel && !email) return;   // hueco vacío de la agenda (solo la hora)
       var c = { linea: n + 1, original: linea.trim(), fecha: f, hora: h, modalidad: mod, nombre: partes[0] || '', apellidos: partes.slice(1).join(' '), telefono: tel, email: email, motivo: $('imp-motivo').value };
       c.error = malDia ? 'Ese día no existe' : !h ? 'Falta la hora' : !f ? 'Falta el día' : !c.nombre ? 'Falta el nombre' : f < D.hoy ? 'Es un día pasado' : '';
       if (!c.error && D.citas.some(function(x){ return x.fecha === f && x.hora === h && x.estado !== 'cancelada'; })) c.error = 'Ya hay una cita a esa hora';
@@ -1053,6 +1069,59 @@ Viernes 14/11
     });
     return out;
   }
+  /* ---------- leer la foto de la agenda (en el propio navegador, sin enviarla a ningún sitio) ---------- */
+  var OCR = null;
+  function cargarOCR(){
+    if (OCR) return OCR;
+    OCR = new Promise(function(ok, ko){ var sc = document.createElement('script'); sc.src = 'ocr/tesseract.min.js'; sc.onload = ok; sc.onerror = ko; document.head.appendChild(sc); })
+      .then(function(){
+        var base = location.href.replace(/[^\/]*$/, '') + 'ocr/';
+        return Tesseract.createWorker('spa', 1, {
+          workerPath: base + 'worker.min.js', corePath: base + 'core', langPath: base + 'lang', workerBlobURL: false, gzip: true, cacheMethod: 'none',
+          logger: function(m){ if (m.status === 'recognizing text') progreso(m.progress, 'Leyendo la letra…'); else if (/load|initiali/.test(m.status)) progreso(.05, 'Preparando el lector (solo tarda la primera vez)…'); }
+        });
+      });
+    OCR.catch(function(){ OCR = null; });
+    return OCR;
+  }
+  function progreso(p, t){ $('foto-barra').style.width = Math.round(Math.max(.03, p) * 100) + '%'; if (t) $('foto-est').textContent = t; }
+  function prepararFoto(file){
+    // reduce el tamaño, pasa a gris y sube el contraste para que se lea mejor
+    return new Promise(function(ok, ko){
+      var img = new Image(); img.onload = function(){
+        var esc_ = Math.min(1, 2200 / Math.max(img.width, img.height)), c = document.createElement('canvas');
+        c.width = Math.round(img.width * esc_); c.height = Math.round(img.height * esc_);
+        var x = c.getContext('2d'); x.drawImage(img, 0, 0, c.width, c.height);
+        var d = x.getImageData(0, 0, c.width, c.height), a = d.data, min = 255, max = 0, i, g;
+        for (i = 0; i < a.length; i += 4) { g = a[i] * .299 + a[i + 1] * .587 + a[i + 2] * .114; a[i] = g; if (g < min) min = g; if (g > max) max = g; }
+        var r = Math.max(1, max - min);
+        for (i = 0; i < a.length; i += 4) { g = Math.min(255, Math.max(0, (a[i] - min) * 255 / r)); g = g > 200 ? 255 : g; a[i] = a[i + 1] = a[i + 2] = g; }
+        x.putImageData(d, 0, 0); URL.revokeObjectURL(img.src); ok(c);
+      };
+      img.onerror = ko; img.src = URL.createObjectURL(file);
+    });
+  }
+  $('imp-foto').addEventListener('change', function(){
+    var f = this.files && this.files[0]; this.value = ''; if (!f) return;
+    $('foto-prev').hidden = false; $('foto-img').src = URL.createObjectURL(f);
+    $('foto-txt').textContent = ''; progreso(.02, 'Abriendo la foto…');
+    Promise.all([prepararFoto(f), cargarOCR()]).then(function(r){
+      progreso(.1, 'Leyendo la letra…');
+      return r[1].recognize(r[0]);
+    }).then(function(res){
+      var lineas = String(res.data.text || '').split(/\r?\n/).map(function(l){ return l.replace(/[|_~«»"“”]/g, ' ').replace(/\s+/g, ' ').trim(); }).filter(function(l){ return /\d/.test(l) || /[a-záéíóúñ]{3,}/i.test(l); });
+      var dia = $('imp-dia').value, cab = dia ? dia.split('-').reverse().slice(0, 2).join('/') : '';
+      var txt = (cab ? cab + '\n' : '') + lineas.join('\n');
+      var ta = $('imp-txt'); ta.value = (ta.value.trim() ? ta.value.trim() + '\n' : '') + txt;
+      progreso(1, lineas.length ? 'Foto leída.' : 'No he podido leer texto en la foto.');
+      $('foto-txt').textContent = lineas.length ? 'Revisa la lista de abajo: si algo está mal leído, corrígelo en el recuadro de texto y pulsa «Revisar citas» otra vez.' : 'Prueba con más luz, la página recta y sin sombras, o escribe las citas a mano.';
+      if (lineas.length) $('imp-rev').click();
+    }).catch(function(){
+      progreso(0, 'No se ha podido leer la foto.');
+      $('foto-txt').textContent = 'Comprueba la conexión y vuelve a probar. Si sigue fallando, escribe o pega las citas en el recuadro.';
+    });
+  });
+
   $('imp-rev').addEventListener('click', function(){
     IMP = leerAgenda($('imp-txt').value);
     var buenas = IMP.filter(function(c){ return !c.error; }).length, msg = $('imp-msg');
