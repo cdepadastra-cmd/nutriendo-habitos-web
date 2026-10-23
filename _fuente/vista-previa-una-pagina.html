@@ -80,21 +80,6 @@ nav.main a[aria-current="page"]{color:var(--primary);text-decoration:underline;t
 .mobile-nav{display:none;border-top:1px solid var(--border);padding:.5rem var(--gutter-r) 1rem var(--gutter-l)}
 .mobile-nav a{display:block;padding:.7rem 0;border-bottom:1px solid color-mix(in oklab,var(--border) 60%,transparent);color:var(--muted-fg)}
 .mobile-nav a[aria-current="page"]{color:var(--primary);font-weight:500}
-.nav-dd{position:relative;display:flex;align-items:center;gap:.1rem}
-.dd-btn{display:grid;place-items:center;width:1.35rem;height:1.35rem;border-radius:999px;color:var(--muted-fg);transition:transform .15s,color .15s}
-.dd-btn svg{width:.85rem;height:.85rem}
-.nav-dd:hover .dd-btn,.nav-dd.open .dd-btn{color:var(--primary)}
-.nav-dd.open .dd-btn{transform:rotate(180deg)}
-.dd-menu{position:absolute;top:calc(100% + .75rem);left:-1rem;min-width:16rem;display:grid;padding:.45rem;background:var(--card);border:1px solid var(--border);border-radius:1rem;box-shadow:0 22px 44px -24px rgba(30,40,28,.35);opacity:0;visibility:hidden;transform:translateY(6px);transition:opacity .15s,transform .15s,visibility .15s;z-index:40}
-.dd-menu::before{content:"";position:absolute;left:0;right:0;top:-.8rem;height:.8rem}
-.nav-dd:hover .dd-menu,.nav-dd:focus-within .dd-menu,.nav-dd.open .dd-menu{opacity:1;visibility:visible;transform:none}
-nav.main .dd-menu a{display:flex;align-items:center;gap:.6rem;padding:.55rem .75rem;border-radius:.65rem;color:var(--foreground);font-size:.9rem}
-nav.main .dd-menu a:hover,nav.main .dd-menu a:focus-visible{background:var(--secondary);color:var(--primary)}
-.dd-menu a svg{width:1rem;height:1rem;color:var(--primary);flex:0 0 auto}
-.dd-menu .sep{border-top:1px solid var(--border);margin:.3rem .5rem}
-nav.main .dd-menu a.all{color:var(--primary);font-weight:500}
-.mobile-nav .m-sub{display:grid;padding:.2rem 0 .4rem 1rem;border-bottom:1px solid color-mix(in oklab,var(--border) 60%,transparent)}
-.mobile-nav .m-sub a{border-bottom:0;padding:.45rem 0;font-size:.92rem}
 .stmt[id]{scroll-margin-top:7.5rem}
 @media (max-width:1023px){
   nav.main{display:none}
@@ -131,8 +116,9 @@ nav.main .dd-menu a.all{color:var(--primary);font-weight:500}
 .h2{font-size:2.25rem;line-height:1.1}
 @media (min-width:768px){.h2{font-size:3rem}}
 .eyebrow-leaf{margin-bottom:.75rem;font-size:.875rem;color:var(--leaf)}
-.acc-grid{margin-top:2.5rem;display:grid;gap:1.25rem}
+.acc-grid{margin-top:2.5rem;display:grid;gap:1.25rem;align-items:start}
 @media (min-width:640px){.acc-grid{grid-template-columns:1fr 1fr}}
+@media (min-width:1000px){.acc-grid{grid-template-columns:repeat(6,minmax(0,1fr))}.acc-grid .acc{grid-column:span 2}.acc-grid .acc:nth-child(n+4){grid-column:span 3}}
 .acc{border-radius:var(--radius);border:1px solid color-mix(in oklab,var(--primary-fg) 20%,transparent);background:color-mix(in oklab,var(--primary-fg) 5%,transparent);padding:1.5rem;transition:background-color .2s}
 .acc:hover{background:color-mix(in oklab,var(--primary-fg) 10%,transparent)}
 .acc button{display:block;width:100%;text-align:left}
@@ -359,6 +345,13 @@ nav.main .dd-menu a.all{color:var(--primary);font-weight:500}
 .legal{padding-top:3rem;padding-bottom:4rem;font-size:.875rem}
 .legal p{margin:1rem 0;line-height:1.8}
 
+/* ---------- servicios: accesos directos ---------- */
+.srv-top{display:grid;gap:.8rem;grid-template-columns:repeat(auto-fit,minmax(min(100%,11.5rem),1fr));margin-bottom:3rem}
+.srv-top a{display:grid;gap:.45rem;align-content:start;padding:1.1rem;border-radius:var(--radius-xl);border:1px solid color-mix(in oklab,var(--primary) 14%,transparent);background:var(--card);transition:border-color .2s,transform .2s,background-color .2s}
+.srv-top a:hover{border-color:var(--primary);background:color-mix(in oklab,var(--secondary) 45%,var(--card));transform:translateY(-2px)}
+.srv-top b{font-family:var(--font-display);font-weight:400;font-size:1.12rem;line-height:1.25;color:var(--primary);margin-top:.35rem}
+.srv-top small{color:var(--muted-fg);font-size:.82rem;line-height:1.4}
+
 /* ---------- preguntas frecuentes ---------- */
 .faq{margin-top:3rem;max-width:52rem}
 .faq-list{margin-top:1.25rem;display:grid;gap:.6rem}
@@ -505,20 +498,18 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
     <h2 class="h2">Cada persona, un camino.</h2>
     <div class="acc-grid" id="acc">
       <div class="acc open"><button aria-expanded="true"><span class="top"><svg class="i" viewBox="0 0 24 24" data-ic="stetho"></svg><svg class="i tog" viewBox="0 0 24 24"></svg></span><h3>Tratamiento de patologías</h3></button>
-        <div class="body"><p>Son numerosas las patologías relacionadas con la alimentación tales como diabetes, hernia de hiato, alergias e intolerancias alimentarias, TCAs, diversas patologías digestivas e intestinales, SIBO, enfermedad de Crohn, Síndrome Metabólico, DAO, etc. El establecimiento de una dieta adecuada para cada una de ellas puede ayudarnos a llevar mejor la enfermedad, mejorar nuestro estado de salud y, en definitiva, mejorar nuestra calidad de vida.</p><a class="link-arrow" href="#contacto">Consultar <svg class="i" viewBox="0 0 24 24" data-ic="arrow"></svg></a></div></div>
+        <div class="body"><p>Son numerosas las patologías relacionadas con la alimentación tales como diabetes, hernia de hiato, alergias e intolerancias alimentarias, TCAs, diversas patologías digestivas e intestinales, SIBO, enfermedad de Crohn, Síndrome Metabólico, DAO, etc. El establecimiento de una dieta adecuada para cada una de ellas puede ayudarnos a llevar mejor la enfermedad, mejorar nuestro estado de salud y, en definitiva, mejorar nuestra calidad de vida.</p><a class="link-arrow" href="#patologias">Ver tratamiento de patologías <svg class="i" viewBox="0 0 24 24" data-ic="arrow"></svg></a></div></div>
       <div class="acc"><button aria-expanded="false"><span class="top"><svg class="i" viewBox="0 0 24 24" data-ic="scale"></svg><svg class="i tog" viewBox="0 0 24 24"></svg></span><h3>Sobrepeso, obesidad y ganancia de peso</h3></button>
-        <div class="body"><p>Según palabras de la propia OMS ‘la obesidad ha alcanzado proporciones epidémicas a nivel mundial, y cada año mueren, como mínimo, 2,8 millones de personas a causa de la obesidad o sobrepeso.’ Por lo tanto, no debemos fijarnos en ellas como un problema estético, si no como algo mucho más serio que puede tener consecuencias graves para nuestra salud.</p><a class="link-arrow" href="#contacto">Consultar <svg class="i" viewBox="0 0 24 24" data-ic="arrow"></svg></a></div></div>
+        <div class="body"><p>Según palabras de la propia OMS ‘la obesidad ha alcanzado proporciones epidémicas a nivel mundial, y cada año mueren, como mínimo, 2,8 millones de personas a causa de la obesidad o sobrepeso.’ Por lo tanto, no debemos fijarnos en ellas como un problema estético, si no como algo mucho más serio que puede tener consecuencias graves para nuestra salud.</p><a class="link-arrow" href="#sobrepeso">Ver sobrepeso y ganancia de peso <svg class="i" viewBox="0 0 24 24" data-ic="arrow"></svg></a></div></div>
       <div class="acc"><button aria-expanded="false"><span class="top"><svg class="i" viewBox="0 0 24 24" data-ic="mountain"></svg><svg class="i tog" viewBox="0 0 24 24"></svg></span><h3>Nutrición deportiva</h3></button>
-        <div class="body"><p>Una de las peticiones de los deportistas es “quiero mejorar mi rendimiento”. La nutrición, la alimentación, forma parte de ese llamado entrenamiento invisible, fundamental para esa mejora de resultados y alcanzar nuestra meta. Una correcta planificación de la dieta del deportista, pre, intra y post entrenamiento puede marcar la diferencia.</p><a class="link-arrow" href="#nutricion-deportiva">Consultar <svg class="i" viewBox="0 0 24 24" data-ic="arrow"></svg></a></div></div>
+        <div class="body"><p>Una de las peticiones de los deportistas es “quiero mejorar mi rendimiento”. La nutrición, la alimentación, forma parte de ese llamado entrenamiento invisible, fundamental para esa mejora de resultados y alcanzar nuestra meta. Una correcta planificación de la dieta del deportista, pre, intra y post entrenamiento puede marcar la diferencia.</p><a class="link-arrow" href="#nutricion-deportiva-valladolid">Ver nutrición deportiva <svg class="i" viewBox="0 0 24 24" data-ic="arrow"></svg></a></div></div>
+      <div class="acc"><button aria-expanded="false"><span class="top"><svg class="i" viewBox="0 0 24 24" data-ic="heart"></svg><svg class="i tog" viewBox="0 0 24 24"></svg></span><h3>Nutrición oncológica</h3></button>
+        <div class="body"><p>Acompañamiento nutricional antes, durante y después del tratamiento oncológico, coordinado con tu equipo médico: pautas para los efectos secundarios que afectan a la alimentación (falta de apetito, náuseas, cambios en el gusto…) y para mantener el peso y la masa muscular.</p><a class="link-arrow" href="#nutricion-oncologica-valladolid">Ver nutrición oncológica <svg class="i" viewBox="0 0 24 24" data-ic="arrow"></svg></a></div></div>
       <div class="acc"><button aria-expanded="false"><span class="top"><svg class="i" viewBox="0 0 24 24" data-ic="leaf"></svg><svg class="i tog" viewBox="0 0 24 24"></svg></span><h3>Vegetariana y vegana</h3></button>
-        <div class="body"><p>Cada vez más personas optan por cambiar su alimentación dada la repercusión que tiene esta, ya no sobre su salud, si no sobre el entorno en el que vivimos. Pero no se puede hacer de cualquier manera y hay que tener en cuenta algunos factores si queremos hacer las cosas bien.</p><a class="link-arrow" href="#contacto">Consultar <svg class="i" viewBox="0 0 24 24" data-ic="arrow"></svg></a></div></div>
+        <div class="body"><p>Cada vez más personas optan por cambiar su alimentación dada la repercusión que tiene esta, ya no sobre su salud, si no sobre el entorno en el que vivimos. Pero no se puede hacer de cualquier manera y hay que tener en cuenta algunos factores si queremos hacer las cosas bien.</p><a class="link-arrow" href="#vegetariana">Ver alimentación vegetariana y vegana <svg class="i" viewBox="0 0 24 24" data-ic="arrow"></svg></a></div></div>
     </div>
     <div class="after-acc">
-      <div style="display:flex;flex-wrap:wrap;gap:.75rem 1.75rem">
-        <a class="link-arrow" href="#todos-los-servicios">Conoce todos los servicios <svg class="i" viewBox="0 0 24 24" data-ic="arrow"></svg></a>
-        <a class="link-arrow" href="#nutricion-deportiva-valladolid">Nutrición deportiva <svg class="i" viewBox="0 0 24 24" data-ic="arrow"></svg></a>
-        <a class="link-arrow" href="#nutricion-oncologica-valladolid">Nutrición oncológica <svg class="i" viewBox="0 0 24 24" data-ic="arrow"></svg></a>
-      </div>
+      <a class="link-arrow" href="#todos-los-servicios">Conoce todos los servicios <svg class="i" viewBox="0 0 24 24" data-ic="arrow"></svg></a>
       <h3>Asesoría externa</h3>
       <p class="d">Colegios, comedores escolares, residencias de estudiantes y geriátricas, empresas, madres de día…</p>
     </div>
@@ -591,6 +582,13 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
 <div data-page="dietista-nutricionista-en-valladolid" hidden>
   <section class="page-hero" data-hero="hero" data-crumb="Dietista-nutricionista en Valladolid" data-ey="Nuestros servicios de nutrición" data-h1="Dietista-nutricionista en Valladolid" data-lead="Soy Andrea Argüello, dietista-nutricionista en Valladolid desde 2013. Te acompaño con alimentación personalizada, educación nutricional y seguimiento presencial u online." data-chips="Consulta presencial|Nutrición online|Bioimpedancia|Sin promesas mágicas"></section>
   <div class="wrap editorial">
+    <nav class="srv-top" aria-label="Servicios">
+      <a href="#patologias"><span class="card-icon" data-ic2="stetho"></span><b>Tratamiento de patologías</b><small>Digestivas, diabetes, TCA y más</small></a>
+      <a href="#sobrepeso"><span class="card-icon" data-ic2="scale"></span><b>Sobrepeso y ganancia de peso</b><small>Sin dietas de cajón</small></a>
+      <a href="#nutricion-deportiva-valladolid"><span class="card-icon" data-ic2="activity"></span><b>Nutrición deportiva</b><small>Antes, durante y después de entrenar</small></a>
+      <a href="#nutricion-oncologica-valladolid"><span class="card-icon" data-ic2="heart"></span><b>Nutrición oncológica</b><small>Durante y después del tratamiento</small></a>
+      <a href="#vegetariana"><span class="card-icon" data-ic2="leaf"></span><b>Vegetariana y vegana</b><small>Bien planificada y completa</small></a>
+    </nav>
     <p class="content-lead">Nutricionista en Valladolid</p>
     <div class="lead-rule"></div>
     <p class="intro">En nuestra consulta de nutrición en Valladolid y online contamos con todos los servicios detallados a continuación, pero si tienes cualquier duda o consulta no dudes en ponerte en contacto con nosotras.</p>
@@ -1138,34 +1136,12 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
 
   // ---------- nav ----------
   var NAV = [['inicio','Inicio'],['dietista-nutricionista-en-valladolid','Servicios'],['nutricionista-online','Online'],['asesoria-externa','Asesoría externa'],['publicaciones','Colaboraciones'],['cursos-talleres','Cursos/Talleres'],['blog-nutricion','Blog'],['contacto','Contacto']];
-  // Submenú de Servicios
-  var SUBSERV = [['patologias','Tratamiento de patologías','stetho'],['sobrepeso','Sobrepeso y ganancia de peso','scale'],['nutricion-deportiva-valladolid','Nutrición deportiva','activity'],['nutricion-oncologica-valladolid','Nutrición oncológica','heart'],['vegetariana','Vegetariana y vegana','leaf']];
-  var CHEV_DOWN = '<svg class="i" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>';
-  var navHTML = NAV.map(function(n){
-    var a = '<a href="#'+n[0]+'" data-nav="'+n[0]+'">'+n[1]+'</a>';
-    if (n[0] !== 'dietista-nutricionista-en-valladolid') return a;
-    return '<div class="nav-dd">'+a+'<button type="button" class="dd-btn" aria-expanded="false" aria-label="Ver todos los servicios">'+CHEV_DOWN+'</button><div class="dd-menu">' +
-      SUBSERV.map(function(x){ return '<a href="#'+x[0]+'"><svg class="i" viewBox="0 0 24 24" data-ic="'+x[2]+'"></svg>'+x[1]+'</a>'; }).join('') +
-      '<div class="sep"></div><a class="all" href="#nuestros-servicios">Todos los servicios</a></div></div>';
-  }).join('');
-  var mnavHTML = NAV.map(function(n){
-    var a = '<a href="#'+n[0]+'" data-nav="'+n[0]+'">'+n[1]+'</a>';
-    if (n[0] !== 'dietista-nutricionista-en-valladolid') return a;
-    return a + '<div class="m-sub">' + SUBSERV.map(function(x){ return '<a href="#'+x[0]+'">'+x[1]+'</a>'; }).join('') + '<a href="#nuestros-servicios">Todos los servicios</a></div>';
-  }).join('');
+  var navHTML = NAV.map(function(n){ return '<a href="#'+n[0]+'" data-nav="'+n[0]+'">'+n[1]+'</a>'; }).join('');
   // En la versión publicada por páginas, el menú ya viene escrito en el HTML
   if (!document.querySelector('nav.main').children.length) {
     document.querySelector('nav.main').innerHTML = navHTML;
-    document.querySelector('.mobile-nav').innerHTML = mnavHTML;
+    document.querySelector('.mobile-nav').innerHTML = navHTML;
   }
-  // Abrir/cerrar el desplegable con el botón (pantallas táctiles y teclado)
-  document.querySelectorAll('.nav-dd').forEach(function(dd){
-    var btn = dd.querySelector('.dd-btn');
-    btn.addEventListener('click', function(e){ e.stopPropagation(); var o = dd.classList.toggle('open'); btn.setAttribute('aria-expanded', o); });
-    dd.querySelectorAll('.dd-menu a').forEach(function(a){ a.addEventListener('click', function(){ dd.classList.remove('open'); btn.setAttribute('aria-expanded','false'); if (document.activeElement) document.activeElement.blur(); }); });
-  });
-  document.addEventListener('click', function(){ document.querySelectorAll('.nav-dd.open').forEach(function(dd){ dd.classList.remove('open'); dd.querySelector('.dd-btn').setAttribute('aria-expanded','false'); }); });
-  document.addEventListener('keydown', function(e){ if (e.key === 'Escape') document.querySelectorAll('.nav-dd.open').forEach(function(dd){ dd.classList.remove('open'); }); });
   var header = document.querySelector('header.site'), mb = document.getElementById('menu-btn');
   mb.addEventListener('click', function(){ var o = header.classList.toggle('open'); mb.setAttribute('aria-expanded', o); });
 

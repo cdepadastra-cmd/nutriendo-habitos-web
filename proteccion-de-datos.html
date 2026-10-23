@@ -102,21 +102,6 @@ nav.main a[aria-current="page"]{color:var(--primary);text-decoration:underline;t
 .mobile-nav{display:none;border-top:1px solid var(--border);padding:.5rem var(--gutter-r) 1rem var(--gutter-l)}
 .mobile-nav a{display:block;padding:.7rem 0;border-bottom:1px solid color-mix(in oklab,var(--border) 60%,transparent);color:var(--muted-fg)}
 .mobile-nav a[aria-current="page"]{color:var(--primary);font-weight:500}
-.nav-dd{position:relative;display:flex;align-items:center;gap:.1rem}
-.dd-btn{display:grid;place-items:center;width:1.35rem;height:1.35rem;border-radius:999px;color:var(--muted-fg);transition:transform .15s,color .15s}
-.dd-btn svg{width:.85rem;height:.85rem}
-.nav-dd:hover .dd-btn,.nav-dd.open .dd-btn{color:var(--primary)}
-.nav-dd.open .dd-btn{transform:rotate(180deg)}
-.dd-menu{position:absolute;top:calc(100% + .75rem);left:-1rem;min-width:16rem;display:grid;padding:.45rem;background:var(--card);border:1px solid var(--border);border-radius:1rem;box-shadow:0 22px 44px -24px rgba(30,40,28,.35);opacity:0;visibility:hidden;transform:translateY(6px);transition:opacity .15s,transform .15s,visibility .15s;z-index:40}
-.dd-menu::before{content:"";position:absolute;left:0;right:0;top:-.8rem;height:.8rem}
-.nav-dd:hover .dd-menu,.nav-dd:focus-within .dd-menu,.nav-dd.open .dd-menu{opacity:1;visibility:visible;transform:none}
-nav.main .dd-menu a{display:flex;align-items:center;gap:.6rem;padding:.55rem .75rem;border-radius:.65rem;color:var(--foreground);font-size:.9rem}
-nav.main .dd-menu a:hover,nav.main .dd-menu a:focus-visible{background:var(--secondary);color:var(--primary)}
-.dd-menu a svg{width:1rem;height:1rem;color:var(--primary);flex:0 0 auto}
-.dd-menu .sep{border-top:1px solid var(--border);margin:.3rem .5rem}
-nav.main .dd-menu a.all{color:var(--primary);font-weight:500}
-.mobile-nav .m-sub{display:grid;padding:.2rem 0 .4rem 1rem;border-bottom:1px solid color-mix(in oklab,var(--border) 60%,transparent)}
-.mobile-nav .m-sub a{border-bottom:0;padding:.45rem 0;font-size:.92rem}
 .stmt[id]{scroll-margin-top:7.5rem}
 @media (max-width:1023px){
   nav.main{display:none}
@@ -153,8 +138,9 @@ nav.main .dd-menu a.all{color:var(--primary);font-weight:500}
 .h2{font-size:2.25rem;line-height:1.1}
 @media (min-width:768px){.h2{font-size:3rem}}
 .eyebrow-leaf{margin-bottom:.75rem;font-size:.875rem;color:var(--leaf)}
-.acc-grid{margin-top:2.5rem;display:grid;gap:1.25rem}
+.acc-grid{margin-top:2.5rem;display:grid;gap:1.25rem;align-items:start}
 @media (min-width:640px){.acc-grid{grid-template-columns:1fr 1fr}}
+@media (min-width:1000px){.acc-grid{grid-template-columns:repeat(6,minmax(0,1fr))}.acc-grid .acc{grid-column:span 2}.acc-grid .acc:nth-child(n+4){grid-column:span 3}}
 .acc{border-radius:var(--radius);border:1px solid color-mix(in oklab,var(--primary-fg) 20%,transparent);background:color-mix(in oklab,var(--primary-fg) 5%,transparent);padding:1.5rem;transition:background-color .2s}
 .acc:hover{background:color-mix(in oklab,var(--primary-fg) 10%,transparent)}
 .acc button{display:block;width:100%;text-align:left}
@@ -381,6 +367,13 @@ nav.main .dd-menu a.all{color:var(--primary);font-weight:500}
 .legal{padding-top:3rem;padding-bottom:4rem;font-size:.875rem}
 .legal p{margin:1rem 0;line-height:1.8}
 
+/* ---------- servicios: accesos directos ---------- */
+.srv-top{display:grid;gap:.8rem;grid-template-columns:repeat(auto-fit,minmax(min(100%,11.5rem),1fr));margin-bottom:3rem}
+.srv-top a{display:grid;gap:.45rem;align-content:start;padding:1.1rem;border-radius:var(--radius-xl);border:1px solid color-mix(in oklab,var(--primary) 14%,transparent);background:var(--card);transition:border-color .2s,transform .2s,background-color .2s}
+.srv-top a:hover{border-color:var(--primary);background:color-mix(in oklab,var(--secondary) 45%,var(--card));transform:translateY(-2px)}
+.srv-top b{font-family:var(--font-display);font-weight:400;font-size:1.12rem;line-height:1.25;color:var(--primary);margin-top:.35rem}
+.srv-top small{color:var(--muted-fg);font-size:.82rem;line-height:1.4}
+
 /* ---------- preguntas frecuentes ---------- */
 .faq{margin-top:3rem;max-width:52rem}
 .faq-list{margin-top:1.25rem;display:grid;gap:.6rem}
@@ -491,13 +484,13 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
 <header class="site" id="top">
   <div class="bar">
     <a class="logo" href="./" aria-label="Nutriendo Hábitos"><img src="img/logo.webp" alt="Nutriendo Hábitos"></a>
-    <nav class="main" aria-label="Principal"><a href="./" data-nav="inicio">Inicio</a><div class="nav-dd"><a href="dietista-nutricionista-en-valladolid.html" data-nav="dietista-nutricionista-en-valladolid">Servicios</a><button type="button" class="dd-btn" aria-expanded="false" aria-label="Ver todos los servicios"><svg class="i" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button><div class="dd-menu"><a href="dietista-nutricionista-en-valladolid.html#patologias"><svg class="i" viewBox="0 0 24 24" data-ic="stetho"></svg>Tratamiento de patologías</a><a href="dietista-nutricionista-en-valladolid.html#sobrepeso"><svg class="i" viewBox="0 0 24 24" data-ic="scale"></svg>Sobrepeso y ganancia de peso</a><a href="nutricion-deportiva-valladolid.html"><svg class="i" viewBox="0 0 24 24" data-ic="activity"></svg>Nutrición deportiva</a><a href="nutricion-oncologica-valladolid.html"><svg class="i" viewBox="0 0 24 24" data-ic="heart"></svg>Nutrición oncológica</a><a href="dietista-nutricionista-en-valladolid.html#vegetariana"><svg class="i" viewBox="0 0 24 24" data-ic="leaf"></svg>Vegetariana y vegana</a><div class="sep"></div><a class="all" href="nuestros-servicios.html">Todos los servicios</a></div></div><a href="nutricionista-online.html" data-nav="nutricionista-online">Online</a><a href="asesoria-externa.html" data-nav="asesoria-externa">Asesoría externa</a><a href="publicaciones.html" data-nav="publicaciones">Colaboraciones</a><a href="cursos-talleres.html" data-nav="cursos-talleres">Cursos/Talleres</a><a href="blog-nutricion.html" data-nav="blog-nutricion">Blog</a><a href="contacto.html" data-nav="contacto">Contacto</a></nav>
+    <nav class="main" aria-label="Principal"><a href="./" data-nav="inicio">Inicio</a><a href="dietista-nutricionista-en-valladolid.html" data-nav="dietista-nutricionista-en-valladolid">Servicios</a><a href="nutricionista-online.html" data-nav="nutricionista-online">Online</a><a href="asesoria-externa.html" data-nav="asesoria-externa">Asesoría externa</a><a href="publicaciones.html" data-nav="publicaciones">Colaboraciones</a><a href="cursos-talleres.html" data-nav="cursos-talleres">Cursos/Talleres</a><a href="blog-nutricion.html" data-nav="blog-nutricion">Blog</a><a href="contacto.html" data-nav="contacto">Contacto</a></nav>
     <div style="display:flex;gap:.5rem;align-items:center">
       <a class="btn btn-primary" href="reservar.html">Pide cita <svg class="i" viewBox="0 0 24 24"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg></a>
       <button class="menu-btn" id="menu-btn" aria-label="Abrir menú" aria-expanded="false"><svg class="i" viewBox="0 0 24 24"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></svg></button>
     </div>
   </div>
-  <nav class="mobile-nav" aria-label="Menú móvil"><a href="./" data-nav="inicio">Inicio</a><a href="dietista-nutricionista-en-valladolid.html" data-nav="dietista-nutricionista-en-valladolid">Servicios</a><div class="m-sub"><a href="dietista-nutricionista-en-valladolid.html#patologias">Tratamiento de patologías</a><a href="dietista-nutricionista-en-valladolid.html#sobrepeso">Sobrepeso y ganancia de peso</a><a href="nutricion-deportiva-valladolid.html">Nutrición deportiva</a><a href="nutricion-oncologica-valladolid.html">Nutrición oncológica</a><a href="dietista-nutricionista-en-valladolid.html#vegetariana">Vegetariana y vegana</a><a href="nuestros-servicios.html">Todos los servicios</a></div><a href="nutricionista-online.html" data-nav="nutricionista-online">Online</a><a href="asesoria-externa.html" data-nav="asesoria-externa">Asesoría externa</a><a href="publicaciones.html" data-nav="publicaciones">Colaboraciones</a><a href="cursos-talleres.html" data-nav="cursos-talleres">Cursos/Talleres</a><a href="blog-nutricion.html" data-nav="blog-nutricion">Blog</a><a href="contacto.html" data-nav="contacto">Contacto</a></nav>
+  <nav class="mobile-nav" aria-label="Menú móvil"><a href="./" data-nav="inicio">Inicio</a><a href="dietista-nutricionista-en-valladolid.html" data-nav="dietista-nutricionista-en-valladolid">Servicios</a><a href="nutricionista-online.html" data-nav="nutricionista-online">Online</a><a href="asesoria-externa.html" data-nav="asesoria-externa">Asesoría externa</a><a href="publicaciones.html" data-nav="publicaciones">Colaboraciones</a><a href="cursos-talleres.html" data-nav="cursos-talleres">Cursos/Talleres</a><a href="blog-nutricion.html" data-nav="blog-nutricion">Blog</a><a href="contacto.html" data-nav="contacto">Contacto</a></nav>
 </header>
 
 <main id="app">
@@ -621,34 +614,12 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
 
   // ---------- nav ----------
   var NAV = [['inicio','Inicio'],['dietista-nutricionista-en-valladolid','Servicios'],['nutricionista-online','Online'],['asesoria-externa','Asesoría externa'],['publicaciones','Colaboraciones'],['cursos-talleres','Cursos/Talleres'],['blog-nutricion','Blog'],['contacto','Contacto']];
-  // Submenú de Servicios
-  var SUBSERV = [['patologias','Tratamiento de patologías','stetho'],['sobrepeso','Sobrepeso y ganancia de peso','scale'],['nutricion-deportiva-valladolid','Nutrición deportiva','activity'],['nutricion-oncologica-valladolid','Nutrición oncológica','heart'],['vegetariana','Vegetariana y vegana','leaf']];
-  var CHEV_DOWN = '<svg class="i" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>';
-  var navHTML = NAV.map(function(n){
-    var a = '<a href="#'+n[0]+'" data-nav="'+n[0]+'">'+n[1]+'</a>';
-    if (n[0] !== 'dietista-nutricionista-en-valladolid') return a;
-    return '<div class="nav-dd">'+a+'<button type="button" class="dd-btn" aria-expanded="false" aria-label="Ver todos los servicios">'+CHEV_DOWN+'</button><div class="dd-menu">' +
-      SUBSERV.map(function(x){ return '<a href="#'+x[0]+'"><svg class="i" viewBox="0 0 24 24" data-ic="'+x[2]+'"></svg>'+x[1]+'</a>'; }).join('') +
-      '<div class="sep"></div><a class="all" href="nuestros-servicios.html">Todos los servicios</a></div></div>';
-  }).join('');
-  var mnavHTML = NAV.map(function(n){
-    var a = '<a href="#'+n[0]+'" data-nav="'+n[0]+'">'+n[1]+'</a>';
-    if (n[0] !== 'dietista-nutricionista-en-valladolid') return a;
-    return a + '<div class="m-sub">' + SUBSERV.map(function(x){ return '<a href="#'+x[0]+'">'+x[1]+'</a>'; }).join('') + '<a href="nuestros-servicios.html">Todos los servicios</a></div>';
-  }).join('');
+  var navHTML = NAV.map(function(n){ return '<a href="#'+n[0]+'" data-nav="'+n[0]+'">'+n[1]+'</a>'; }).join('');
   // En la versión publicada por páginas, el menú ya viene escrito en el HTML
   if (!document.querySelector('nav.main').children.length) {
     document.querySelector('nav.main').innerHTML = navHTML;
-    document.querySelector('.mobile-nav').innerHTML = mnavHTML;
+    document.querySelector('.mobile-nav').innerHTML = navHTML;
   }
-  // Abrir/cerrar el desplegable con el botón (pantallas táctiles y teclado)
-  document.querySelectorAll('.nav-dd').forEach(function(dd){
-    var btn = dd.querySelector('.dd-btn');
-    btn.addEventListener('click', function(e){ e.stopPropagation(); var o = dd.classList.toggle('open'); btn.setAttribute('aria-expanded', o); });
-    dd.querySelectorAll('.dd-menu a').forEach(function(a){ a.addEventListener('click', function(){ dd.classList.remove('open'); btn.setAttribute('aria-expanded','false'); if (document.activeElement) document.activeElement.blur(); }); });
-  });
-  document.addEventListener('click', function(){ document.querySelectorAll('.nav-dd.open').forEach(function(dd){ dd.classList.remove('open'); dd.querySelector('.dd-btn').setAttribute('aria-expanded','false'); }); });
-  document.addEventListener('keydown', function(e){ if (e.key === 'Escape') document.querySelectorAll('.nav-dd.open').forEach(function(dd){ dd.classList.remove('open'); }); });
   var header = document.querySelector('header.site'), mb = document.getElementById('menu-btn');
   mb.addEventListener('click', function(){ var o = header.classList.toggle('open'); mb.setAttribute('aria-expanded', o); });
 
