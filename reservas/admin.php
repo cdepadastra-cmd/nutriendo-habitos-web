@@ -109,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $a = (string)($t[0] ?? '');
                         $b = (string)($t[1] ?? '');
                         if (!es_hora($a) || !es_hora($b) || minutos($a) >= minutos($b)) {
-                            json_salida(['ok' => false, 'error' => 'tramo', 'detalle' => "$m día $d"], 422);
+                            json_salida(['ok' => false, 'error' => 'tramo', 'detalle' => ['', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'][$d]], 422);
                         }
                         $limpios[] = [$a, $b];
                     }
@@ -167,6 +167,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             con_cerrojo(function () use ($id) {
                 $c = cargar_config();
                 $c['especiales'] = array_values(array_filter($c['especiales'], fn($e) => $e['id'] !== $id));
+                guardar_datos('config', $c);
+            });
+            json_salida(['ok' => true]);
+
+        case 'guardar_dias':
+            // Horario de días concretos (igual para presencial y online). null = volver al horario habitual.
+            $dias = (array)($in['dias'] ?? []);
+            if (!$dias || count($dias) > 400) {
+                json_salida(['ok' => false, 'error' => 'datos'], 422);
+            }
+            $limpio = [];
+            foreach ($dias as $f => $tramos) {
+                $f = (string)$f;
+                if (!es_fecha($f)) {
+                    json_salida(['ok' => false, 'error' => 'datos'], 422);
+                }
+                if ($tramos === null) {
+                    $limpio[$f] = null;
+                    continue;
+                }
+                $ts = [];
+                foreach ((array)$tramos as $t) {
+                    $a = (string)($t[0] ?? '');
+                    $b = (string)($t[1] ?? '');
+                    if (!es_hora($a) || !es_hora($b) || minutos($a) >= minutos($b)) {
+                        json_salida(['ok' => false, 'error' => 'tramo', 'detalle' => fecha_larga($f)], 422);
+                    }
+                    $ts[] = [$a, $b];
+                }
+                usort($ts, fn($x, $y) => strcmp($x[0], $y[0]));
+                $limpio[$f] = $ts;
+            }
+            con_cerrojo(function () use ($limpio) {
+                $c = cargar_config();
+                $c['especiales'] = array_values(array_filter($c['especiales'], fn($e) => !array_key_exists($e['fecha'], $limpio)));
+                foreach ($limpio as $f => $ts) {
+                    if ($ts === null) {
+                        continue;
+                    }
+                    foreach (array_keys(MODALIDADES) as $m) {
+                        $c['especiales'][] = ['id' => bin2hex(random_bytes(5)), 'fecha' => $f, 'modalidad' => $m, 'tramos' => $ts];
+                    }
+                }
+                usort($c['especiales'], fn($a, $b) => strcmp($a['fecha'] . $a['modalidad'], $b['fecha'] . $b['modalidad']));
                 guardar_datos('config', $c);
             });
             json_salida(['ok' => true]);
@@ -528,35 +572,28 @@ table.imp td.ie{font-size:.78rem;color:#9A3B2E;min-width:9rem}table.imp td.ie sm
 .cita.pendiente{background:#FBF1DE}
 .cita .acts{display:flex;gap:.4rem;flex-wrap:wrap}
 .motivo{display:block;color:var(--secondary-fg);font-size:.82rem}
-.cal-wrap{display:grid;gap:1.25rem;align-items:start}
-@media(min-width:960px){.cal-wrap{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)}.apl-card{position:sticky;top:1rem}}
-.cal-head{display:flex;align-items:center;gap:.6rem;margin-bottom:.75rem}
-.cal-head h2::first-letter{text-transform:uppercase}
-.cal-dow,.cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:.3rem}
-.cal-dow button{border:0;background:var(--muted);border-radius:.5rem;padding:.35rem 0;font-size:.75rem;font-weight:600;letter-spacing:.06em;color:var(--muted-fg);cursor:pointer}
-.cal-dow button:hover{background:var(--secondary);color:var(--secondary-fg)}
-.cal-day{position:relative;min-height:5.4rem;border:1.5px solid var(--border);border-radius:.7rem;background:var(--card);padding:.3rem .35rem;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:.15rem;font-size:.68rem;line-height:1.25;color:var(--fg);overflow:hidden}
-.cal-day .n{font-size:.85rem;font-weight:600;font-variant-numeric:tabular-nums}
-.cal-day .t{display:block;border-radius:.3rem;padding:.05rem .25rem;font-variant-numeric:tabular-nums}
-.cal-day .t b{font-weight:600;margin-right:.15rem}
-.cal-day .t i{font-style:normal;display:block}
-.cal-day .t.p{background:var(--secondary);color:var(--secondary-fg)}
-.cal-day .t.o{background:#ECE8E3;color:#5E554F}
-.cal-day .t.c{color:var(--muted-fg)}
-.cal-day.esp{border-color:#C98A2B}
-.cal-day.esp::after{content:"";position:absolute;top:.35rem;right:.35rem;width:.45rem;height:.45rem;border-radius:999px;background:#C98A2B}
-.cal-day.blo{background:repeating-linear-gradient(135deg,#F3E4E1 0 6px,#fff 6px 12px)}
-.cal-day.pas{opacity:.4;cursor:default}
-.cal-day.fuera{opacity:.55}
-.cal-day.sel{border-color:var(--primary);box-shadow:0 0 0 2px var(--primary) inset;background:color-mix(in oklab,var(--secondary) 50%,var(--card))}
-.cal-day:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
-.cal-leg{display:flex;flex-wrap:wrap;gap:.4rem 1rem;margin-top:.8rem;font-size:.78rem;color:var(--muted-fg)}
-.cal-leg span{display:flex;align-items:center;gap:.35rem}
-.lg{display:inline-block;width:.8rem;height:.8rem;border-radius:.25rem}
-.lg.p{background:var(--secondary)}.lg.o{background:#ECE8E3}.lg.x{border:2px solid #C98A2B;border-radius:999px}.lg.b{background:repeating-linear-gradient(135deg,#F3E4E1 0 3px,#fff 3px 6px);border:1px solid #E8C9C3}
-.cal-sel{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;margin-top:.8rem}
-.apl-card{display:grid;gap:.8rem}
-@media(max-width:640px){.cal-day{min-height:3.6rem;padding:.25rem}.cal-day .t{padding:0 .2rem;font-size:.62rem}.cal-day .t i{display:none}.cal-dow,.cal-grid{gap:.2rem}}
+.semana{display:grid;gap:1rem}
+.sem-top{display:flex;flex-wrap:wrap;gap:1rem;align-items:end;justify-content:space-between}
+.sem-mes{flex:0 1 16rem}
+.sem-mes select::first-letter{text-transform:uppercase}
+.sem-nav{display:flex;align-items:center;gap:.6rem;flex:1 1 22rem;justify-content:flex-end}
+.sem-nav h3{font-size:1.1rem;text-align:center;flex:1;margin:0}
+.sem-dias{display:grid;gap:.4rem}
+.sd{display:grid;grid-template-columns:9.5rem minmax(0,1fr) auto;gap:.5rem 1rem;align-items:start;padding:.6rem .75rem;border-radius:.8rem;background:var(--muted)}
+.sd .dn{font-weight:600;padding-top:.35rem}
+.sd .dn small{display:block;font-weight:400;color:var(--muted-fg);font-size:.78rem}
+.sd .dn::first-letter{text-transform:uppercase}
+.sd .tramos{display:flex;flex-wrap:wrap;gap:.4rem .8rem;align-items:center}
+.sd .tag{font-size:.72rem;font-weight:600;padding:.15rem .5rem;border-radius:999px;background:var(--card);color:var(--muted-fg);white-space:nowrap}
+.sd .tag.cam{background:#F6EBD6;color:#7A5A1F}
+.sd .tag.cer{background:#F3E4E1;color:var(--danger)}
+.sd .side{display:flex;flex-direction:column;gap:.3rem;align-items:flex-end}
+.sd .lnk{border:0;background:none;color:var(--primary);font-size:.78rem;cursor:pointer;padding:0;text-decoration:underline}
+.sd.pas{opacity:.45}
+.sd.otro .dn{color:var(--muted-fg)}
+.sd.blo{background:repeating-linear-gradient(135deg,#F3E4E1 0 6px,var(--muted) 6px 12px)}
+.sem-acc{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+@media(max-width:640px){.sd .tramo{display:flex;flex-wrap:nowrap;align-items:center;gap:.3rem}.sd .tramo input{width:7.4rem;min-width:0;padding:.45rem .4rem}.sd{grid-template-columns:1fr auto}.sd .tramos{grid-column:1/-1;grid-row:2}.sem-nav{flex-basis:100%}}
 .abierto{display:flex;flex-wrap:wrap;gap:1rem 1.5rem;align-items:end;border-color:var(--leaf);background:color-mix(in oklab,var(--secondary) 40%,var(--card))}
 .muted{color:var(--muted-fg);font-size:.88rem}
 .sticky{position:sticky;bottom:0;padding:.8rem 0;background:linear-gradient(transparent,var(--bg) 35%);display:flex;gap:.75rem;align-items:center;flex-wrap:wrap}
@@ -676,54 +713,31 @@ Viernes 14/11
         </div>
       </div>
 
-      <!-- Calendario del mes: horario día a día -->
-      <h2 style="font-size:1.3rem;margin:1.6rem 0 .3rem">Calendario: horario de cada día</h2>
-      <p class="muted" style="margin-top:0">Aquí ves qué horas tiene cada día. Los días sin marca siguen tu <b>horario habitual</b> (más abajo). Selecciona uno o varios días, pon las horas y pulsa «Poner estas horas». Así puedes cambiar un lunes concreto, cerrar un día o abrir un sábado suelto.</p>
-      <div class="cal-wrap">
-        <div class="card cal-card">
-          <div class="cal-head">
-            <button class="btn sec sm" type="button" id="m-prev" aria-label="Mes anterior">‹</button>
-            <h2 id="m-titulo" style="font-size:1.25rem;text-align:center;flex:1"></h2>
-            <button class="btn sec sm" type="button" id="m-next" aria-label="Mes siguiente">›</button>
-          </div>
-          <div class="cal-dow" id="m-dow"></div>
-          <div class="cal-grid" id="m-grid"></div>
-          <div class="cal-leg"><span><i class="lg p"></i>Presencial</span><span><i class="lg o"></i>Online</span><span><i class="lg x"></i>Cambiado a mano</span><span><i class="lg b"></i>Bloqueado</span></div>
-          <div class="cal-sel">
-            <button class="btn sec sm" type="button" id="m-todo">Seleccionar todo el mes</button>
-            <button class="btn sec sm" type="button" id="m-nada">Quitar selección</button>
-            <span class="muted">Pulsa L, M, X… para elegir todos esos días del mes.</span>
+      <!-- Horario de cada semana -->
+      <h2 style="font-size:1.3rem;margin:1.6rem 0 .3rem">Horario de cada semana</h2>
+      <p class="muted" style="margin-top:0">Elige el mes y ve semana a semana. Las horas que pongas sirven igual para citas presenciales y online: el paciente elige la modalidad al reservar. Al cambiar de semana se guarda solo.</p>
+      <div class="card semana">
+        <div class="sem-top">
+          <label for="s-mes" class="sem-mes">Mes<select id="s-mes"></select></label>
+          <div class="sem-nav">
+            <button class="btn sec sm" type="button" id="s-prev" aria-label="Semana anterior">‹</button>
+            <h3 id="s-titulo"></h3>
+            <button class="btn sec sm" type="button" id="s-next" aria-label="Semana siguiente">›</button>
           </div>
         </div>
-        <div class="card apl-card">
-          <h2 style="font-size:1.2rem">Días seleccionados: <span id="m-nsel">0</span></h2>
-          <p class="muted" id="m-sel-txt" style="margin:0">Pulsa en los días del calendario para elegirlos.</p>
-          <label for="m-mod">Consulta<select id="m-mod"><option value="ambas">Presencial y online (las mismas horas)</option><option value="presencial">Solo presencial</option><option value="online">Solo online</option></select></label>
-          <div class="row">
-            <label for="m-a1">Mañana desde<input id="m-a1" type="time" step="300" value="09:30"></label>
-            <label for="m-b1">hasta<input id="m-b1" type="time" step="300" value="13:15"></label>
-          </div>
-          <div class="row">
-            <label for="m-a2">Tarde desde<input id="m-a2" type="time" step="300"></label>
-            <label for="m-b2">hasta<input id="m-b2" type="time" step="300"></label>
-          </div>
-          <p class="muted" style="margin:-.3rem 0 0;font-size:.8rem">Deja la tarde vacía si solo es por la mañana (o al revés).</p>
-          <p class="msg err" id="m-err" hidden></p>
-          <p class="msg" id="m-aviso" hidden></p>
-          <div style="display:grid;gap:.5rem">
-            <button class="btn" type="button" id="m-aplicar">Poner estas horas</button>
-            <button class="btn danger" type="button" id="m-cerrar">Cerrar estos días (sin citas)</button>
-            <button class="btn sec" type="button" id="m-reset">Volver al horario habitual</button>
-          </div>
+        <p class="msg err" id="s-aviso" hidden></p>
+        <div class="sem-dias" id="s-dias"></div>
+        <p class="msg err" id="s-err" hidden></p>
+        <div class="sem-acc">
+          <button class="btn" type="button" id="s-guardar">Guardar semana</button>
+          <button class="btn sec" type="button" id="s-repetir">Repetir esta semana en el resto del mes</button>
+          <span class="muted" id="s-msg"></span>
         </div>
       </div>
 
       <h2 style="font-size:1.3rem;margin:2rem 0 .3rem">Horario habitual</h2>
-      <p class="muted" style="margin-top:0">Lo normal de cada semana. Se usa en todos los días que no hayas cambiado en el calendario de arriba. La web divide las horas en huecos de <span class="dur2">45</span> minutos. Una cita presencial también ocupa ese hueco en online, y al revés. Si prefieres marcarlo todo en el calendario, puedes dejar esto vacío.</p>
-      <div class="grid2">
-        <div class="card"><h2 style="font-size:1.3rem;margin-bottom:.5rem">Presencial en Valladolid</h2><div class="week" id="w-presencial"></div></div>
-        <div class="card"><h2 style="font-size:1.3rem;margin-bottom:.5rem">Online</h2><div class="week" id="w-online"></div></div>
-      </div>
+      <p class="muted" style="margin-top:0">Lo normal de cada semana. Es lo que aparece al abrir una semana nueva; luego lo cambias arriba en los días que sean distintos. La web divide las horas en huecos de <span class="dur2">45</span> minutos, y cada hueco se puede reservar una vez (presencial u online).</p>
+      <div class="card" style="max-width:44rem"><div class="week" id="w-habitual"></div></div>
       <div class="sticky"><button class="btn" id="b-guardar-h">Guardar horario habitual y fecha</button><span class="muted" id="h-msg"></span></div>
     </div>
 
@@ -863,7 +877,7 @@ Viernes 14/11
   function cargar(){
     return api('datos').then(function(r){
       if (!r.ok) { if (r.error === 'no_autorizado') return mostrarLogin(true); toast(errTxt(r)); return; }
-      D = r; H = JSON.parse(JSON.stringify(r.horario));
+      D = r; H = unir(r.horario);
       $('v-login').hidden = true; $('v-panel').hidden = false;
       $('dur').textContent = r.duracion; document.querySelectorAll('.dur2').forEach(function(e){ e.textContent = r.duracion; });
       ['c-motivo', 'imp-motivo'].forEach(function(id){ if ($(id).options.length < 2) (r.motivos || []).forEach(function(m){ var o = document.createElement('option'); o.value = o.textContent = m; $(id).appendChild(o); }); });
@@ -871,7 +885,7 @@ Viernes 14/11
       pintarManana();
       pintarCitas(); pintarHorario(); pintarBloqueos();
       $('a-ant').value = r.antelacion_horas; $('a-vista').value = r.dias_vista;
-      $('h-abierto').value = r.abierto_hasta || ''; $('h-abierto').min = r.hoy; pintarLimite(); pintarEspeciales();
+      $('h-abierto').value = r.abierto_hasta || ''; $('h-abierto').min = r.hoy; pintarLimite(); if (!SUCIO) { if (SEM) abrirSemana(SEM); else pintarSemana(); }
       $('c-fecha').min = r.hoy;
     });
   }
@@ -1039,37 +1053,43 @@ Viernes 14/11
     });
   });
 
-  /* ---------- horario ---------- */
+  /* ---------- horario habitual (igual para presencial y online) ---------- */
+  function unir(h){
+    var u = {};
+    for (var d = 1; d <= 7; d++) { var p = (h.presencial || {})[d] || [], o = (h.online || {})[d] || []; u[d] = JSON.parse(JSON.stringify(p.length ? p : o)); }
+    return u;
+  }
+  function tramosHTML(tramos, attrs, etiqueta){
+    return tramos.map(function(t, i){
+      return '<div class="tramo"><input type="time" step="300" aria-label="' + etiqueta + ' desde" value="' + t[0] + '" ' + attrs + ' data-i="' + i + '" data-k="0"> a ' +
+        '<input type="time" step="300" aria-label="' + etiqueta + ' hasta" value="' + t[1] + '" ' + attrs + ' data-i="' + i + '" data-k="1">' +
+        '<button class="x" type="button" title="Quitar" aria-label="Quitar horas" ' + attrs.replace(/data-(\w+)=/g, 'data-del$1=') + ' data-deli="' + i + '">×</button></div>';
+    }).join('');
+  }
+  function nuevoTramo(l){ var last = l[l.length - 1]; l.push(last ? [last[1] < '16:00' ? '16:00' : last[1], last[1] < '16:00' ? '20:00' : '21:00'] : ['09:30', '14:00']); }
   function pintarHorario(){
-    ['presencial', 'online'].forEach(function(m){
-      var cont = $('w-' + m), html = '';
-      for (var d = 1; d <= 7; d++) {
-        var tramos = H[m][d] || [];
-        html += '<div class="wd"><b>' + DIAS[d] + '</b><div class="tramos">' +
-          tramos.map(function(t, i){
-            return '<div class="tramo"><input type="time" step="300" aria-label="' + DIAS[d] + ' desde" value="' + t[0] + '" data-m="' + m + '" data-d="' + d + '" data-i="' + i + '" data-k="0"> a ' +
-              '<input type="time" step="300" aria-label="' + DIAS[d] + ' hasta" value="' + t[1] + '" data-m="' + m + '" data-d="' + d + '" data-i="' + i + '" data-k="1">' +
-              '<button class="x" type="button" title="Quitar tramo" aria-label="Quitar tramo" data-del="' + m + '|' + d + '|' + i + '">×</button></div>';
-          }).join('') +
-          (tramos.length ? '' : '<span class="muted" style="padding-top:.35rem">Cerrado</span>') +
-          '<button class="add" type="button" data-add="' + m + '|' + d + '">+ Añadir horas</button></div></div>';
-      }
-      cont.innerHTML = html;
-    });
+    var html = '';
+    for (var d = 1; d <= 7; d++) {
+      var tramos = H[d] || [];
+      html += '<div class="wd"><b>' + DIAS[d] + '</b><div class="tramos">' + tramosHTML(tramos, 'data-hd="' + d + '"', DIAS[d]) +
+        (tramos.length ? '' : '<span class="muted" style="padding-top:.35rem">Cerrado</span>') +
+        '<button class="add" type="button" data-addhd="' + d + '">+ Añadir horas</button></div></div>';
+    }
+    $('w-habitual').innerHTML = html;
   }
   document.addEventListener('input', function(e){
-    var t = e.target; if (!t.dataset || !t.dataset.m || t.type !== 'time') return;
-    H[t.dataset.m][t.dataset.d][+t.dataset.i][+t.dataset.k] = t.value; $('h-msg').textContent = 'Cambios sin guardar';
+    var t = e.target; if (t.type !== 'time') return;
+    if (t.dataset.hd) { H[t.dataset.hd][+t.dataset.i][+t.dataset.k] = t.value; $('h-msg').textContent = 'Cambios sin guardar'; }
+    if (t.dataset.wf) { W[t.dataset.wf][+t.dataset.i][+t.dataset.k] = t.value; marcarSucio(); }
   });
   document.addEventListener('click', function(e){
-    var a = e.target.closest('[data-add]'), x = e.target.closest('[data-del]');
-    if (a) { var p = a.dataset.add.split('|'); var l = H[p[0]][p[1]] = H[p[0]][p[1]] || []; var last = l[l.length - 1];
-      l.push(last ? [last[1] < '16:00' ? '16:00' : last[1], last[1] < '16:00' ? '20:00' : '21:00'] : ['09:30', '14:00']); pintarHorario(); $('h-msg').textContent = 'Cambios sin guardar'; }
-    if (x) { var q = x.dataset.del.split('|'); H[q[0]][q[1]].splice(+q[2], 1); pintarHorario(); $('h-msg').textContent = 'Cambios sin guardar'; }
+    var a = e.target.closest('[data-addhd]'), x = e.target.closest('[data-delhd]');
+    if (a) { nuevoTramo(H[a.dataset.addhd] = H[a.dataset.addhd] || []); pintarHorario(); $('h-msg').textContent = 'Cambios sin guardar'; }
+    if (x) { H[x.dataset.delhd].splice(+x.dataset.deli, 1); pintarHorario(); $('h-msg').textContent = 'Cambios sin guardar'; }
   });
   function guardarHorario(btn, msg){
     btn.disabled = true;
-    return api('guardar_horario', { horario: H, antelacion_horas: +$('a-ant').value, dias_vista: +$('a-vista').value, abierto_hasta: $('h-abierto').value }).then(function(r){
+    return api('guardar_horario', { horario: { presencial: H, online: H }, antelacion_horas: +$('a-ant').value, dias_vista: +$('a-vista').value, abierto_hasta: $('h-abierto').value }).then(function(r){
       btn.disabled = false;
       if (!r.ok) { msg.textContent = errTxt(r) + (r.detalle ? ' (' + r.detalle + ')' : ''); return; }
       msg.textContent = 'Guardado'; toast('Guardado. El calendario de la web ya está actualizado.'); cargar();
@@ -1095,89 +1115,108 @@ Viernes 14/11
   });
   $('h-abierto').addEventListener('input', function(){ pintarLimite(); $('h-msg').textContent = 'Cambios sin guardar · pulsa «Guardar horario»'; });
 
-  /* ---------- calendario: horario de cada día ---------- */
-  var MES = null, SEL = {};
+  /* ---------- horario de cada semana ---------- */
+  var SEM = null, W = {}, SUCIO = false;
   function iso(d){ return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
-  function bloqueado(f, m){ return (D.bloqueos || []).some(function(b){ return f >= b.desde && f <= b.hasta && (b.modalidad === 'todas' || b.modalidad === m); }); }
-  function especial(f, m){ return (D.especiales || []).find(function(e){ return e.fecha === f && e.modalidad === m; }); }
-  function tramosDe(f, m){
-    var e = especial(f, m); if (e) return e.tramos;
-    var dow = new Date(f + 'T12:00:00').getDay() || 7;
-    return (D.horario[m] && D.horario[m][dow]) || [];
+  function dia(f){ return new Date(f + 'T12:00:00'); }
+  function sumar(f, n){ var d = dia(f); d.setDate(d.getDate() + n); return iso(d); }
+  function lunesDe(f){ var d = dia(f); return sumar(f, -((d.getDay() + 6) % 7)); }
+  function dowDe(f){ return dia(f).getDay() || 7; }
+  function habitual(f){ return unir(D.horario)[dowDe(f)] || []; }
+  function especialDe(f){ return (D.especiales || []).find(function(e){ return e.fecha === f && e.modalidad === 'presencial'; }) || (D.especiales || []).find(function(e){ return e.fecha === f; }); }
+  function tramosDe(f){ var e = especialDe(f); return e ? e.tramos : habitual(f); }
+  function bloqueoDe(f){ return (D.bloqueos || []).find(function(b){ return f >= b.desde && f <= b.hasta; }); }
+  function txtTramos(t){ return t.map(function(x){ return x[0] + '–' + x[1]; }).join(' y '); }
+  function igual(a, b){ return JSON.stringify(a) === JSON.stringify(b); }
+  function mesDeSemana(lun){ return sumar(lun, 3).slice(0, 7); }   // el mes al que pertenece el jueves
+  function marcarSucio(){ SUCIO = true; $('s-msg').textContent = 'Cambios sin guardar'; pintarTags(); }
+  function abrirSemana(lun){
+    SEM = lun < lunesDe(D.hoy) ? lunesDe(D.hoy) : lun; W = {}; SUCIO = false; $('s-msg').textContent = '';
+    for (var i = 0; i < 7; i++) { var f = sumar(SEM, i); W[f] = JSON.parse(JSON.stringify(tramosDe(f))); }
+    pintarSemana();
   }
-  function txtTramos(t){ return t.map(function(x){ return x[0].replace(/^0/, '') + '–' + x[1].replace(/^0/, ''); }).join(' · '); }
-  function pintarEspeciales(){
-    if (!MES) { var h = new Date(D.hoy + 'T12:00:00'); MES = new Date(h.getFullYear(), h.getMonth(), 1); }
-    $('m-titulo').textContent = MES.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
-    var hoyMes = D.hoy.slice(0, 7);
-    $('m-prev').disabled = iso(MES).slice(0, 7) <= hoyMes;
-    $('m-dow').innerHTML = ['L','M','X','J','V','S','D'].map(function(l, i){ return '<button type="button" data-dow="' + (i + 1) + '" title="Seleccionar todos los ' + DIAS[i + 1].toLowerCase() + ' del mes">' + l + '</button>'; }).join('');
-    var y = MES.getFullYear(), m = MES.getMonth(), n = new Date(y, m + 1, 0).getDate(), off = (new Date(y, m, 1).getDay() + 6) % 7, html = '';
-    var lim = D.limite || '';
-    for (var i = 0; i < off; i++) html += '<span></span>';
-    for (var d = 1; d <= n; d++) {
-      var f = iso(new Date(y, m, d)), pas = f < D.hoy, lineas = '', esp = false, blo = true;
-      ['presencial', 'online'].forEach(function(mod){
-        if (especial(f, mod)) esp = true;
-        if (bloqueado(f, mod)) { lineas += '<span class="t c">' + (mod === 'presencial' ? 'P' : 'O') + ' bloqueado</span>'; return; }
-        blo = false;
-        var t = tramosDe(f, mod);
-        lineas += t.length ? '<span class="t ' + (mod === 'presencial' ? 'p' : 'o') + '"><b>' + (mod === 'presencial' ? 'P' : 'O') + '</b>' + t.map(function(x){ return '<i>' + txtTramos([x]) + '</i>'; }).join('') + '</span>' : '';
-      });
-      if (!lineas) lineas = '<span class="t c">Cerrado</span>';
-      var cls = 'cal-day' + (esp ? ' esp' : '') + (blo ? ' blo' : '') + (pas ? ' pas' : '') + (SEL[f] ? ' sel' : '') + (lim && f > lim ? ' fuera' : '');
-      html += '<button type="button" class="' + cls + '" data-dia="' + f + '"' + (pas ? ' disabled' : '') + ' aria-pressed="' + !!SEL[f] + '" aria-label="' + esc(fechaLarga(f)) + '"><span class="n">' + d + '</span>' + lineas + '</button>';
+  function pintarMeses(){
+    var sel = $('s-mes'), h = dia(D.hoy), html = '';
+    for (var i = 0; i < 13; i++) { var d = new Date(h.getFullYear(), h.getMonth() + i, 1), v = iso(d).slice(0, 7), t = d.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }); html += '<option value="' + v + '">' + t.charAt(0).toUpperCase() + t.slice(1) + '</option>'; }
+    sel.innerHTML = html;
+  }
+  function pintarSemana(){
+    if (!SEM) { pintarMeses(); return abrirSemana(lunesDe(D.hoy)); }
+    var dom = sumar(SEM, 6), a = dia(SEM), b = dia(dom), mesSel = mesDeSemana(SEM);
+    if ($('s-mes').value !== mesSel) $('s-mes').value = mesSel;
+    $('s-titulo').textContent = 'Semana del lunes ' + a.getDate() + (a.getMonth() !== b.getMonth() ? ' de ' + a.toLocaleDateString('es-ES', { month: 'long' }) : '') + ' al domingo ' + b.getDate() + ' de ' + b.toLocaleDateString('es-ES', { month: 'long' });
+    $('s-prev').disabled = SEM <= lunesDe(D.hoy);
+    var html = '';
+    for (var i = 0; i < 7; i++) {
+      var f = sumar(SEM, i), pas = f < D.hoy, bl = bloqueoDe(f), d = dia(f), t = W[f];
+      html += '<div class="sd' + (pas ? ' pas' : '') + (bl ? ' blo' : '') + (f.slice(0, 7) !== mesSel ? ' otro' : '') + '" data-sd="' + f + '">' +
+        '<div class="dn">' + DIAS[i + 1] + ' ' + d.getDate() + '<small>' + esc(d.toLocaleDateString('es-ES', { month: 'long' })) + '</small></div>' +
+        '<div class="tramos">' + (pas ? '<span class="muted">' + (t.length ? esc(txtTramos(t)) : 'Cerrado') + '</span>' :
+          tramosHTML(t, 'data-wf="' + f + '"', DIAS[i + 1] + ' ' + d.getDate()) + (t.length ? '' : '<span class="muted" style="padding-top:.35rem">Cerrado</span>') +
+          '<button class="add" type="button" data-addwf="' + f + '">+ Añadir horas</button>') + '</div>' +
+        '<div class="side"><span class="tag" data-tag="' + f + '"></span>' + (pas ? '' : (igual(t, habitual(f)) ? '' : '<button class="lnk" type="button" data-hab="' + f + '">Poner horario habitual</button>') + (t.length ? '<button class="lnk" type="button" data-cerrar="' + f + '">Cerrar este día</button>' : '')) + '</div></div>';
     }
-    $('m-grid').innerHTML = html;
-    pintarSel();
-  }
-  function pintarSel(){
-    var fs = Object.keys(SEL).sort(); $('m-nsel').textContent = fs.length;
-    if (fs.length === 1) {
-      var f1 = fs[0], det = ['presencial', 'online'].map(function(m){ var t = bloqueado(f1, m) ? null : tramosDe(f1, m); return (m === 'presencial' ? 'Presencial: ' : 'Online: ') + (t === null ? 'bloqueado' : t.length ? txtTramos(t) : 'cerrado'); }).join(' · ');
-      $('m-sel-txt').textContent = fechaLarga(f1) + ' — ' + det;
-    } else $('m-sel-txt').textContent = fs.length ? (fs.length <= 4 ? fs.map(function(f){ return fechaCorta(f); }).join(', ') : fechaCorta(fs[0]) + ' … ' + fechaCorta(fs[fs.length - 1])) : 'Pulsa en los días del calendario para elegirlos.';
-    var lim = D.limite || '', fuera = fs.filter(function(f){ return lim && f > lim; });
-    var av = $('m-aviso');
-    if (fuera.length) { av.hidden = false; av.className = 'msg err'; av.innerHTML = 'Hay días después de «Reservas abiertas hasta» (' + esc(fechaCorta(lim)) + '): los pacientes aún no los verán. <button class="btn sec sm" type="button" id="m-ampliar" style="margin-top:.4rem">Abrir reservas hasta el ' + esc(fechaCorta(fs[fs.length - 1])) + '</button>'; }
+    $('s-dias').innerHTML = html;
+    pintarTags();
+    var lim = D.limite || '', av = $('s-aviso');
+    if (lim && dom > lim) { av.hidden = false; av.innerHTML = 'Los días después del ' + esc(fechaLarga(lim)) + ' aún no se pueden reservar en la web. <button class="btn sec sm" type="button" id="s-abrir" style="margin-left:.3rem">Abrir reservas hasta el ' + esc(fechaCorta(finDeMes(b.getFullYear(), b.getMonth()))) + '</button>'; }
     else av.hidden = true;
-    ['m-aplicar', 'm-cerrar', 'm-reset'].forEach(function(id){ $(id).disabled = !fs.length; });
   }
-  $('m-grid').addEventListener('click', function(e){
-    var b = e.target.closest('[data-dia]'); if (!b || b.disabled) return;
-    var f = b.dataset.dia; if (SEL[f]) delete SEL[f]; else SEL[f] = true;
-    b.classList.toggle('sel', !!SEL[f]); b.setAttribute('aria-pressed', !!SEL[f]); pintarSel();
-  });
-  $('m-dow').addEventListener('click', function(e){
-    var b = e.target.closest('[data-dow]'); if (!b) return;
-    var dow = +b.dataset.dow, botones = [].slice.call(document.querySelectorAll('#m-grid [data-dia]:not([disabled])')).filter(function(x){ return (new Date(x.dataset.dia + 'T12:00:00').getDay() || 7) === dow; });
-    var todos = botones.every(function(x){ return SEL[x.dataset.dia]; });
-    botones.forEach(function(x){ if (todos) delete SEL[x.dataset.dia]; else SEL[x.dataset.dia] = true; });
-    pintarEspeciales();
-  });
-  $('m-todo').addEventListener('click', function(){ document.querySelectorAll('#m-grid [data-dia]:not([disabled])').forEach(function(x){ SEL[x.dataset.dia] = true; }); pintarEspeciales(); });
-  $('m-nada').addEventListener('click', function(){ SEL = {}; pintarEspeciales(); });
-  $('m-prev').addEventListener('click', function(){ MES = new Date(MES.getFullYear(), MES.getMonth() - 1, 1); pintarEspeciales(); });
-  $('m-next').addEventListener('click', function(){ MES = new Date(MES.getFullYear(), MES.getMonth() + 1, 1); pintarEspeciales(); });
-  function aplicar(accion, tramos, texto){
-    var err = $('m-err'); err.hidden = true;
-    var fechas = Object.keys(SEL).sort(); if (!fechas.length) return;
-    api(accion, { fechas: fechas, modalidad: $('m-mod').value, tramos: tramos }).then(function(r){
-      if (!r.ok) { err.textContent = r.error === 'tramo' ? 'Revisa las horas: la hora de fin tiene que ser después de la de inicio.' : errTxt(r); err.hidden = false; return; }
-      SEL = {}; toast(texto[r.dias === 1 ? 1 : 0].replace('{n}', r.dias)); cargar();
+  function pintarTags(){
+    Object.keys(W).forEach(function(f){
+      var el = document.querySelector('[data-tag="' + f + '"]'); if (!el) return;
+      var bl = bloqueoDe(f), t = W[f], hab = igual(t, habitual(f));
+      el.className = 'tag' + (bl ? ' cer' : !t.length ? ' cer' : !hab ? ' cam' : '');
+      el.textContent = bl ? 'Bloqueado' + (bl.nota ? ': ' + bl.nota : '') : !t.length ? 'Cerrado' : hab ? 'Horario habitual' : 'Horario especial';
     });
   }
-  $('m-aplicar').addEventListener('click', function(){
-    var t = [[$('m-a1').value, $('m-b1').value], [$('m-a2').value, $('m-b2').value]].filter(function(x){ return x[0] || x[1]; });
-    if (!t.length) { $('m-err').textContent = 'Pon al menos un tramo de horas, o usa «Cerrar estos días».'; $('m-err').hidden = false; return; }
-    aplicar('aplicar_dias', t, ['Horario puesto en {n} días.', 'Horario puesto en 1 día.']);
+  function cambiosSemana(fechas, origen){
+    var dias = {};
+    fechas.forEach(function(f){ if (f < D.hoy) return; var t = (origen || W)[f]; dias[f] = igual(t, habitual(f)) ? null : t; });
+    return dias;
+  }
+  function guardarDias(dias, texto){
+    var err = $('s-err'); err.hidden = true;
+    if (!Object.keys(dias).length) return Promise.resolve(true);
+    for (var f in dias) { var t = dias[f] || []; for (var i = 0; i < t.length; i++) if (!t[i][0] || !t[i][1] || t[i][0] >= t[i][1]) { err.textContent = 'Revisa las horas del ' + fechaLarga(f) + ': la hora de fin tiene que ser después de la de inicio.'; err.hidden = false; return Promise.resolve(false); } }
+    return api('guardar_dias', { dias: dias }).then(function(r){
+      if (!r.ok) { err.textContent = errTxt(r) + (r.detalle ? ' (' + r.detalle + ')' : ''); err.hidden = false; return false; }
+      SUCIO = false; $('s-msg').textContent = 'Guardado'; if (texto) toast(texto);
+      return cargarSinPintarSemana().then(function(){ return true; });
+    });
+  }
+  function cargarSinPintarSemana(){ var s = SEM; return cargar().then(function(){ abrirSemana(s); }); }
+  function irA(lun){
+    if (!SUCIO) return abrirSemana(lun);
+    guardarDias(cambiosSemana(Object.keys(W)), 'Semana guardada.').then(function(ok){ if (ok) abrirSemana(lun); });
+  }
+  $('s-prev').addEventListener('click', function(){ irA(sumar(SEM, -7)); });
+  $('s-next').addEventListener('click', function(){ irA(sumar(SEM, 7)); });
+  $('s-mes').addEventListener('change', function(){ var l = lunesDe(this.value + '-01'); if (mesDeSemana(l) !== this.value) l = sumar(l, 7); irA(l); });
+  $('s-guardar').addEventListener('click', function(){ guardarDias(cambiosSemana(Object.keys(W)), 'Semana guardada. La web ya muestra estas horas.'); });
+  $('s-repetir').addEventListener('click', function(){
+    var mes = mesDeSemana(SEM), dias = cambiosSemana(Object.keys(W)), n = 0, f = sumar(SEM, 7);
+    while (f.slice(0, 7) <= mes) {
+      if (f.slice(0, 7) === mes) { var orig = sumar(SEM, (dowDe(f) - 1)); var t = W[orig]; dias[f] = igual(t, habitual(f)) ? null : JSON.parse(JSON.stringify(t)); n++; }
+      f = sumar(f, 1);
+    }
+    if (!n) return toast('Esta es la última semana del mes.');
+    guardarDias(dias, 'Guardado. Las semanas siguientes de ' + dia(mes + '-01').toLocaleDateString('es-ES', { month: 'long' }) + ' tienen ahora este horario.');
   });
-  $('m-cerrar').addEventListener('click', function(){ aplicar('aplicar_dias', [], ['{n} días cerrados: no se podrá reservar.', 'Día cerrado: no se podrá reservar.']); });
-  $('m-reset').addEventListener('click', function(){ aplicar('restablecer_dias', [], ['{n} días vuelven al horario habitual.', 'El día vuelve al horario habitual.']); });
   document.addEventListener('click', function(e){
-    if (!e.target.closest('#m-ampliar')) return;
-    var fs = Object.keys(SEL).sort(); $('h-abierto').value = fs[fs.length - 1];
-    guardarHorario($('b-guardar-h'), $('h-msg'));
+    var a = e.target.closest('[data-addwf]'), x = e.target.closest('[data-delwf]'), h = e.target.closest('[data-hab]'), c = e.target.closest('[data-cerrar]');
+    if (a) { nuevoTramo(W[a.dataset.addwf]); }
+    else if (x) { W[x.dataset.delwf].splice(+x.dataset.deli, 1); }
+    else if (h) { W[h.dataset.hab] = JSON.parse(JSON.stringify(habitual(h.dataset.hab))); }
+    else if (c) { W[c.dataset.cerrar] = []; }
+    else return;
+    pintarSemana(); marcarSucio();
+  });
+  document.addEventListener('click', function(e){
+    if (!e.target.closest('#s-abrir')) return;
+    var b = dia(sumar(SEM, 6)); $('h-abierto').value = finDeMes(b.getFullYear(), b.getMonth());
+    var pend = SUCIO ? guardarDias(cambiosSemana(Object.keys(W))) : Promise.resolve(true);
+    pend.then(function(ok){ if (ok) guardarHorario($('b-guardar-h'), $('h-msg')).then(function(){ setTimeout(function(){ abrirSemana(SEM); }, 400); }); });
   });
 
   /* ---------- bloqueos ---------- */
