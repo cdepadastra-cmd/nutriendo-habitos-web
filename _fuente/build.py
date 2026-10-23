@@ -204,13 +204,34 @@ def jsonld(slug: str, url: str, titulo: str, desc: str, seg: str) -> str:
     return '<script type="application/ld+json">' + json.dumps({'@context': 'https://schema.org', '@graph': graph}, ensure_ascii=False) + '</script>'
 
 # ---------------------------------------------------------------- montar cada página
-def nav_html(slug: str) -> str:
+SUBSERV = [('patologias', 'Tratamiento de patologías', 'stetho'), ('sobrepeso', 'Sobrepeso y ganancia de peso', 'scale'),
+           ('nutricion-deportiva-valladolid', 'Nutrición deportiva', 'activity'), ('nutricion-oncologica-valladolid', 'Nutrición oncológica', 'heart'),
+           ('vegetariana', 'Vegetariana y vegana', 'leaf')]
+CHEV_DOWN = '<svg class="i" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>'
+
+def href_de(token: str, slug: str) -> str:
+    if token in FILES:
+        return './' if FILES[token] == 'index.html' else FILES[token]
+    if slug == 'dietista-nutricionista-en-valladolid':
+        return '#' + token
+    return FILES['dietista-nutricionista-en-valladolid'] + '#' + token
+
+def nav_html(slug: str, movil: bool = False) -> str:
     activo = NAVMAP.get(slug, slug)
     out = []
     for key, txt in NAV:
         href = './' if key == 'inicio' else FILES[key]
         cur = ' aria-current="page"' if key == activo else ''
-        out.append(f'<a href="{href}" data-nav="{key}"{cur}>{txt}</a>')
+        a = f'<a href="{href}" data-nav="{key}"{cur}>{txt}</a>'
+        if key != 'dietista-nutricionista-en-valladolid':
+            out.append(a)
+        elif movil:
+            subs = ''.join(f'<a href="{href_de(t, slug)}">{n}</a>' for t, n, _ in SUBSERV)
+            out.append(a + f'<div class="m-sub">{subs}<a href="{FILES["nuestros-servicios"]}">Todos los servicios</a></div>')
+        else:
+            subs = ''.join(f'<a href="{href_de(t, slug)}"><svg class="i" viewBox="0 0 24 24" data-ic="{ic}"></svg>{n}</a>' for t, n, ic in SUBSERV)
+            out.append(f'<div class="nav-dd">{a}<button type="button" class="dd-btn" aria-expanded="false" aria-label="Ver todos los servicios">{CHEV_DOWN}</button>'
+                       f'<div class="dd-menu">{subs}<div class="sep"></div><a class="all" href="{FILES["nuestros-servicios"]}">Todos los servicios</a></div></div>')
     return ''.join(out)
 
 if OUT.exists():
@@ -249,7 +270,7 @@ for slug, (archivo, titulo, desc, _prio) in PAGINAS.items():
     extra = re.sub(r'<title>.*?</title>\n', '', head_extra, flags=re.S).replace('<meta name="claude:viewport-fit-sides" content="cover">\n', '')
     cuerpo = antes_main + '\n' + seg + '\n' + despues_main
     cuerpo = cuerpo.replace('<nav class="main" aria-label="Principal"></nav>', f'<nav class="main" aria-label="Principal">{nav_html(slug)}</nav>')
-    cuerpo = cuerpo.replace('<nav class="mobile-nav" aria-label="Menú móvil"></nav>', f'<nav class="mobile-nav" aria-label="Menú móvil">{nav_html(slug)}</nav>')
+    cuerpo = cuerpo.replace('<nav class="mobile-nav" aria-label="Menú móvil"></nav>', f'<nav class="mobile-nav" aria-label="Menú móvil">{nav_html(slug, True)}</nav>')
     mpa = {'page': slug, 'files': FILES_JS, 'anchors': {k: v.replace('index.html#', './#') for k, v in ANCLAS.items()}}
     cuerpo = cuerpo.replace('<script>\n(function(){', '<script>window.__MPA=' + json.dumps(mpa, ensure_ascii=False) + ';</script>\n<script>\n(function(){', 1)
     cuerpo = reescribir_enlaces(cuerpo, slug)

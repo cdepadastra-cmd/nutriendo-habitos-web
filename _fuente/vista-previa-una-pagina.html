@@ -80,6 +80,22 @@ nav.main a[aria-current="page"]{color:var(--primary);text-decoration:underline;t
 .mobile-nav{display:none;border-top:1px solid var(--border);padding:.5rem var(--gutter-r) 1rem var(--gutter-l)}
 .mobile-nav a{display:block;padding:.7rem 0;border-bottom:1px solid color-mix(in oklab,var(--border) 60%,transparent);color:var(--muted-fg)}
 .mobile-nav a[aria-current="page"]{color:var(--primary);font-weight:500}
+.nav-dd{position:relative;display:flex;align-items:center;gap:.1rem}
+.dd-btn{display:grid;place-items:center;width:1.35rem;height:1.35rem;border-radius:999px;color:var(--muted-fg);transition:transform .15s,color .15s}
+.dd-btn svg{width:.85rem;height:.85rem}
+.nav-dd:hover .dd-btn,.nav-dd.open .dd-btn{color:var(--primary)}
+.nav-dd.open .dd-btn{transform:rotate(180deg)}
+.dd-menu{position:absolute;top:calc(100% + .75rem);left:-1rem;min-width:16rem;display:grid;padding:.45rem;background:var(--card);border:1px solid var(--border);border-radius:1rem;box-shadow:0 22px 44px -24px rgba(30,40,28,.35);opacity:0;visibility:hidden;transform:translateY(6px);transition:opacity .15s,transform .15s,visibility .15s;z-index:40}
+.dd-menu::before{content:"";position:absolute;left:0;right:0;top:-.8rem;height:.8rem}
+.nav-dd:hover .dd-menu,.nav-dd:focus-within .dd-menu,.nav-dd.open .dd-menu{opacity:1;visibility:visible;transform:none}
+nav.main .dd-menu a{display:flex;align-items:center;gap:.6rem;padding:.55rem .75rem;border-radius:.65rem;color:var(--foreground);font-size:.9rem}
+nav.main .dd-menu a:hover,nav.main .dd-menu a:focus-visible{background:var(--secondary);color:var(--primary)}
+.dd-menu a svg{width:1rem;height:1rem;color:var(--primary);flex:0 0 auto}
+.dd-menu .sep{border-top:1px solid var(--border);margin:.3rem .5rem}
+nav.main .dd-menu a.all{color:var(--primary);font-weight:500}
+.mobile-nav .m-sub{display:grid;padding:.2rem 0 .4rem 1rem;border-bottom:1px solid color-mix(in oklab,var(--border) 60%,transparent)}
+.mobile-nav .m-sub a{border-bottom:0;padding:.45rem 0;font-size:.92rem}
+.stmt[id]{scroll-margin-top:7.5rem}
 @media (max-width:1023px){
   nav.main{display:none}
   .menu-btn{display:inline-flex}
@@ -579,19 +595,19 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
     <div class="lead-rule"></div>
     <p class="intro">En nuestra consulta de nutrición en Valladolid y online contamos con todos los servicios detallados a continuación, pero si tienes cualquier duda o consulta no dudes en ponerte en contacto con nosotras.</p>
     <div>
-      <article class="stmt"><div class="left"><span class="card-icon sq" data-ic2="salad"></span><h3 class="card-title">Tratamiento de sobrepeso y obesidad</h3><span class="num">1</span></div>
+      <article class="stmt" id="sobrepeso"><div class="left"><span class="card-icon sq" data-ic2="salad"></span><h3 class="card-title">Tratamiento de sobrepeso y obesidad</h3><span class="num">1</span></div>
         <div class="oc small"><p>Según palabras de la propia OMS “la obesidad ha alcanzado proporciones epidémicas a nivel mundial, y cada año mueren, como mínimo, 2,8 millones de personas a causa de la obesidad o sobrepeso.” Por lo tanto, no debemos fijarnos en ellas como un problema estético, si no como algo mucho más serio que puede tener</p><p>consecuencias graves para nuestra salud.</p></div></article>
       <article class="stmt"><div class="left"><span class="card-icon sq" data-ic2="scale"></span><h3 class="card-title">Ganancia de peso</h3><span class="num">2</span></div>
         <div class="oc small"><p>Es otra de las necesidades que vemos en consulta. Es curioso el contraste que podemos ver a nuestro alrededor, mientras unas personas están deseando perder peso, otras están</p><p>deseando cogerlo... ¡¡Pero no debe hacerse de cualquier manera!! Con dieta y ejercicio podemos conseguirlo.</p></div></article>
       <article class="stmt"><div class="left"><span class="card-icon sq" data-ic2="activity"></span><h3 class="card-title">Nutrición deportiva</h3><span class="num">3</span></div>
         <div class="oc small"><p>Una de las peticiones de los deportistas es “quiero mejorar mi rendimiento”. La nutrición, la alimentación, forma parte de ese llamado entrenamiento invisible, fundamental para esa mejora de resultados y alcanzar nuestra</p><p>meta. Una correcta planificación de la dieta del deportista, pre, intra y post entrenamiento puede marcar la diferencia.</p><p>Si quieres trabajar la alimentación en relación con tus entrenamientos, conoce la <a href="#nutricion-deportiva">consulta de nutrición deportiva en Valladolid</a>: pautas personalizadas, valoración de composición corporal y seguimiento con Andrea Argüello, miembro del Equipo Sputnik y Sputnik Investigación.</p></div></article>
-      <article class="stmt"><div class="left"><span class="card-icon sq" data-ic2="stetho"></span><h3 class="card-title">Patología digestiva</h3><span class="num">4</span></div>
+      <article class="stmt" id="patologias"><div class="left"><span class="card-icon sq" data-ic2="stetho"></span><h3 class="card-title">Patología digestiva</h3><span class="num">4</span></div>
         <div class="oc small"><p>Celiaquía, intolerancias y alergias alimentarias, SIBO, IMO, SIFO, DAO, intestino irritable, Crohn... Cada vez son más las personas que acuden a consulta con problemas de este tipo. ¿Te ayudo?</p></div></article>
       <article class="stmt"><div class="left"><span class="card-icon sq" data-ic2="apple"></span><h3 class="card-title">Patologías relacionadas</h3><span class="num">5</span></div>
         <div class="oc small"><p>Son numerosas las patologías relacionadas con la alimentación tales como diabetes, hernia de hiato, TCA, Síndrome Metabólico, cáncer etc.</p><p>El establecimiento de una pauta adecuada para cada una de ellas puede ayudarnos a llevar mejor la enfermedad, mejorar</p><p>nuestro estado de salud y, en definitiva, mejorar nuestra calidad de vida.</p></div></article>
       <article class="stmt"><div class="left"><span class="card-icon sq" data-ic2="heart"></span><h3 class="card-title">Nutrición oncológica</h3><span class="num">6</span></div>
         <div class="oc small"><p>Acompañamiento nutricional antes, durante y después del tratamiento oncológico, coordinado con tu equipo médico: pautas para los efectos secundarios que afectan a la alimentación y para mantener el peso y la masa muscular.</p><p>Conoce la <a href="#nutricion-oncologica-valladolid">consulta de nutrición oncológica en Valladolid y online</a>.</p></div></article>
-      <article class="stmt"><div class="left"><span class="card-icon sq" data-ic2="leaf"></span><h3 class="card-title">Seguimiento y adaptación para personas vegetarianas y veganas</h3><span class="num">7</span></div>
+      <article class="stmt" id="vegetariana"><div class="left"><span class="card-icon sq" data-ic2="leaf"></span><h3 class="card-title">Seguimiento y adaptación para personas vegetarianas y veganas</h3><span class="num">7</span></div>
         <div class="oc small"><p>Cada vez más personas optan por cambiar su alimentación dada la repercusión que tiene esta. ya no sobre su salud, si no sobre el entorno en el que vivimos. Pero no se puede hacer de cualquier manera y hay que tener en cuenta algunos factores si queremos hacer las cosas bien.</p></div></article>
     </div>
     <div class="band"><h2>Cómo trabajamos</h2></div>
@@ -1122,12 +1138,34 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
 
   // ---------- nav ----------
   var NAV = [['inicio','Inicio'],['dietista-nutricionista-en-valladolid','Servicios'],['nutricionista-online','Online'],['asesoria-externa','Asesoría externa'],['publicaciones','Colaboraciones'],['cursos-talleres','Cursos/Talleres'],['blog-nutricion','Blog'],['contacto','Contacto']];
-  var navHTML = NAV.map(function(n){ return '<a href="#'+n[0]+'" data-nav="'+n[0]+'">'+n[1]+'</a>'; }).join('');
+  // Submenú de Servicios
+  var SUBSERV = [['patologias','Tratamiento de patologías','stetho'],['sobrepeso','Sobrepeso y ganancia de peso','scale'],['nutricion-deportiva-valladolid','Nutrición deportiva','activity'],['nutricion-oncologica-valladolid','Nutrición oncológica','heart'],['vegetariana','Vegetariana y vegana','leaf']];
+  var CHEV_DOWN = '<svg class="i" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>';
+  var navHTML = NAV.map(function(n){
+    var a = '<a href="#'+n[0]+'" data-nav="'+n[0]+'">'+n[1]+'</a>';
+    if (n[0] !== 'dietista-nutricionista-en-valladolid') return a;
+    return '<div class="nav-dd">'+a+'<button type="button" class="dd-btn" aria-expanded="false" aria-label="Ver todos los servicios">'+CHEV_DOWN+'</button><div class="dd-menu">' +
+      SUBSERV.map(function(x){ return '<a href="#'+x[0]+'"><svg class="i" viewBox="0 0 24 24" data-ic="'+x[2]+'"></svg>'+x[1]+'</a>'; }).join('') +
+      '<div class="sep"></div><a class="all" href="#nuestros-servicios">Todos los servicios</a></div></div>';
+  }).join('');
+  var mnavHTML = NAV.map(function(n){
+    var a = '<a href="#'+n[0]+'" data-nav="'+n[0]+'">'+n[1]+'</a>';
+    if (n[0] !== 'dietista-nutricionista-en-valladolid') return a;
+    return a + '<div class="m-sub">' + SUBSERV.map(function(x){ return '<a href="#'+x[0]+'">'+x[1]+'</a>'; }).join('') + '<a href="#nuestros-servicios">Todos los servicios</a></div>';
+  }).join('');
   // En la versión publicada por páginas, el menú ya viene escrito en el HTML
   if (!document.querySelector('nav.main').children.length) {
     document.querySelector('nav.main').innerHTML = navHTML;
-    document.querySelector('.mobile-nav').innerHTML = navHTML;
+    document.querySelector('.mobile-nav').innerHTML = mnavHTML;
   }
+  // Abrir/cerrar el desplegable con el botón (pantallas táctiles y teclado)
+  document.querySelectorAll('.nav-dd').forEach(function(dd){
+    var btn = dd.querySelector('.dd-btn');
+    btn.addEventListener('click', function(e){ e.stopPropagation(); var o = dd.classList.toggle('open'); btn.setAttribute('aria-expanded', o); });
+    dd.querySelectorAll('.dd-menu a').forEach(function(a){ a.addEventListener('click', function(){ dd.classList.remove('open'); btn.setAttribute('aria-expanded','false'); if (document.activeElement) document.activeElement.blur(); }); });
+  });
+  document.addEventListener('click', function(){ document.querySelectorAll('.nav-dd.open').forEach(function(dd){ dd.classList.remove('open'); dd.querySelector('.dd-btn').setAttribute('aria-expanded','false'); }); });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape') document.querySelectorAll('.nav-dd.open').forEach(function(dd){ dd.classList.remove('open'); }); });
   var header = document.querySelector('header.site'), mb = document.getElementById('menu-btn');
   mb.addEventListener('click', function(){ var o = header.classList.toggle('open'); mb.setAttribute('aria-expanded', o); });
 
@@ -1472,7 +1510,7 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
       if (el) window.scrollTo(0, el.getBoundingClientRect().top + scrollY - header.offsetHeight);
     };
     window.addEventListener('hashchange', irAncla);
-    if (location.hash) setTimeout(irAncla, 50);
+    if (location.hash) { setTimeout(irAncla, 50); window.addEventListener('load', function(){ setTimeout(irAncla, 30); }); if (document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ setTimeout(irAncla, 30); }); }
     return;
   }
   function route(){
