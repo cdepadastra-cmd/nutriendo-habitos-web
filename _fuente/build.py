@@ -26,13 +26,22 @@ PAGINAS = {
         'Dietista-nutricionista en Valladolid desde 2013. Consulta presencial y online: nutrición deportiva, nutrición oncológica, pérdida de peso y patología digestiva. Reserva tu cita.', '1.0'),
     'dietista-nutricionista-en-valladolid': ('dietista-nutricionista-en-valladolid.html',
         'Dietista-nutricionista en Valladolid · Consulta y servicios | Nutriendo Hábitos',
-        'Consulta de nutrición en Valladolid con Andrea Argüello: sobrepeso, ganancia de peso, nutrición deportiva, patología digestiva, oncológica y vegana. Bioimpedancia y seguimiento.', '0.9'),
+        'Consulta de nutrición en Valladolid con Andrea Argüello: pérdida y ganancia de peso, nutrición deportiva, patologías digestivas, oncológica y vegetariana. Bioimpedancia y seguimiento.', '0.9'),
     'nutricion-deportiva-valladolid': ('nutricion-deportiva-valladolid.html',
         'Nutrición deportiva en Valladolid | Nutricionista deportiva · Nutriendo Hábitos',
-        'Nutricionista deportiva en Valladolid y online: alimentación antes, durante y después del entrenamiento, escalada y composición corporal con Andrea Argüello.', '0.9'),
+        'Nutricionista deportiva en Valladolid y online: escalada, running, trail, ciclismo y fuerza. Alimentación antes, durante y después del entrenamiento, hidratación y composición corporal.', '0.9'),
     'nutricion-oncologica-valladolid': ('nutricion-oncologica-valladolid.html',
         'Nutrición oncológica en Valladolid y online | Nutriendo Hábitos',
         'Nutricionista oncológica en Valladolid y online, con Máster en Nutrición Oncológica: alimentación antes, durante y después del tratamiento del cáncer, junto a tu equipo médico.', '0.9'),
+    'perdida-de-peso-valladolid': ('perdida-de-peso-valladolid.html',
+        'Nutricionista para perder peso en Valladolid | Nutriendo Hábitos',
+        'Nutricionista para adelgazar en Valladolid y online: pérdida de peso sin dietas milagro, ganancia de peso saludable y seguimiento con bioimpedancia. Andrea Argüello.', '0.9'),
+    'patologias-digestivas-valladolid': ('patologias-digestivas-valladolid.html',
+        'Nutricionista digestiva en Valladolid: SIBO, intolerancias y celiaquía | Nutriendo Hábitos',
+        'Nutricionista en Valladolid y online para SIBO, intestino irritable, dieta FODMAP, intolerancias, déficit de DAO, celiaquía, Crohn y reflujo. Pauta adaptada a tu diagnóstico.', '0.9'),
+    'alimentacion-vegetariana-vegana-valladolid': ('alimentacion-vegetariana-vegana-valladolid.html',
+        'Nutricionista vegetariana y vegana en Valladolid | Nutriendo Hábitos',
+        'Nutricionista en Valladolid y online para alimentación vegetariana y vegana bien planificada: proteína, B12, hierro y menús para cada etapa de la vida.', '0.8'),
     'nutricionista-online': ('nutricionista-online.html',
         'Nutricionista online · Consulta por videollamada | Nutriendo Hábitos',
         'Consulta de nutrición online con Andrea Argüello: dietas personalizadas y seguimiento por videollamada desde cualquier punto de España.', '0.8'),
@@ -68,7 +77,9 @@ ALIAS = {'servicios': 'dietista-nutricionista-en-valladolid', 'online': 'nutrici
          'colaboraciones': 'publicaciones', 'cursos': 'cursos-talleres', 'blog': 'blog-nutricion',
          'todos-los-servicios': 'nuestros-servicios', 'nutricion-deportiva': 'nutricion-deportiva-valladolid',
          'privacidad': 'proteccion-de-datos', 'reserva': 'reservar', 'cita': 'reservar',
-         'oncologica': 'nutricion-oncologica-valladolid', 'nutricion-oncologica': 'nutricion-oncologica-valladolid'}
+         'oncologica': 'nutricion-oncologica-valladolid', 'nutricion-oncologica': 'nutricion-oncologica-valladolid',
+         'perdida-de-peso': 'perdida-de-peso-valladolid', 'patologias-digestivas': 'patologias-digestivas-valladolid',
+         'vegana': 'alimentacion-vegetariana-vegana-valladolid'}
 FILES = {k: v[0] for k, v in PAGINAS.items()}
 FILES_JS = {k: ('./' if v == 'index.html' else v) for k, v in FILES.items()}
 for a, b in ALIAS.items():
@@ -81,7 +92,8 @@ for m in re.finditer(r'<div data-page="([^"]+)"', SRC):
 NAV = [('inicio', 'Inicio'), ('dietista-nutricionista-en-valladolid', 'Servicios'), ('nutricionista-online', 'Online'),
        ('asesoria-externa', 'Asesoría externa'), ('publicaciones', 'Colaboraciones'), ('cursos-talleres', 'Cursos/Talleres'),
        ('blog-nutricion', 'Blog'), ('contacto', 'Contacto')]
-NAVMAP = {'nutricion-oncologica-valladolid': 'dietista-nutricionista-en-valladolid', 'nuestros-servicios': 'dietista-nutricionista-en-valladolid',
+NAVMAP = {'perdida-de-peso-valladolid': 'dietista-nutricionista-en-valladolid', 'patologias-digestivas-valladolid': 'dietista-nutricionista-en-valladolid',
+          'alimentacion-vegetariana-vegana-valladolid': 'dietista-nutricionista-en-valladolid', 'nutricion-oncologica-valladolid': 'dietista-nutricionista-en-valladolid', 'nuestros-servicios': 'dietista-nutricionista-en-valladolid',
           'nutricion-deportiva-valladolid': 'dietista-nutricionista-en-valladolid', 'tips': 'blog-nutricion'}
 
 WA = 'https://wa.me/34669877052?text=Hola%20Andrea%2C%20me%20gustar%C3%ADa%20pedir%20cita.%20%C2%BFQu%C3%A9%20huecos%20tienes%20disponibles%3F'
@@ -168,7 +180,7 @@ NEGOCIO = {
                 'addressLocality': 'Valladolid', 'addressRegion': 'Castilla y León', 'addressCountry': 'ES'},
     'areaServed': [{'@type': 'City', 'name': 'Valladolid'}, {'@type': 'Country', 'name': 'España'}],
     'founder': {'@id': BASE + '#andrea'}, 'sameAs': ['https://www.instagram.com/nutrir_habitos/'],
-    'knowsAbout': ['Nutrición deportiva', 'Nutrición oncológica', 'Pérdida de peso', 'Patología digestiva', 'Dietética', 'Bioimpedancia'],
+    'knowsAbout': ['Nutrición deportiva', 'Nutrición oncológica', 'Pérdida de peso', 'Patología digestiva', 'SIBO', 'Celiaquía', 'Alimentación vegetariana y vegana', 'Dietética', 'Bioimpedancia'],
 }
 ANDREA = {'@type': 'Person', '@id': BASE + '#andrea', 'name': 'Andrea Argüello Arbe', 'jobTitle': 'Dietista-nutricionista',
           'worksFor': {'@id': BASE + '#negocio'},
@@ -183,6 +195,9 @@ WEB = {'@type': 'WebSite', '@id': BASE + '#web', 'url': BASE, 'name': 'Nutriendo
 SERVICIOS = {
     'nutricion-deportiva-valladolid': 'Nutrición deportiva',
     'nutricion-oncologica-valladolid': 'Nutrición oncológica',
+    'perdida-de-peso-valladolid': 'Consulta de nutrición para pérdida y ganancia de peso',
+    'patologias-digestivas-valladolid': 'Nutrición en patologías digestivas',
+    'alimentacion-vegetariana-vegana-valladolid': 'Asesoramiento en alimentación vegetariana y vegana',
     'dietista-nutricionista-en-valladolid': 'Consulta de dietética y nutrición',
     'nutricionista-online': 'Consulta de nutrición online',
 }
