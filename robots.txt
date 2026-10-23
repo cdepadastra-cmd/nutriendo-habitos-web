@@ -2,5 +2,6 @@ User-agent: *
 Allow: /
 Disallow: /reservas/
 Disallow: /nueva/
+Disallow: /NUEVA/
 
 Sitemap: https://www.nutriendohabitos.es/sitemap.xml

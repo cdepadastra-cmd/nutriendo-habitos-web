@@ -10,7 +10,8 @@ import html, json, re, shutil, sys, datetime
 from pathlib import Path
 
 MODO = sys.argv[1] if len(sys.argv) > 1 else 'definitiva'
-BASE = 'https://www.nutriendohabitos.es/' if MODO == 'definitiva' else 'https://www.nutriendohabitos.es/nueva/'
+RAIZ = '/' if MODO == 'definitiva' else '/NUEVA/'   # carpeta del hosting (en el hosting importan las mayúsculas)
+BASE = 'https://www.nutriendohabitos.es' + RAIZ
 AQUI = Path(__file__).resolve().parent
 SRC = (AQUI / 'nutriendo-habitos.html').read_text(encoding='utf-8')
 SITE = AQUI / 'site'
@@ -266,10 +267,14 @@ shutil.copytree(SITE / 'reservas', OUT / 'reservas', ignore=shutil.ignore_patter
 admin = (OUT / 'reservas' / 'admin.php').read_text(encoding='utf-8').replace('href="../#reservar"', 'href="../reservar.html"')
 (OUT / 'reservas' / 'admin.php').write_text(admin, encoding='utf-8')
 
+# Página de error 404 (rutas absolutas: se muestra en cualquier dirección que no exista)
+(OUT / '404.html').write_text((SITE / '404.tpl.html').read_text(encoding='utf-8').replace('{{RAIZ}}', RAIZ), encoding='utf-8')
+(OUT / '.htaccess').write_text(f'# Nutriendo Hábitos\nErrorDocument 404 {RAIZ}404.html\n', encoding='utf-8')
+
 if MODO == 'definitiva':
     urls = ''.join(f'  <url><loc>{BASE if a == "index.html" else BASE + a}</loc><lastmod>{HOY}</lastmod><priority>{p}</priority></url>\n'
                    for s_, (a, t, d, p) in PAGINAS.items() if s_ != 'proteccion-de-datos')
     (OUT / 'sitemap.xml').write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + urls + '</urlset>\n', encoding='utf-8')
-    (OUT / 'robots.txt').write_text(f'User-agent: *\nAllow: /\nDisallow: /reservas/\nDisallow: /nueva/\n\nSitemap: {BASE}sitemap.xml\n', encoding='utf-8')
+    (OUT / 'robots.txt').write_text(f'User-agent: *\nAllow: /\nDisallow: /reservas/\nDisallow: /nueva/\nDisallow: /NUEVA/\n\nSitemap: {BASE}sitemap.xml\n', encoding='utf-8')
 
 print(MODO, '->', OUT, '|', len(PAGINAS), 'páginas')

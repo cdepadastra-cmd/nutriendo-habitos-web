@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Página no encontrada | Nutriendo Hábitos</title>
+<meta name="robots" content="noindex, follow">
+<meta name="theme-color" content="#56704F">
+<link rel="icon" href="{{RAIZ}}img/favicon.webp">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,400&family=Outfit:wght@300;400;500;600&display=swap">
+<style>
+:root{--background:#FBFAF6;--foreground:#2F302C;--card:#fff;--primary:#56704F;--primary-fg:#FBFAF6;--secondary:#E4F0D0;--secondary-fg:#3F523B;--muted:#F2EFEA;--muted-fg:#6B6660;--accent:#7D726A;--border:#E3E1D8;--leaf:#C2D8B9;
+  --font-display:"Fraunces",Georgia,"Times New Roman",serif;--font-sans:"Outfit",system-ui,-apple-system,"Segoe UI",sans-serif}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--background);color:var(--foreground);font-family:var(--font-sans);font-weight:300;line-height:1.6;-webkit-font-smoothing:antialiased;min-height:100vh;display:flex;flex-direction:column}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+.wrap{width:100%;max-width:72rem;margin:0 auto;padding:0 max(1.25rem,env(safe-area-inset-left,0px))}
+header{border-bottom:1px solid var(--border);background:rgba(251,250,246,.9)}
+header .wrap{display:flex;align-items:center;justify-content:space-between;height:5rem}
+header img{height:3.4rem;width:auto}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;white-space:nowrap;font:500 .9rem/1 var(--font-sans);height:2.75rem;padding:0 1.6rem;border-radius:999px;border:1px solid transparent;transition:background-color .15s,color .15s,border-color .15s,transform .15s;cursor:pointer}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--primary);color:var(--primary-fg)}.btn-primary:hover{background:#4A6144}
+.btn-secondary{background:var(--secondary);color:var(--secondary-fg)}.btn-secondary:hover{background:#D7E8BD}
+.btn-outline{border-color:var(--border);background:var(--card)}.btn-outline:hover{border-color:var(--primary);color:var(--primary)}
+.btn svg{width:1rem;height:1rem;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.btn:focus-visible,.chip:focus-visible,.avo:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+
+main{flex:1;padding:clamp(2.5rem,7vw,5rem) 0 4rem}
+.grid{display:grid;gap:3rem;align-items:center}
+@media(min-width:900px){.grid{grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr)}}
+.ey{font-size:.75rem;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--primary);margin:0 0 1rem}
+.num{display:flex;align-items:center;gap:.05em;font-family:var(--font-display);font-weight:300;font-size:clamp(6rem,19vw,11rem);line-height:.9;color:var(--primary);margin:0 0 1.5rem;letter-spacing:-.02em}
+.avo{position:relative;font-size:inherit;width:.72em;height:.92em;border:0;background:none;padding:0;cursor:pointer;flex:none;margin:0 .06em;color:inherit}
+.avo svg{width:100%;height:100%;overflow:visible}
+.avo .cuerpo{transform-origin:50% 90%;transition:transform .3s}
+.avo:hover .cuerpo{animation:baila .6s ease-in-out}
+.hueso{transition:transform .9s cubic-bezier(.3,1.3,.5,1),opacity .3s}
+.avo.sin .hueso{transform:translate(118px,40px) rotate(420deg)}
+.bocadillo{position:absolute;left:50%;bottom:102%;transform:translateX(-50%) scale(.6);opacity:0;pointer-events:none;background:var(--foreground);color:#fff;font:500 .8rem/1.3 var(--font-sans);letter-spacing:0;padding:.45rem .7rem;border-radius:.7rem;white-space:nowrap;transition:opacity .2s,transform .2s}
+.bocadillo::after{content:"";position:absolute;left:50%;top:100%;margin-left:-6px;border:6px solid transparent;border-top-color:var(--foreground)}
+.avo.habla .bocadillo{opacity:1;transform:translateX(-50%) scale(1)}
+@keyframes baila{0%,100%{transform:rotate(0)}25%{transform:rotate(-8deg)}75%{transform:rotate(8deg)}}
+h1{font-family:var(--font-display);font-weight:400;font-size:clamp(2rem,4.5vw,3.1rem);line-height:1.1;letter-spacing:-.01em;margin:0 0 1rem;color:var(--foreground);text-wrap:balance}
+h1 em{font-style:italic;color:var(--primary)}
+.lead{font-size:1.1rem;color:var(--muted-fg);max-width:34rem;margin:0 0 2rem}
+.ctas{display:flex;flex-wrap:wrap;gap:.7rem}
+.pista{font-size:.85rem;color:var(--muted-fg);margin:1.4rem 0 0}
+
+.etiqueta{background:var(--card);border:2px solid var(--foreground);border-radius:.6rem;padding:1rem 1.2rem 1.1rem;max-width:23rem;width:100%;justify-self:center;font-family:var(--font-sans);box-shadow:0 18px 40px -24px rgba(47,48,44,.35);transform:rotate(1.5deg)}
+.etiqueta h2{font:600 1.45rem/1.1 var(--font-sans);letter-spacing:-.01em;margin:0;padding-bottom:.35rem;border-bottom:8px solid var(--foreground)}
+.etiqueta .por{display:flex;justify-content:space-between;font-size:.8rem;font-weight:500;padding:.4rem 0;border-bottom:3px solid var(--foreground)}
+.etiqueta dl{margin:0}
+.etiqueta .f{display:flex;justify-content:space-between;gap:1rem;padding:.38rem 0;border-bottom:1px solid var(--foreground);font-size:.92rem;font-weight:400}
+.etiqueta .f.sub{padding-left:1rem;font-size:.85rem;color:var(--muted-fg)}
+.etiqueta .f dt{margin:0}.etiqueta .f dd{margin:0;font-weight:600;font-variant-numeric:tabular-nums}
+.etiqueta .f.top{border-bottom-width:4px}
+.etiqueta .f.top dt,.etiqueta .f.top dd{font-weight:600;font-size:1.05rem}
+.etiqueta .f.ok dd{color:var(--primary)}
+.etiqueta .nota{font-size:.75rem;color:var(--muted-fg);margin:.6rem 0 0;line-height:1.45}
+
+.quiza{margin-top:4rem;padding-top:2rem;border-top:1px solid var(--border)}
+.quiza h2{font:400 1.35rem/1.2 var(--font-display);margin:0 0 1rem}
+.chips{display:flex;flex-wrap:wrap;gap:.5rem}
+.chip{display:inline-flex;align-items:center;gap:.4rem;font-size:.9rem;font-weight:400;padding:.55rem 1rem;border-radius:999px;background:var(--muted);border:1px solid transparent;transition:background-color .15s,border-color .15s}
+.chip:hover{background:var(--secondary);border-color:var(--leaf)}
+footer{border-top:1px solid var(--border);padding:1.5rem 0;font-size:.85rem;color:var(--muted-fg)}
+footer .wrap{display:flex;flex-wrap:wrap;gap:.5rem 1.5rem;justify-content:space-between}
+footer a:hover{color:var(--primary)}
+@media(max-width:560px){.ctas .btn{flex:1 1 100%}.etiqueta{transform:none}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <a href="{{RAIZ}}" aria-label="Nutriendo Hábitos, ir al inicio"><img src="{{RAIZ}}img/logo.webp" alt="Nutriendo Hábitos" width="120" height="54"></a>
+    <a class="btn btn-primary" href="{{RAIZ}}reservar.html">Pide cita</a>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <div class="grid">
+      <div>
+        <p class="ey">Error 404 · Página no encontrada</p>
+        <p class="num" aria-label="404">
+          <span aria-hidden="true">4</span>
+          <button class="avo" type="button" id="avo" aria-label="Aguacate: púlsalo">
+            <span class="bocadillo" id="bocadillo" aria-live="polite"></span>
+            <svg viewBox="0 0 100 128" aria-hidden="true">
+              <g class="cuerpo">
+                <path d="M50 4C34 4 27 20 24 36 21 51 8 62 8 84c0 23 19 40 42 40s42-17 42-40c0-22-13-33-16-48C73 20 66 4 50 4Z" fill="#3F523B"/>
+                <path d="M50 12c-11 0-17 13-19 26-3 15-14 25-14 45 0 18 15 32 33 32s33-14 33-32c0-20-11-30-14-45C67 25 61 12 50 12Z" fill="#C9DE9E"/>
+                <path d="M50 20c-8 0-13 11-15 22-2 12-11 21-11 38 0 15 12 27 26 27s26-12 26-27c0-17-9-26-11-38C63 31 58 20 50 20Z" fill="#E4F0D0"/>
+              </g>
+              <g class="hueso" id="hueso">
+                <circle cx="50" cy="80" r="17" fill="#8A6A4F"/>
+                <circle cx="44" cy="74" r="5" fill="#A88566"/>
+              </g>
+            </svg>
+          </button>
+          <span aria-hidden="true">4</span>
+        </p>
+        <h1>Esta página se la ha <em>comido</em> alguien.</h1>
+        <p class="lead">Buscabas algo sano y te has encontrado el plato vacío. Puede que el enlace esté mal escrito o que la página ya no exista. Tranquilidad: aquí no contamos calorías, contamos hábitos.</p>
+        <div class="ctas">
+          <a class="btn btn-primary" href="{{RAIZ}}">Volver al inicio <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg></a>
+          <a class="btn btn-outline" href="{{RAIZ}}dietista-nutricionista-en-valladolid.html">Ver servicios</a>
+          <a class="btn btn-secondary" href="{{RAIZ}}reservar.html">Reservar cita</a>
+        </div>
+        <p class="pista">Pista: el aguacate se deja tocar.</p>
+      </div>
+
+      <aside class="etiqueta" aria-label="Información nutricional de esta página">
+        <h2>Información nutricional</h2>
+        <div class="por"><span>Por 100 g de página</span><span>Ración: 1 clic</span></div>
+        <dl>
+          <div class="f top"><dt>Valor energético</dt><dd>0 kcal</dd></div>
+          <div class="f"><dt>Grasas</dt><dd>0 g</dd></div>
+          <div class="f sub"><dt>de las cuales, saturadas</dt><dd>0 g</dd></div>
+          <div class="f"><dt>Hidratos de carbono</dt><dd>0 g</dd></div>
+          <div class="f"><dt>Proteínas</dt><dd>0 g</dd></div>
+          <div class="f"><dt>Contenido encontrado</dt><dd>0 %</dd></div>
+          <div class="f ok"><dt>Ganas de seguir navegando</dt><dd>100 %*</dd></div>
+        </dl>
+        <p class="nota">* Ingrediente no encontrado: la página que buscabas. Puede contener trazas de enlaces rotos.</p>
+      </aside>
+    </div>
+
+    <section class="quiza" aria-labelledby="quiza-t">
+      <h2 id="quiza-t">Quizá buscabas…</h2>
+      <nav class="chips" aria-label="Páginas más visitadas">
+        <a class="chip" href="{{RAIZ}}dietista-nutricionista-en-valladolid.html">Nutricionista en Valladolid</a>
+        <a class="chip" href="{{RAIZ}}nutricion-deportiva-valladolid.html">Nutrición deportiva</a>
+        <a class="chip" href="{{RAIZ}}nutricion-oncologica-valladolid.html">Nutrición oncológica</a>
+        <a class="chip" href="{{RAIZ}}nutricionista-online.html">Consulta online</a>
+        <a class="chip" href="{{RAIZ}}blog-nutricion.html">Blog</a>
+        <a class="chip" href="{{RAIZ}}contacto.html">Contacto</a>
+      </nav>
+    </section>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© Nutriendo Hábitos · Andrea Argüello · Valladolid</span>
+    <a href="tel:+34669877052">669 87 70 52</a>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var avo = document.getElementById('avo'), bo = document.getElementById('bocadillo'), n = 0, t;
+  var frases = ['¡Eh, mi hueso!', 'Eso no se come…', '¿Lo buscas? Yo también.', 'Vale, te lo devuelvo.', 'Guacamole no, por favor.'];
+  avo.addEventListener('click', function(){
+    var sin = avo.classList.toggle('sin');
+    bo.textContent = sin ? frases[n % 3] : frases[3 + (n % 2)];
+    n++;
+    avo.classList.add('habla'); clearTimeout(t);
+    t = setTimeout(function(){ avo.classList.remove('habla'); }, 1800);
+  });
+})();
+</script>
+</body>
+</html>
