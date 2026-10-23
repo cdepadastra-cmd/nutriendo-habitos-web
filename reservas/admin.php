@@ -455,7 +455,7 @@ input,select{height:2.4rem;border:1px solid var(--border);border-radius:.6rem;ba
   <section id="v-panel" hidden>
     <header>
       <div class="brand"><img src="../img/logo.webp" alt=""><div><h1 style="font-size:1.4rem">Reservas</h1><span class="muted">Nutriendo Hábitos · citas de <span id="dur">45</span> min</span></div></div>
-      <div style="display:flex;gap:.5rem;flex-wrap:wrap"><a class="btn sec sm" href="../#reservar" target="_blank" rel="noopener">Ver calendario público</a><button class="btn sec sm" id="b-salir">Salir</button></div>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap"><a class="btn sec sm" href="../reservar.html" target="_blank" rel="noopener">Ver calendario público</a><button class="btn sec sm" id="b-salir">Salir</button></div>
     </header>
 
     <div class="tabs" role="tablist">
