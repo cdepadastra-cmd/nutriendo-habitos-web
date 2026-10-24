@@ -1188,7 +1188,7 @@ Viernes 14/11
           <p class="muted" style="margin:0" id="s-estado"></p>
           <details class="ej"><summary>Cómo conectarla (solo una vez)</summary>
             <ol class="pasos">
-              <li>Abre tu hoja de Google «Nutriendo Hábitos · Citas y ventas».</li>
+              <li>Entra en Google con <b>nutricion.arguello@gmail.com</b> y crea una hoja nueva en <a href="https://sheets.new" target="_blank" rel="noopener">sheets.new</a>. Ponle de nombre «Nutriendo Hábitos · Citas y ventas».</li>
               <li>Menú <b>Extensiones → Apps Script</b>. Borra lo que haya y pega este código:</li>
             </ol>
             <div class="copy" style="align-items:start"><textarea id="s-code" readonly rows="6" aria-label="Código para Apps Script"></textarea><button class="btn sec sm" type="button" id="s-copiar">Copiar</button></div>
