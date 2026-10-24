@@ -539,7 +539,7 @@ function fila_producto(array $p): array {
 function sheets_enviar(array $citas = [], array $ventas = [], bool $stock = false, bool $todo = false): bool {
     $cfg = cargar_config();
     $url = (string)$cfg['sheets']['url'];
-    if (!preg_match('~^https://script\.google\.com/macros/s/[A-Za-z0-9_-]+/exec$~', $url) || $cfg['sheets']['token'] === '') {
+    if (!preg_match('~^https://script\.google\.com/(a/macros/[a-z0-9.-]+|macros)/s/[A-Za-z0-9_-]+/exec$~', $url) || $cfg['sheets']['token'] === '') {
         return false;
     }
     $tienda = cargar_tienda();
@@ -557,8 +557,7 @@ function sheets_enviar(array $citas = [], array $ventas = [], bool $stock = fals
         $ch = curl_init($url);
         curl_setopt_array($ch, [CURLOPT_POST => true, CURLOPT_POSTFIELDS => $json, CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
             CURLOPT_RETURNTRANSFER => true, CURLOPT_FOLLOWLOCATION => true, CURLOPT_TIMEOUT => $todo ? 30 : 6, CURLOPT_CONNECTTIMEOUT => 4]);
-        $res = curl_exec($ch);
-        curl_close($ch);
+        $res = curl_exec($ch);   // (curl_close ya no hace falta y en PHP 8.5 da aviso)
     } else {
         $res = @file_get_contents($url, false, stream_context_create(['http' => ['method' => 'POST', 'header' => "Content-Type: application/json\r\n", 'content' => $json, 'timeout' => $todo ? 30 : 6]]));
     }

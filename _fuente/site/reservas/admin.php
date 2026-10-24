@@ -543,7 +543,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         case 'sheets_guardar':
             $url = trim((string)($in['url'] ?? ''));
-            if ($url !== '' && !preg_match('~^https://script\.google\.com/macros/s/[A-Za-z0-9_-]+/exec$~', $url)) {
+            $url = preg_replace('~(/exec)[?#].*$~', '$1', $url);
+            if ($url !== '' && !preg_match('~^https://script\.google\.com/(a/macros/[a-z0-9.-]+|macros)/s/[A-Za-z0-9_-]+/exec$~', $url)) {
                 json_salida(['ok' => false, 'error' => 'url_sheets'], 422);
             }
             con_cerrojo(function () use ($url) {
@@ -1445,15 +1446,16 @@ Viernes 14/11
     (navigator.clipboard ? navigator.clipboard.writeText(t.value) : Promise.reject()).then(function(){ toast('Código copiado.'); }, function(){ document.execCommand('copy'); toast('Código copiado.'); });
   });
   $('b-sheets').addEventListener('click', function(){
-    var b = this, err = $('s-err'); err.hidden = true; b.disabled = true; b.textContent = 'Enviando…';
+    var b = this, err = $('s-err'); err.className = 'msg'; err.textContent = 'Conectando con Google… (puede tardar hasta medio minuto la primera vez)'; err.hidden = false; b.disabled = true; b.textContent = 'Enviando…';
     api('sheets_guardar', { url: $('s-url').value.trim() }).then(function(r){
       if (!r.ok) throw r;
       if (!$('s-url').value.trim()) return { ok: true, vacio: true };
       return api('sheets_todo');
     }).then(function(r){
       if (!r.ok) throw r;
-      toast(r.vacio ? 'Copia en Google Sheets desconectada.' : '¡Conectada! Todo se ha copiado en tu hoja de Google.'); cargar();
-    }).catch(function(r){ err.textContent = errTxt(r); err.hidden = false; })
+      var m = r.vacio ? 'Copia en Google Sheets desconectada.' : '¡Conectada! Todo se ha copiado en tu hoja de Google: mira las pestañas Citas, Ventas y Stock.';
+      toast(m); err.className = 'msg ok'; err.textContent = m; err.hidden = false; cargar();
+    }).catch(function(r){ err.className = 'msg err'; err.textContent = errTxt(r || {}); err.hidden = false; })
       .then(function(){ b.disabled = false; b.textContent = 'Guardar y enviar todo'; });
   });
 
