@@ -33,6 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $accion === 'mes') {
         'hasta'    => fecha_limite($cfg),
         'duracion' => DURACION,
         'motivos'  => MOTIVOS,
+        'pago'     => ['online' => redsys_listo($cfg), 'precio' => importe((string)$cfg['precio'])],
     ]);
 }
 
@@ -49,6 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $accion === 'reservar') {
     $telefono  = limpiar((string)($_POST['telefono'] ?? ''), 30);
     $email     = limpiar((string)($_POST['email'] ?? ''));
     $motivo    = limpiar((string)($_POST['motivo'] ?? ''), 80);
+    $pagarYa   = ($_POST['pago'] ?? '') === 'online';
 
     if (!isset(MODALIDADES[$modalidad]) || !es_fecha($fecha) || !es_hora($hora)
         || $nombre === '' || $apellidos === ''
@@ -62,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $accion === 'reservar') {
         json_salida(['ok' => false, 'error' => 'limite'], 429);
     }
 
-    $resultado = con_cerrojo(function () use ($modalidad, $fecha, $hora, $nombre, $apellidos, $telefono, $email, $motivo) {
+    $resultado = con_cerrojo(function () use ($modalidad, $fecha, $hora, $nombre, $apellidos, $telefono, $email, $motivo, $pagarYa) {
         $cfg = cargar_config();
         $reservas = cargar_reservas();
         if (!in_array($hora, huecos_del_dia($cfg, $reservas, $fecha, $modalidad), true)) {
@@ -82,6 +84,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $accion === 'reservar') {
             'estado'    => 'pendiente',   // el hueco queda bloqueado hasta que Andrea confirme o rechace
             'creada'    => date('c'),
         ];
+        if ($pagarYa && redsys_listo($cfg)) {
+            $cita['pago'] = ['estado' => 'pendiente', 'metodo' => 'online', 'importe' => importe((string)$cfg['precio']), 'pedido' => redsys_pedido()];
+        }
         $reservas[] = $cita;
         guardar_datos('reservas', $reservas);
         return $cita;
@@ -94,7 +99,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $accion === 'reservar') {
     $cita = $resultado;
     // Aviso para Andrea
     enviar_correo(DESTINO, 'RESERVA WEB',
-        "Nueva solicitud de cita desde la web (PENDIENTE DE CONFIRMAR)\n\n" . texto_cita($cita) . "\n"
+        "Nueva solicitud de cita desde la web (PENDIENTE DE CONFIRMAR)\n\n" . texto_cita($cita)
+        . (isset($cita['pago']) ? "Pago: online con tarjeta (" . texto_importe($cita['pago']['importe']) . "). Te llegará otro aviso cuando se complete.\n" : "Pago: en la consulta.\n") . "\n"
         . "Nombre: {$cita['nombre']}\nApellidos: {$cita['apellidos']}\n"
         . "Teléfono: {$cita['telefono']}\nEmail: {$cita['email']}\n\n"
         . "El hueco ya está bloqueado en el calendario. Para confirmarla o rechazarla, entra en el panel:\n"
@@ -110,7 +116,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $accion === 'reservar') {
         . "Un saludo,\nAndrea Argüello · " . NOMBRE_WEB . "\n",
         DESTINO);
 
-    json_salida(['ok' => true, 'cita' => [
+    sheets_enviar([$cita]);
+    $cfg = cargar_config();
+    json_salida(['ok' => true, 'redsys' => isset($cita['pago']) ? redsys_formulario($cita, $cfg) : null, 'cita' => [
         'fecha' => $cita['fecha'], 'fecha_texto' => fecha_larga($cita['fecha']),
         'hora' => $cita['hora'], 'modalidad' => MODALIDADES[$cita['modalidad']], 'estado' => 'pendiente',
     ]]);

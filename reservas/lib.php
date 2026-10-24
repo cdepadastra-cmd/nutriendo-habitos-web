@@ -124,6 +124,10 @@ function config_por_defecto(): array {
         'dias_vista'       => 60,   // cuántos días hacia delante se puede reservar
         'recordatorios'    => true, // email automático el día antes de la cita
         'clave_cron'       => '',   // clave aleatoria para la tarea programada (se crea sola)
+        'precio'           => '',   // importe de la consulta en euros, p. ej. "45.00"
+        'pago_online'      => false, // pago con tarjeta al reservar (Redsys); apagado hasta tener los datos del banco
+        'redsys'           => ['comercio' => '', 'terminal' => '1', 'clave' => '', 'entorno' => 'pruebas'],
+        'sheets'           => ['url' => '', 'token' => ''],   // copia en Google Sheets
     ];
 }
 
@@ -389,8 +393,21 @@ function cita_del_panel(array $in): ?array {
     ];
 }
 
+/** Dominio de la web. Solo se acepta el propio (o el equipo local de pruebas) para que nadie pueda falsear los enlaces. */
+function host_web(): string {
+    $host = strtolower(preg_replace('/[^a-z0-9.\-:]/i', '', (string)($_SERVER['HTTP_HOST'] ?? '')));
+    return preg_match('/^((www\.)?nutriendohabitos\.es|127\.0\.0\.1(:\d+)?|localhost(:\d+)?)$/', $host) ? $host : 'www.nutriendohabitos.es';
+}
+
+/** Dirección de la web (carpeta donde está index.html), terminada en «/». */
+function url_web(): string {
+    $dir = rtrim(str_replace('\\', '/', dirname((string)($_SERVER['SCRIPT_NAME'] ?? '/reservas/api.php'), 2)), '/');
+    $esquema = preg_match('/^(127\.|localhost)/', host_web()) ? 'http://' : 'https://';
+    return $esquema . host_web() . $dir . '/';
+}
+
 function url_panel(): string {
-    $host = preg_replace('/[^a-z0-9.\-:]/i', '', (string)($_SERVER['HTTP_HOST'] ?? 'nutriendohabitos.es'));
+    $host = host_web();
     $dir = rtrim(str_replace('\\', '/', dirname((string)($_SERVER['SCRIPT_NAME'] ?? '/reservas/api.php'))), '/');
     return 'https://' . $host . $dir . '/admin.php';
 }
@@ -409,4 +426,155 @@ function limitar(string $clave, int $maximo, int $segundos): bool {
     $marcas[] = $ahora;
     file_put_contents($f, implode(',', $marcas), LOCK_EX);
     return true;
+}
+
+
+/* ---------- precio y cobros ---------- */
+
+const METODOS_PAGO = ['online' => 'Pagado online', 'efectivo' => 'Efectivo', 'datafono' => 'Datáfono', 'bizum' => 'Bizum / transferencia'];
+
+/** Convierte "45", "45,5" o "45.50" en "45.50". Devuelve '' si no es un importe válido. */
+function importe(string $v): string {
+    $v = str_replace([' ', '€'], '', str_replace(',', '.', trim($v)));
+    if (!preg_match('/^\d{1,5}(\.\d{1,2})?$/', $v)) {
+        return '';
+    }
+    return number_format((float)$v, 2, '.', '');
+}
+
+function texto_importe(string $v): string {
+    return $v === '' ? '' : str_replace('.', ',', $v) . ' €';
+}
+
+/* ---------- pago online con Redsys ---------- */
+
+function redsys_listo(array $cfg): bool {
+    $r = $cfg['redsys'];
+    return !empty($cfg['pago_online']) && importe((string)$cfg['precio']) !== '' && (float)$cfg['precio'] > 0
+        && preg_match('/^\d{6,10}$/', (string)$r['comercio']) && preg_match('/^\d{1,3}$/', (string)$r['terminal'])
+        && strlen(base64_decode((string)$r['clave'], true) ?: '') >= 16;
+}
+
+/** Firma HMAC-SHA256 de Redsys: clave del pedido con 3DES y HMAC de los parámetros. */
+function redsys_firma(string $params64, string $pedido, string $clave64): string {
+    $clave = base64_decode($clave64, true) ?: '';
+    $largo = (int)ceil(strlen($pedido) / 8) * 8;
+    $claveP = openssl_encrypt(str_pad($pedido, $largo, "\0"), 'des-ede3-cbc', $clave, OPENSSL_RAW_DATA | OPENSSL_NO_PADDING, str_repeat("\0", 8));
+    return base64_encode(hash_hmac('sha256', $params64, (string)$claveP, true));
+}
+
+/** Datos del formulario que el navegador envía a Redsys para pagar la cita. */
+function redsys_formulario(array $cita, array $cfg): array {
+    $r = $cfg['redsys'];
+    $params = [
+        'DS_MERCHANT_AMOUNT'             => (string)(int)round((float)$cita['pago']['importe'] * 100),
+        'DS_MERCHANT_ORDER'              => $cita['pago']['pedido'],
+        'DS_MERCHANT_MERCHANTCODE'       => (string)$r['comercio'],
+        'DS_MERCHANT_CURRENCY'           => '978',
+        'DS_MERCHANT_TRANSACTIONTYPE'    => '0',
+        'DS_MERCHANT_TERMINAL'           => (string)$r['terminal'],
+        'DS_MERCHANT_MERCHANTURL'        => url_web() . 'reservas/redsys.php',
+        'DS_MERCHANT_URLOK'              => url_web() . 'reservar.html?pago=ok',
+        'DS_MERCHANT_URLKO'              => url_web() . 'reservar.html?pago=ko',
+        'DS_MERCHANT_PRODUCTDESCRIPTION' => 'Consulta de nutricion ' . date('d/m/Y', strtotime($cita['fecha'])) . ' ' . $cita['hora'],
+        'DS_MERCHANT_TITULAR'            => mb_substr($cita['nombre'] . ' ' . $cita['apellidos'], 0, 60, 'UTF-8'),
+        'DS_MERCHANT_MERCHANTNAME'       => 'Nutriendo Habitos',
+        'DS_MERCHANT_CONSUMERLANGUAGE'   => '001',
+    ];
+    $p64 = base64_encode(json_encode($params, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    return [
+        'url'                  => $r['entorno'] === 'real' ? 'https://sis.redsys.es/sis/realizarPago' : 'https://sis-t.redsys.es:25443/sis/realizarPago',
+        'Ds_SignatureVersion'  => 'HMAC_SHA256_V1',
+        'Ds_MerchantParameters'=> $p64,
+        'Ds_Signature'         => redsys_firma($p64, $params['DS_MERCHANT_ORDER'], (string)$r['clave']),
+    ];
+}
+
+/** Número de pedido único para Redsys: 12 caracteres, los 4 primeros numéricos. */
+function redsys_pedido(): string {
+    return substr((string)time(), -8) . bin2hex(random_bytes(2));
+}
+
+/* ---------- tienda: productos, stock y ventas ---------- */
+
+function cargar_tienda(): array {
+    $t = leer_datos('tienda', []);
+    return ['productos' => $t['productos'] ?? [], 'ventas' => $t['ventas'] ?? []];
+}
+
+/* ---------- copia en Google Sheets ---------- */
+
+const CABECERA_CITAS  = ['ID', 'Fecha', 'Hora', 'Consulta', 'Motivo', 'Nombre', 'Apellidos', 'Teléfono', 'Email', 'Estado', 'Origen', 'Cobro', 'Importe (€)', 'Cobrado el', 'Reservada el'];
+const CABECERA_VENTAS = ['ID', 'Fecha', 'Cliente', 'Producto', 'Unidades', 'Precio unidad (€)', 'Total (€)', 'Forma de pago', 'Estado', 'Nota'];
+const CABECERA_STOCK  = ['ID', 'Producto', 'Precio (€)', 'Stock', 'Actualizado'];
+
+function fila_cita(array $c): array {
+    $estados = ['pendiente' => 'Pendiente de confirmar', 'confirmada' => 'Confirmada', 'cancelada' => (($c['estado_previo'] ?? '') === 'pendiente' ? 'Rechazada' : 'Anulada')];
+    $pago = $c['pago'] ?? [];
+    $cobro = ($pago['estado'] ?? '') === 'pagado' ? (METODOS_PAGO[$pago['metodo']] ?? $pago['metodo']) : ((($pago['metodo'] ?? '') === 'online') ? 'Pago online pendiente' : 'Sin cobrar');
+    return [
+        $c['id'], date('d/m/Y', strtotime($c['fecha'])), $c['hora'], MODALIDADES[$c['modalidad']] ?? $c['modalidad'],
+        $c['motivo'] ?? '', $c['nombre'] ?? '', $c['apellidos'] ?? '', ($c['telefono'] ?? '') === '' ? '' : "'" . $c['telefono'], $c['email'] ?? '',
+        $estados[$c['estado']] ?? $c['estado'], ($c['origen'] ?? '') === 'panel' ? 'Panel' : 'Web',
+        $cobro, ($pago['estado'] ?? '') === 'pagado' ? (float)$pago['importe'] : '',
+        !empty($pago['fecha']) ? date('d/m/Y H:i', strtotime($pago['fecha'])) : '',
+        !empty($c['creada']) ? date('d/m/Y H:i', strtotime($c['creada'])) : '',
+    ];
+}
+
+function fila_venta(array $v): array {
+    return [$v['id'], date('d/m/Y H:i', strtotime($v['fecha'])), $v['cliente'], $v['producto'], (int)$v['unidades'],
+            (float)$v['precio_unidad'], (float)$v['total'], METODOS_PAGO[$v['metodo']] ?? $v['metodo'],
+            !empty($v['anulada']) ? 'Anulada' : 'Vendida', $v['nota'] ?? ''];
+}
+
+function fila_producto(array $p): array {
+    return [$p['id'], $p['nombre'], (float)$p['precio'], (int)$p['stock'], date('d/m/Y H:i')];
+}
+
+/**
+ * Envía a la hoja de Google las filas que han cambiado (o todo si $todo).
+ * Si no está configurado o Google no responde, no pasa nada: el panel sigue funcionando.
+ */
+function sheets_enviar(array $citas = [], array $ventas = [], bool $stock = false, bool $todo = false): bool {
+    $cfg = cargar_config();
+    $url = (string)$cfg['sheets']['url'];
+    if (!preg_match('~^https://script\.google\.com/macros/s/[A-Za-z0-9_-]+/exec$~', $url) || $cfg['sheets']['token'] === '') {
+        return false;
+    }
+    $tienda = cargar_tienda();
+    $datos = [
+        'token' => $cfg['sheets']['token'], 'todo' => $todo,
+        'cabeceras' => ['Citas' => CABECERA_CITAS, 'Ventas' => CABECERA_VENTAS, 'Stock' => CABECERA_STOCK],
+        'Citas' => array_map('fila_cita', $citas),
+        'Ventas' => array_map('fila_venta', $ventas),
+    ];
+    if ($stock || $todo) {
+        $datos['Stock'] = array_map('fila_producto', array_values(array_filter($tienda['productos'], fn($p) => empty($p['borrado']))));
+    }
+    $json = json_encode($datos, JSON_UNESCAPED_UNICODE);
+    if (function_exists('curl_init')) {
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [CURLOPT_POST => true, CURLOPT_POSTFIELDS => $json, CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+            CURLOPT_RETURNTRANSFER => true, CURLOPT_FOLLOWLOCATION => true, CURLOPT_TIMEOUT => $todo ? 30 : 6, CURLOPT_CONNECTTIMEOUT => 4]);
+        $res = curl_exec($ch);
+        curl_close($ch);
+    } else {
+        $res = @file_get_contents($url, false, stream_context_create(['http' => ['method' => 'POST', 'header' => "Content-Type: application/json\r\n", 'content' => $json, 'timeout' => $todo ? 30 : 6]]));
+    }
+    $ok = is_string($res) && strpos($res, '"ok":true') !== false;
+    if (!$ok) {
+        error_log('Reservas Nutriendo Hábitos: no se pudo copiar en Google Sheets');
+    }
+    return $ok;
+}
+
+/** Copia en la hoja una cita concreta (por id), tras cualquier cambio. */
+function sheets_cita(string $id): void {
+    foreach (cargar_reservas() as $c) {
+        if ($c['id'] === $id) {
+            sheets_enviar([$c]);
+            return;
+        }
+    }
 }

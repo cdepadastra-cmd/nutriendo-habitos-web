@@ -37,6 +37,34 @@ function crear_sesion(): string {
     });
     return $t;
 }
+/** Clave compartida con la hoja de Google (se crea sola la primera vez). */
+function token_sheets(): string {
+    return con_cerrojo(function () {
+        $c = cargar_config();
+        if (!preg_match('/^[a-f0-9]{32}$/', (string)$c['sheets']['token'])) {
+            $c['sheets']['token'] = bin2hex(random_bytes(16));
+            guardar_datos('config', $c);
+        }
+        return $c['sheets']['token'];
+    });
+}
+
+/** Pacientes y clientes conocidos, para elegirlos al vender. */
+function lista_clientes(): array {
+    $out = [];
+    foreach (cargar_reservas() as $r) {
+        $n = trim(($r['nombre'] ?? '') . ' ' . ($r['apellidos'] ?? ''));
+        if ($n !== '') {
+            $out[mb_strtolower($n, 'UTF-8')] = $n;
+        }
+    }
+    foreach (cargar_tienda()['ventas'] as $v) {
+        $out[mb_strtolower($v['cliente'], 'UTF-8')] = $v['cliente'];
+    }
+    ksort($out);
+    return array_values($out);
+}
+
 function borrar_sesiones(string $t = ''): void {
     con_cerrojo(function () use ($t) {
         $h = hash('sha256', $t);
@@ -121,7 +149,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'duracion' => DURACION, 'motivos' => MOTIVOS,
                 'recordatorios' => !empty($cfg['recordatorios']),
                 'url_cron' => preg_replace('~/admin\.php$~', '/recordatorios.php', url_panel()) . '?clave=' . clave_cron(),
-                'direccion' => DIRECCION, 'telefono' => TELEFONO]);
+                'direccion' => DIRECCION, 'telefono' => TELEFONO,
+                'precio' => importe((string)$cfg['precio']), 'pago_online' => !empty($cfg['pago_online']), 'redsys_listo' => redsys_listo($cfg),
+                'redsys' => ['comercio' => $cfg['redsys']['comercio'], 'terminal' => $cfg['redsys']['terminal'], 'entorno' => $cfg['redsys']['entorno'], 'clave' => $cfg['redsys']['clave'] !== ''],
+                'sheets' => ['url' => $cfg['sheets']['url'], 'token' => token_sheets()],
+                'metodos' => METODOS_PAGO, 'tienda' => cargar_tienda(), 'clientes' => lista_clientes()]);
 
         case 'guardar_horario':
             $horario = $in['horario'] ?? null;
@@ -328,12 +360,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!$ok) {
                 json_salida(['ok' => false, 'error' => 'ocupado'], 409);
             }
+            sheets_enviar([$cita]);
             json_salida(['ok' => true]);
 
         case 'anadir_citas':
             // Varias citas a la vez (pasadas desde la agenda de papel)
             $lista = array_slice((array)($in['citas'] ?? []), 0, 200);
-            $res = con_cerrojo(function () use ($lista) {
+            $nuevas = [];
+            $res = con_cerrojo(function () use ($lista, &$nuevas) {
                 $rs = cargar_reservas();
                 $out = [];
                 foreach ($lista as $item) {
@@ -344,12 +378,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $out[] = 'ocupado';
                     } else {
                         $rs[] = $cita;
+                        $nuevas[] = $cita;
                         $out[] = 'ok';
                     }
                 }
                 guardar_datos('reservas', $rs);
                 return $out;
             });
+            if ($nuevas) {
+                sheets_enviar($nuevas);
+            }
             json_salida(['ok' => true, 'resultados' => $res, 'anadidas' => count(array_keys($res, 'ok', true))]);
 
         case 'recordar_ahora':
@@ -394,7 +432,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!$cita) {
                 json_salida(['ok' => false, 'error' => 'no_encontrada'], 404);
             }
-            json_salida(['ok' => true, 'avisado' => correo_confirmacion($cita)]);
+            $avisado = correo_confirmacion($cita);
+            sheets_enviar([$cita]);
+            json_salida(['ok' => true, 'avisado' => $avisado]);
 
         case 'cancelar_cita':
             $id = (string)($in['id'] ?? '');
@@ -427,7 +467,220 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     . "Si quieres buscar otro día, puedes reservar de nuevo en la web o llamarme al " . TELEFONO . ".\n\n"
                     . "Un saludo,\nAndrea Argüello · " . NOMBRE_WEB . "\n", DESTINO);
             }
+            sheets_enviar([$cita]);
             json_salida(['ok' => true, 'avisado' => $avisado]);
+
+        case 'cobro':
+            // Registrar (o quitar) el cobro de una cita: efectivo, datáfono o Bizum
+            $id = (string)($in['id'] ?? '');
+            $metodo = (string)($in['metodo'] ?? '');
+            $imp = importe((string)($in['importe'] ?? ''));
+            if ($metodo !== '' && (!isset(METODOS_PAGO[$metodo]) || $metodo === 'online' || $imp === '')) {
+                json_salida(['ok' => false, 'error' => 'importe'], 422);
+            }
+            $cita = con_cerrojo(function () use ($id, $metodo, $imp) {
+                $rs = cargar_reservas();
+                foreach ($rs as &$r) {
+                    if ($r['id'] !== $id) {
+                        continue;
+                    }
+                    if (($r['pago']['metodo'] ?? '') === 'online' && ($r['pago']['estado'] ?? '') === 'pagado') {
+                        return false;   // lo pagado online no se cambia a mano
+                    }
+                    if ($metodo === '') {
+                        unset($r['pago']);
+                    } else {
+                        $r['pago'] = ['estado' => 'pagado', 'metodo' => $metodo, 'importe' => $imp, 'fecha' => date('c')];
+                    }
+                    guardar_datos('reservas', $rs);
+                    return $r;
+                }
+                return null;
+            });
+            if ($cita === false) {
+                json_salida(['ok' => false, 'error' => 'pagado_online'], 409);
+            }
+            if (!$cita) {
+                json_salida(['ok' => false, 'error' => 'no_encontrada'], 404);
+            }
+            sheets_enviar([$cita]);
+            json_salida(['ok' => true]);
+
+        case 'guardar_pago':
+            // Precio de la consulta y pago online (Redsys). La clave secreta solo se guarda, nunca se devuelve.
+            $precio = trim((string)($in['precio'] ?? '')) === '' ? '' : importe((string)$in['precio']);
+            if (trim((string)($in['precio'] ?? '')) !== '' && $precio === '') {
+                json_salida(['ok' => false, 'error' => 'importe'], 422);
+            }
+            $com = preg_replace('/\D/', '', (string)($in['comercio'] ?? ''));
+            $ter = preg_replace('/\D/', '', (string)($in['terminal'] ?? '1')) ?: '1';
+            $clave = trim((string)($in['clave'] ?? ''));
+            if ($clave !== '' && strlen(base64_decode($clave, true) ?: '') < 16) {
+                json_salida(['ok' => false, 'error' => 'clave_redsys'], 422);
+            }
+            $ent = ($in['entorno'] ?? '') === 'real' ? 'real' : 'pruebas';
+            $activar = !empty($in['activo']);
+            $r = con_cerrojo(function () use ($precio, $com, $ter, $clave, $ent, $activar) {
+                $c = cargar_config();
+                $c['precio'] = $precio;
+                $c['redsys']['comercio'] = $com;
+                $c['redsys']['terminal'] = $ter;
+                $c['redsys']['entorno'] = $ent;
+                if ($clave !== '') {
+                    $c['redsys']['clave'] = $clave;
+                }
+                $c['pago_online'] = $activar;
+                if ($activar && !redsys_listo($c)) {
+                    return 'incompleto';
+                }
+                guardar_datos('config', $c);
+                return 'ok';
+            });
+            if ($r !== 'ok') {
+                json_salida(['ok' => false, 'error' => 'redsys_incompleto'], 422);
+            }
+            json_salida(['ok' => true]);
+
+        case 'sheets_guardar':
+            $url = trim((string)($in['url'] ?? ''));
+            if ($url !== '' && !preg_match('~^https://script\.google\.com/macros/s/[A-Za-z0-9_-]+/exec$~', $url)) {
+                json_salida(['ok' => false, 'error' => 'url_sheets'], 422);
+            }
+            con_cerrojo(function () use ($url) {
+                $c = cargar_config();
+                $c['sheets']['url'] = $url;
+                guardar_datos('config', $c);
+            });
+            json_salida(['ok' => true]);
+
+        case 'sheets_todo':
+            // Envía todas las citas, ventas y el stock (también sirve para probar la conexión)
+            $t = cargar_tienda();
+            $ok = sheets_enviar(cargar_reservas(), $t['ventas'], true, true);
+            json_salida(['ok' => $ok, 'error' => $ok ? null : 'sheets']);
+
+        /* ---------- tienda ---------- */
+        case 'producto_guardar':
+            $nombre = limpiar((string)($in['nombre'] ?? ''), 80);
+            $precio = importe((string)($in['precio'] ?? ''));
+            $stock = (int)($in['stock'] ?? 0);
+            $pid = (string)($in['id'] ?? '');
+            if ($nombre === '' || $precio === '' || $stock < 0 || $stock > 100000) {
+                json_salida(['ok' => false, 'error' => 'datos'], 422);
+            }
+            con_cerrojo(function () use ($nombre, $precio, $stock, $pid) {
+                $t = cargar_tienda();
+                $hecho = false;
+                foreach ($t['productos'] as &$p) {
+                    if ($p['id'] === $pid) {
+                        $p['nombre'] = $nombre; $p['precio'] = $precio; $p['stock'] = $stock; $hecho = true;
+                    }
+                }
+                unset($p);
+                if (!$hecho) {
+                    $t['productos'][] = ['id' => bin2hex(random_bytes(5)), 'nombre' => $nombre, 'precio' => $precio, 'stock' => $stock, 'creado' => date('c')];
+                }
+                guardar_datos('tienda', $t);
+            });
+            sheets_enviar([], [], true);
+            json_salida(['ok' => true]);
+
+        case 'producto_entrada':
+            $pid = (string)($in['id'] ?? '');
+            $n = (int)($in['unidades'] ?? 0);
+            if ($n === 0 || abs($n) > 100000) {
+                json_salida(['ok' => false, 'error' => 'datos'], 422);
+            }
+            con_cerrojo(function () use ($pid, $n) {
+                $t = cargar_tienda();
+                foreach ($t['productos'] as &$p) {
+                    if ($p['id'] === $pid) {
+                        $p['stock'] = max(0, (int)$p['stock'] + $n);
+                    }
+                }
+                unset($p);
+                guardar_datos('tienda', $t);
+            });
+            sheets_enviar([], [], true);
+            json_salida(['ok' => true]);
+
+        case 'producto_borrar':
+            $pid = (string)($in['id'] ?? '');
+            con_cerrojo(function () use ($pid) {
+                $t = cargar_tienda();
+                foreach ($t['productos'] as &$p) {
+                    if ($p['id'] === $pid) {
+                        $p['borrado'] = date('c');   // se oculta, pero las ventas antiguas lo siguen mostrando
+                    }
+                }
+                unset($p);
+                guardar_datos('tienda', $t);
+            });
+            sheets_enviar([], [], true);
+            json_salida(['ok' => true]);
+
+        case 'venta_registrar':
+            $pid = (string)($in['producto'] ?? '');
+            $cliente = limpiar((string)($in['cliente'] ?? ''), 100);
+            $uds = (int)($in['unidades'] ?? 0);
+            $total = importe((string)($in['total'] ?? ''));
+            $metodo = (string)($in['metodo'] ?? '');
+            $nota = limpiar((string)($in['nota'] ?? ''), 200);
+            if ($cliente === '' || $uds < 1 || $uds > 1000 || $total === '' || !isset(METODOS_PAGO[$metodo]) || $metodo === 'online') {
+                json_salida(['ok' => false, 'error' => 'datos'], 422);
+            }
+            $venta = con_cerrojo(function () use ($pid, $cliente, $uds, $total, $metodo, $nota) {
+                $t = cargar_tienda();
+                foreach ($t['productos'] as &$p) {
+                    if ($p['id'] !== $pid || !empty($p['borrado'])) {
+                        continue;
+                    }
+                    if ((int)$p['stock'] < $uds) {
+                        return 'stock';
+                    }
+                    $p['stock'] = (int)$p['stock'] - $uds;
+                    $v = ['id' => bin2hex(random_bytes(5)), 'fecha' => date('c'), 'cliente' => $cliente, 'producto_id' => $p['id'], 'producto' => $p['nombre'],
+                          'unidades' => $uds, 'precio_unidad' => number_format((float)$total / $uds, 2, '.', ''), 'total' => $total, 'metodo' => $metodo, 'nota' => $nota];
+                    $t['ventas'][] = $v;
+                    guardar_datos('tienda', $t);
+                    return $v;
+                }
+                return null;
+            });
+            if ($venta === 'stock') {
+                json_salida(['ok' => false, 'error' => 'stock'], 409);
+            }
+            if (!$venta) {
+                json_salida(['ok' => false, 'error' => 'no_encontrada'], 404);
+            }
+            sheets_enviar([], [$venta], true);
+            json_salida(['ok' => true]);
+
+        case 'venta_anular':
+            $vid = (string)($in['id'] ?? '');
+            $venta = con_cerrojo(function () use ($vid) {
+                $t = cargar_tienda();
+                foreach ($t['ventas'] as &$v) {
+                    if ($v['id'] !== $vid || !empty($v['anulada'])) {
+                        continue;
+                    }
+                    $v['anulada'] = date('c');
+                    foreach ($t['productos'] as &$p) {
+                        if ($p['id'] === $v['producto_id']) {
+                            $p['stock'] = (int)$p['stock'] + (int)$v['unidades'];   // vuelve al stock
+                        }
+                    }
+                    unset($p);
+                    guardar_datos('tienda', $t);
+                    return $v;
+                }
+                return null;
+            });
+            if (!$venta) {
+                json_salida(['ok' => false, 'error' => 'no_encontrada'], 404);
+            }
+            sheets_enviar([], [$venta], true);
+            json_salida(['ok' => true]);
 
         case 'cambiar_password':
             if (!password_verify((string)($in['actual'] ?? ''), $cfg['password'])) {
@@ -465,7 +718,7 @@ function exportar_csv(): void {
     header('Cache-Control: no-store');
     $out = fopen('php://output', 'w');
     fwrite($out, "\xEF\xBB\xBF"); // para que Excel lea bien las tildes
-    fputcsv($out, ['Fecha', 'Día', 'Hora', 'Consulta', 'Motivo', 'Nombre', 'Apellidos', 'Teléfono', 'Email', 'Estado', 'Origen', 'Reservada el', 'Confirmada el', 'Anulada el'], ';');
+    fputcsv($out, ['Fecha', 'Día', 'Hora', 'Consulta', 'Motivo', 'Nombre', 'Apellidos', 'Teléfono', 'Email', 'Estado', 'Origen', 'Cobro', 'Importe (€)', 'Cobrado el', 'Reservada el', 'Confirmada el', 'Anulada el'], ';');
     $estados = ['pendiente' => 'Pendiente de confirmar', 'confirmada' => 'Confirmada', 'cancelada' => 'Anulada / rechazada'];
     $dias = ['', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'];
     foreach ($citas as $c) {
@@ -478,6 +731,9 @@ function exportar_csv(): void {
             $c['nombre'] ?? '', $c['apellidos'] ?? '', $c['telefono'] ?? '', $c['email'] ?? '',
             $estados[$c['estado'] ?? ''] ?? '',
             ($c['origen'] ?? '') === 'panel' ? 'Añadida en el panel' : 'Web',
+            ($c['pago']['estado'] ?? '') === 'pagado' ? (METODOS_PAGO[$c['pago']['metodo']] ?? '') : (($c['pago']['metodo'] ?? '') === 'online' ? 'Pago online pendiente' : 'Sin cobrar'),
+            ($c['pago']['estado'] ?? '') === 'pagado' ? str_replace('.', ',', $c['pago']['importe']) : '',
+            !empty($c['pago']['fecha']) ? date('d/m/Y H:i', strtotime($c['pago']['fecha'])) : '',
             !empty($c['creada']) ? date('d/m/Y H:i', strtotime($c['creada'])) : '',
             !empty($c['confirmada']) ? date('d/m/Y H:i', strtotime($c['confirmada'])) : '',
             !empty($c['cancelada']) ? date('d/m/Y H:i', strtotime($c['cancelada'])) : '',
@@ -544,6 +800,26 @@ input,select{height:2.4rem;border:1px solid var(--border);border-radius:.6rem;ba
 .pill{font-size:.72rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:.2rem .55rem;border-radius:999px;background:var(--secondary);color:var(--secondary-fg)}
 .pill.online{background:#ECE8E3;color:#5E554F}
 .cita.cancelada{opacity:.55}
+.pago{display:inline-flex;align-items:center;gap:.3rem;font-size:.75rem;font-weight:600;padding:.2rem .55rem;border-radius:999px;background:var(--secondary);color:var(--secondary-fg);white-space:nowrap}
+.pago.pe{background:#F6EBD6;color:#7A5A1F}.pago.no{background:#F3E4E1;color:var(--danger)}
+.cobro-w{display:flex;flex-wrap:wrap;gap:.35rem;align-items:center;width:100%}
+.cobro-w select{height:2rem;width:auto;font-size:.8rem;padding:0 .5rem}
+.cobro-w input{height:2rem;width:5rem;font-size:.8rem;padding:0 .5rem;text-align:right}
+.cobro-w .lnk,.lnk{border:0;background:none;color:var(--primary);font-size:.78rem;cursor:pointer;padding:0;text-decoration:underline}
+.totales{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:.8rem}
+.totales span{background:var(--muted);border-radius:.7rem;padding:.45rem .7rem;font-size:.82rem}
+.totales b{display:block;font-size:1.05rem;font-variant-numeric:tabular-nums}
+.venta{display:flex;flex-wrap:wrap;gap:.3rem 1rem;align-items:center;padding:.6rem .75rem;border-radius:.7rem;background:var(--muted);margin:.35rem 0}
+.venta .q{flex:1;min-width:12rem}.venta small{display:block;color:var(--muted-fg)}
+.venta .t{font-weight:600;font-variant-numeric:tabular-nums}
+.venta.anulada{opacity:.5;text-decoration:line-through}
+table.stock{min-width:32rem}table.stock td{vertical-align:middle}
+.grid2>*>*{min-width:0}
+table.stock .st{font-weight:600;font-variant-numeric:tabular-nums}
+table.stock .st.bajo{color:var(--danger)}
+table.stock .ent{display:flex;gap:.3rem}table.stock .ent input{width:4.5rem;height:2rem}
+.pasos{margin:.4rem 0;padding-left:1.2rem;font-size:.85rem;display:grid;gap:.35rem}
+#s-code{flex:1;min-width:0;font:.72rem/1.4 ui-monospace,Menlo,monospace;border:1px solid var(--border);border-radius:.6rem;padding:.5rem;background:var(--bg);resize:vertical}
 .card.manana{border-color:color-mix(in oklab,var(--primary) 35%,var(--border))}
 .cita .rec{display:flex;flex-wrap:wrap;gap:.35rem;align-items:center}
 .ok-tag{font-size:.75rem;color:var(--secondary-fg);background:var(--secondary);border-radius:999px;padding:.15rem .55rem}
@@ -658,6 +934,7 @@ table.imp td.ie{font-size:.78rem;color:#9A3B2E;min-width:9rem}table.imp td.ie sm
       <button role="tab" aria-selected="false" data-tab="horario">Horario</button>
       <button role="tab" aria-selected="false" data-tab="bloqueos">Días bloqueados</button>
       <button role="tab" aria-selected="false" data-tab="historial">Historial</button>
+      <button role="tab" aria-selected="false" data-tab="ventas">Ventas</button>
       <button role="tab" aria-selected="false" data-tab="ajustes">Ajustes</button>
     </div>
 
@@ -810,10 +1087,62 @@ Viernes 14/11
         </div>
         <p class="muted" id="h-count" style="margin:0"></p>
         <div class="tbl-wrap"><table class="tbl">
-          <thead><tr><th>Fecha</th><th>Hora</th><th>Consulta</th><th>Paciente</th><th>Contacto</th><th>Estado</th></tr></thead>
+          <thead><tr><th>Fecha</th><th>Hora</th><th>Consulta</th><th>Paciente</th><th>Contacto</th><th>Estado</th><th>Cobro</th></tr></thead>
           <tbody id="h-body"></tbody>
         </table></div>
         <p class="muted" style="margin:0">El archivo de Excel incluye todas las citas, también las anuladas. Guárdalo de vez en cuando como copia de seguridad.</p>
+      </div>
+    </div>
+
+    <!-- VENTAS (productos de la consulta: solo en el panel) -->
+    <div data-panel="ventas" hidden>
+      <div class="grid2">
+        <div style="display:grid;gap:1.25rem;align-content:start">
+          <div class="card">
+            <h2 style="font-size:1.3rem;margin-bottom:.25rem">Nueva venta</h2>
+            <p class="muted" style="margin:0 0 .8rem">Lo que vendes en la consulta. Al guardarla se descuenta del stock.</p>
+            <form id="f-venta" style="display:grid;gap:.7rem">
+              <label for="v-cliente">Cliente<input id="v-cliente" list="dl-clientes" autocomplete="off" placeholder="Escribe para buscar un paciente" required></label>
+              <datalist id="dl-clientes"></datalist>
+              <label for="v-prod">Producto<select id="v-prod" required></select></label>
+              <div class="row">
+                <label for="v-uds" style="flex:1 1 6rem">Unidades<input id="v-uds" type="number" min="1" value="1" required></label>
+                <label for="v-total" style="flex:1 1 8rem">Total (€)<input id="v-total" inputmode="decimal" required></label>
+                <label for="v-met" style="flex:2 1 10rem">Forma de pago<select id="v-met"><option value="efectivo">Efectivo</option><option value="datafono">Datáfono</option><option value="bizum">Bizum / transferencia</option></select></label>
+              </div>
+              <label for="v-nota">Nota (opcional)<input id="v-nota" maxlength="200"></label>
+              <p class="msg err" id="v-err" hidden></p>
+              <button class="btn" type="submit">Registrar venta</button>
+            </form>
+          </div>
+          <div class="card">
+            <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:.6rem">
+              <h2 style="font-size:1.3rem">Ventas</h2>
+              <label for="v-mes" style="flex:0 1 12rem"><span class="sr">Mes</span><select id="v-mes"></select></label>
+            </div>
+            <div class="totales" id="v-totales"></div>
+            <div id="v-lista"></div>
+          </div>
+        </div>
+        <div style="display:grid;gap:1.25rem;align-content:start">
+          <div class="card">
+            <h2 style="font-size:1.3rem;margin-bottom:.6rem">Productos y stock</h2>
+            <div class="tbl-wrap"><table class="tbl stock"><thead><tr><th>Producto</th><th>Precio</th><th>Stock</th><th>Añadir unidades</th><th></th></tr></thead><tbody id="p-body"></tbody></table></div>
+          </div>
+          <div class="card">
+            <h2 style="font-size:1.2rem;margin-bottom:.6rem" id="p-titulo">Añadir producto</h2>
+            <form id="f-prod" style="display:grid;gap:.7rem">
+              <input type="hidden" id="p-id">
+              <label for="p-nombre">Nombre<input id="p-nombre" maxlength="80" placeholder="Ej.: Proteína whey vainilla 1 kg" required></label>
+              <div class="row">
+                <label for="p-precio" style="flex:1 1 8rem">Precio de venta (€)<input id="p-precio" inputmode="decimal" required></label>
+                <label for="p-stock" style="flex:1 1 8rem">Unidades en stock<input id="p-stock" type="number" min="0" value="0" required></label>
+              </div>
+              <p class="msg err" id="p-err" hidden></p>
+              <div class="row"><button class="btn" type="submit" id="p-btn">Añadir producto</button><button class="btn sec" type="button" id="p-cancelar" hidden>Cancelar</button></div>
+            </form>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -833,6 +1162,45 @@ Viernes 14/11
           <p class="muted" style="margin:0">Para que salgan solos cada día, crea una vez la tarea en DonDominio: <b>Hosting → Tareas programadas (Cron) → Crear tarea</b>, todos los días a las 10:00, con esta dirección:</p>
           <div class="copy"><input id="r-url" readonly aria-label="Dirección para la tarea programada"><button class="btn sec sm" type="button" id="r-copiar">Copiar</button></div>
           <p class="muted" style="margin:0;font-size:.8rem">No compartas esta dirección. Aunque no crees la tarea, puedes mandarlos tú desde «Citas» → «Enviar ahora los emails de mañana». Los recordatorios por WhatsApp se envían desde ese mismo recuadro con un toque por paciente.</p>
+        </div>
+        <div class="card" style="display:grid;gap:.7rem;align-content:start">
+          <h2 style="font-size:1.2rem">Precio y pago online</h2>
+          <label for="g-precio">Precio de la consulta (€)<input id="g-precio" inputmode="decimal" placeholder="Ej.: 45"></label>
+          <p class="muted" style="margin:-.3rem 0 0;font-size:.8rem">Se propone al marcar un cobro y es lo que se paga online.</p>
+          <label class="chk" for="g-on"><input id="g-on" type="checkbox"> Ofrecer el pago con tarjeta al reservar en la web (Redsys)</label>
+          <p class="msg" id="g-estado"></p>
+          <details class="ej"><summary>Datos de Redsys (te los da tu banco)</summary>
+            <div style="display:grid;gap:.6rem;margin-top:.4rem">
+              <div class="row">
+                <label for="g-com" style="flex:2 1 9rem">Número de comercio (FUC)<input id="g-com" inputmode="numeric" autocomplete="off"></label>
+                <label for="g-ter" style="flex:1 1 5rem">Terminal<input id="g-ter" inputmode="numeric" value="1"></label>
+              </div>
+              <label for="g-clave">Clave secreta SHA-256<input id="g-clave" type="password" autocomplete="off" placeholder="Pégala aquí"></label>
+              <label for="g-ent">Entorno<select id="g-ent"><option value="pruebas">Pruebas (no cobra de verdad)</option><option value="real">Real</option></select></label>
+              <p class="muted" style="margin:0;font-size:.8rem">La clave secreta se guarda solo en tu hosting y no vuelve a mostrarse. En la configuración de Redsys, la «URL de notificación» es la que el panel envía sola; no hace falta ponerla a mano.</p>
+            </div>
+          </details>
+          <p class="msg err" id="g-err" hidden></p>
+          <div><button class="btn" type="button" id="b-guardar-g">Guardar</button></div>
+        </div>
+        <div class="card" style="display:grid;gap:.7rem;align-content:start">
+          <h2 style="font-size:1.2rem">Copia en Google Sheets</h2>
+          <p class="muted" style="margin:0" id="s-estado"></p>
+          <details class="ej"><summary>Cómo conectarla (solo una vez)</summary>
+            <ol class="pasos">
+              <li>Abre tu hoja de Google «Nutriendo Hábitos · Citas y ventas».</li>
+              <li>Menú <b>Extensiones → Apps Script</b>. Borra lo que haya y pega este código:</li>
+            </ol>
+            <div class="copy" style="align-items:start"><textarea id="s-code" readonly rows="6" aria-label="Código para Apps Script"></textarea><button class="btn sec sm" type="button" id="s-copiar">Copiar</button></div>
+            <ol class="pasos" start="3">
+              <li>Pulsa <b>Guardar</b> y luego <b>Implementar → Nueva implementación</b>. En el engranaje elige <b>Aplicación web</b>; «Ejecutar como: <b>yo</b>» y «Quién tiene acceso: <b>cualquier usuario</b>». Pulsa <b>Implementar</b> y da permiso con tu cuenta.</li>
+              <li>Copia la <b>URL de la aplicación web</b> (termina en <code>/exec</code>), pégala aquí abajo y pulsa «Guardar y enviar todo».</li>
+            </ol>
+          </details>
+          <label for="s-url">URL de la aplicación web<input id="s-url" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off"></label>
+          <p class="msg err" id="s-err" hidden></p>
+          <div class="row"><button class="btn" type="button" id="b-sheets">Guardar y enviar todo</button></div>
+          <p class="muted" style="margin:0;font-size:.8rem">Desde ese momento, cada cita, cobro y venta se copia sola en la hoja (pestañas «Citas», «Ventas» y «Stock»). Contiene datos de salud de tus pacientes: no compartas la hoja.</p>
         </div>
         <div class="card">
           <h2 style="font-size:1.2rem;margin-bottom:.75rem">Cambiar contraseña</h2>
@@ -879,8 +1247,9 @@ Viernes 14/11
     return d.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
   }
   function fechaCorta(f){ var d = new Date(f + 'T12:00:00'); return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }); }
+  var ERR_EXTRA = { importe: 'Pon un importe válido (por ejemplo 45 o 45,50).', pagado_online: 'Esta cita ya está pagada online y no se puede cambiar a mano.', clave_redsys: 'La clave secreta de Redsys no parece correcta: cópiala tal cual te la da el banco.', redsys_incompleto: 'Para activar el pago online faltan datos: precio, número de comercio, terminal y clave secreta.', url_sheets: 'La dirección tiene que ser la de la aplicación web de Apps Script (empieza por https://script.google.com/macros/s/ y termina en /exec).', sheets: 'No se ha podido conectar con la hoja de Google. Revisa que la implementación sea «Aplicación web» con acceso «Cualquier usuario» y que hayas pegado el código completo.', stock: 'No hay unidades suficientes en stock.', no_encontrada: 'No se ha encontrado. Recarga la página.' };
   var ERR = { password: 'Contraseña incorrecta.', limite: 'Demasiados intentos. Espera 15 minutos y vuelve a probar.', corta: 'La contraseña debe tener al menos 8 caracteres.', ocupado: 'Ese hueco ya tiene una cita.', datos: 'Revisa los datos: falta algo o no es válido.', red: 'No hay conexión con el servidor.', sesion: 'La sesión ha caducado. Recarga la página.', no_autorizado: 'La sesión ha caducado. Recarga la página.', tramo: 'Hay un tramo con la hora de fin antes que la de inicio.', escritura: 'El servidor no deja guardar datos en la carpeta reservas/datos. En el administrador de archivos de DonDominio, pon permisos 755 a las carpetas «reservas» y «datos».', servidor: 'Ha fallado algo en el servidor. Prueba otra vez en un momento.' };
-  function errTxt(r){ return ERR[r && r.error] || 'No se ha podido guardar. Prueba otra vez.'; }
+  function errTxt(r){ return ERR[r && r.error] || ERR_EXTRA[r && r.error] || 'No se ha podido guardar. Prueba otra vez.'; }
 
   /* ---------- acceso ---------- */
   var primeraVez = false;
@@ -920,7 +1289,7 @@ Viernes 14/11
       $('dur').textContent = r.duracion; document.querySelectorAll('.dur2').forEach(function(e){ e.textContent = r.duracion; });
       ['c-motivo', 'imp-motivo'].forEach(function(id){ if ($(id).options.length < 2) (r.motivos || []).forEach(function(m){ var o = document.createElement('option'); o.value = o.textContent = m; $(id).appendChild(o); }); });
       $('r-on').checked = !!r.recordatorios; $('r-url').value = r.url_cron || '';
-      pintarManana();
+      pintarManana(); pintarAjustesPago(); pintarVentas();
       pintarCitas(); pintarHorario(); pintarBloqueos();
       $('a-ant').value = r.antelacion_horas; $('a-vista').value = r.dias_vista;
       $('h-abierto').value = r.abierto_hasta || ''; $('h-abierto').min = r.hoy; pintarLimite(); if (!SUCIO) { if (SEM) abrirSemana(SEM); else pintarSemana(); }
@@ -948,10 +1317,41 @@ Viernes 14/11
       html += '<div class="cita' + (canc ? ' cancelada' : '') + (pend ? ' pendiente' : '') + '"><span class="h">' + esc(c.hora) + '</span>' +
         '<span class="pill' + (c.modalidad === 'online' ? ' online' : '') + '">' + esc(MOD[c.modalidad]) + '</span>' +
         '<span class="who">' + esc(c.nombre + ' ' + (c.apellidos || '')) + (c.motivo ? '<span class="motivo">' + esc(c.motivo) + '</span>' : '') + '<small>' + esc([c.telefono, c.email].filter(Boolean).join(' · ')) + (c.origen === 'panel' ? ' · añadida por ti' : '') + (canc ? (c.estado_previo === 'pendiente' ? ' · RECHAZADA' : ' · ANULADA') : '') + '</small></span>' +
-        acts + '</div>';
+        acts + (canc ? '' : cobroHTML(c)) + '</div>';
     });
     return html ? html + '</div>' : '';
   }
+  /* ---------- cobros de las citas ---------- */
+  function euros(v){ return v === '' || v == null ? '' : String((+v).toFixed(2)).replace('.', ',').replace(',00', '') + ' €'; }
+  function textoCobro(c){
+    var p = c.pago || {};
+    if (p.estado === 'pagado') return (D.metodos[p.metodo] || p.metodo) + ' · ' + euros(p.importe);
+    if (p.metodo === 'online') return p.estado === 'fallido' ? 'Pago online fallido' : 'Pago online pendiente';
+    return 'Sin cobrar';
+  }
+  function cobroHTML(c){
+    var p = c.pago || {}, id = esc(c.id);
+    if (p.estado === 'pagado' && p.metodo === 'online') return '<div class="cobro-w"><span class="pago">✓ Pagado online · ' + esc(euros(p.importe)) + '</span></div>';
+    if (p.estado === 'pagado') return '<div class="cobro-w"><span class="pago">✓ Cobrado: ' + esc(textoCobro(c)) + '</span><button type="button" class="lnk" data-cobro-quitar="' + id + '">Cambiar</button></div>';
+    var aviso = p.metodo === 'online' ? '<span class="pago ' + (p.estado === 'fallido' ? 'no' : 'pe') + '">' + esc(textoCobro(c)) + '</span>' : '';
+    return '<div class="cobro-w">' + aviso + '<select data-cobro="' + id + '" aria-label="Forma de cobro"><option value="">Marcar cobro…</option><option value="efectivo">Efectivo</option><option value="datafono">Datáfono</option><option value="bizum">Bizum / transferencia</option></select>' +
+      '<input data-imp="' + id + '" inputmode="decimal" value="' + esc((D.precio || '').replace('.', ',').replace(',00', '')) + '" aria-label="Importe en euros" placeholder="€"><span class="muted" style="font-size:.8rem">€</span></div>';
+  }
+  document.addEventListener('change', function(e){
+    var s = e.target.closest('[data-cobro]'); if (!s || !s.value) return;
+    var id = s.getAttribute('data-cobro'), imp = document.querySelector('[data-imp="' + id + '"]');
+    s.disabled = true;
+    api('cobro', { id: id, metodo: s.value, importe: imp ? imp.value : '' }).then(function(r){
+      s.disabled = false;
+      if (!r.ok) { s.value = ''; return toast(errTxt(r)); }
+      toast('Cobro guardado.'); cargar();
+    });
+  });
+  document.addEventListener('click', function(e){
+    var b = e.target.closest('[data-cobro-quitar]'); if (!b) return;
+    if (!confirm('¿Quitar el cobro de esta cita para volver a marcarlo?')) return;
+    api('cobro', { id: b.getAttribute('data-cobro-quitar'), metodo: '' }).then(function(r){ if (!r.ok) return toast(errTxt(r)); cargar(); });
+  });
   document.addEventListener('click', function(e){
     var b = e.target.closest('[data-cancel]'); if (!b) return;
     var c = D.citas.find(function(x){ return x.id === b.getAttribute('data-cancel'); }); if (!c) return;
@@ -985,6 +1385,148 @@ Viernes 14/11
     e.preventDefault(); var err = $('c-err'); err.hidden = true;
     api('anadir_cita', { fecha: $('c-fecha').value, hora: $('c-hora').value, modalidad: $('c-mod').value, nombre: $('c-nombre').value, apellidos: $('c-ape').value, telefono: $('c-tel').value, email: $('c-email').value, motivo: $('c-motivo').value })
       .then(function(r){ if (!r.ok) { err.textContent = errTxt(r); err.hidden = false; return; } e.target.reset(); toast('Cita añadida.'); cargar(); });
+  });
+
+  /* ---------- ajustes: precio, Redsys y Google Sheets ---------- */
+  var CODIGO_GS = [
+    '// Nutriendo Hábitos: recibe las citas, ventas y stock del panel de reservas',
+    "const CLAVE = '{TOKEN}';",
+    '',
+    'function doPost(e) {',
+    '  const d = JSON.parse(e.postData.contents);',
+    '  if (d.token !== CLAVE) return salida({ ok: false });',
+    '  const cerrojo = LockService.getScriptLock(); cerrojo.waitLock(20000);',
+    '  try {',
+    '    const libro = SpreadsheetApp.getActiveSpreadsheet();',
+    "    ['Citas', 'Ventas'].forEach(function (n) { volcar(hoja(libro, n, d.cabeceras[n]), d[n] || []); });",
+    "    if (d.Stock) { const h = hoja(libro, 'Stock', d.cabeceras.Stock);",
+    '      if (h.getLastRow() > 1) h.getRange(2, 1, h.getLastRow() - 1, h.getLastColumn()).clearContent();',
+    '      if (d.Stock.length) h.getRange(2, 1, d.Stock.length, d.Stock[0].length).setValues(d.Stock); }',
+    '  } finally { cerrojo.releaseLock(); }',
+    '  return salida({ ok: true });',
+    '}',
+    'function hoja(libro, nombre, cab) {',
+    '  let h = libro.getSheetByName(nombre) || libro.insertSheet(nombre);',
+    "  if (h.getLastRow() === 0) { h.appendRow(cab); h.setFrozenRows(1); h.getRange(1, 1, 1, cab.length).setFontWeight('bold'); }",
+    '  return h;',
+    '}',
+    'function volcar(h, filas) {',
+    '  const n = h.getLastRow() - 1;',
+    '  const ids = n > 0 ? h.getRange(2, 1, n, 1).getValues().map(function (r) { return String(r[0]); }) : [];',
+    '  filas.forEach(function (f) {',
+    '    const i = ids.indexOf(String(f[0]));',
+    '    if (i >= 0) h.getRange(i + 2, 1, 1, f.length).setValues([f]); else { h.appendRow(f); ids.push(String(f[0])); }',
+    '  });',
+    '}',
+    'function salida(o) { return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON); }'
+  ].join('\n');
+  function pintarAjustesPago(){
+    if (document.activeElement && /^g-|^s-url/.test(document.activeElement.id)) return;
+    $('g-precio').value = (D.precio || '').replace('.', ',');
+    $('g-on').checked = !!D.pago_online; $('g-com').value = D.redsys.comercio || ''; $('g-ter').value = D.redsys.terminal || '1'; $('g-ent').value = D.redsys.entorno || 'pruebas';
+    $('g-clave').value = ''; $('g-clave').placeholder = D.redsys.clave ? 'Guardada ✓ (escribe solo para cambiarla)' : 'Pégala aquí';
+    var est = $('g-estado');
+    if (D.pago_online && D.redsys_listo) { est.className = 'msg ok'; est.textContent = 'Pago online ACTIVADO' + (D.redsys.entorno === 'real' ? '' : ' en modo PRUEBAS (no se cobra de verdad)') + '. Los pacientes pueden pagar ' + euros(D.precio) + ' al reservar.'; }
+    else { est.className = 'msg'; est.textContent = 'Pago online APAGADO: en la web los pacientes no ven la opción de pagar; pagan en la consulta.'; }
+    $('s-code').value = CODIGO_GS.replace('{TOKEN}', D.sheets.token || '');
+    $('s-url').value = D.sheets.url || '';
+    $('s-estado').textContent = D.sheets.url ? 'Conectada: las citas, cobros y ventas se copian solos en tu hoja de Google.' : 'Sin conectar todavía. Sigue los pasos para que todo se copie solo en tu hoja de Google.';
+  }
+  $('b-guardar-g').addEventListener('click', function(){
+    var b = this, err = $('g-err'); err.hidden = true; b.disabled = true;
+    api('guardar_pago', { precio: $('g-precio').value, activo: $('g-on').checked, comercio: $('g-com').value, terminal: $('g-ter').value, clave: $('g-clave').value, entorno: $('g-ent').value }).then(function(r){
+      b.disabled = false;
+      if (!r.ok) { err.textContent = errTxt(r); err.hidden = false; if (r.error === 'redsys_incompleto') $('g-on').checked = false; return; }
+      toast('Guardado.'); cargar();
+    });
+  });
+  $('s-copiar').addEventListener('click', function(){
+    var t = $('s-code'); t.select();
+    (navigator.clipboard ? navigator.clipboard.writeText(t.value) : Promise.reject()).then(function(){ toast('Código copiado.'); }, function(){ document.execCommand('copy'); toast('Código copiado.'); });
+  });
+  $('b-sheets').addEventListener('click', function(){
+    var b = this, err = $('s-err'); err.hidden = true; b.disabled = true; b.textContent = 'Enviando…';
+    api('sheets_guardar', { url: $('s-url').value.trim() }).then(function(r){
+      if (!r.ok) throw r;
+      if (!$('s-url').value.trim()) return { ok: true, vacio: true };
+      return api('sheets_todo');
+    }).then(function(r){
+      if (!r.ok) throw r;
+      toast(r.vacio ? 'Copia en Google Sheets desconectada.' : '¡Conectada! Todo se ha copiado en tu hoja de Google.'); cargar();
+    }).catch(function(r){ err.textContent = errTxt(r); err.hidden = false; })
+      .then(function(){ b.disabled = false; b.textContent = 'Guardar y enviar todo'; });
+  });
+
+  /* ---------- ventas y stock ---------- */
+  var MESES_V = null;
+  function productosActivos(){ return (D.tienda.productos || []).filter(function(p){ return !p.borrado; }); }
+  function pintarVentas(){
+    var prods = productosActivos(), sel = $('v-prod'), prev = sel.value;
+    sel.innerHTML = prods.length ? prods.map(function(p){ return '<option value="' + esc(p.id) + '"' + (+p.stock < 1 ? ' disabled' : '') + '>' + esc(p.nombre) + ' — ' + esc(euros(p.precio)) + ' (' + (+p.stock) + ' en stock)</option>'; }).join('') : '<option value="">Primero añade un producto →</option>';
+    if (prev && prods.some(function(p){ return p.id === prev; })) sel.value = prev;
+    if (!$('v-total').dataset.tocado) calcTotal();
+    $('dl-clientes').innerHTML = (D.clientes || []).map(function(n){ return '<option value="' + esc(n) + '">'; }).join('');
+    $('p-body').innerHTML = prods.length ? prods.map(function(p){
+      return '<tr><td>' + esc(p.nombre) + '</td><td>' + esc(euros(p.precio)) + '</td><td class="st' + (+p.stock <= 2 ? ' bajo' : '') + '">' + (+p.stock) + '</td>' +
+        '<td><span class="ent"><input type="number" min="1" placeholder="+" data-ent-n="' + esc(p.id) + '" aria-label="Unidades que entran de ' + esc(p.nombre) + '"><button class="btn sec sm" type="button" data-ent="' + esc(p.id) + '">Añadir</button></span></td>' +
+        '<td style="white-space:nowrap"><button class="lnk" type="button" data-pedit="' + esc(p.id) + '">Editar</button> · <button class="lnk" type="button" data-pdel="' + esc(p.id) + '">Quitar</button></td></tr>';
+    }).join('') : '<tr><td colspan="5" class="muted">Todavía no hay productos. Añádelos abajo con su precio y las unidades que tienes.</td></tr>';
+    // meses con ventas
+    var ventas = (D.tienda.ventas || []).slice().sort(function(a, b){ return a.fecha < b.fecha ? 1 : -1; });
+    var meses = {}; ventas.forEach(function(v){ meses[v.fecha.slice(0, 7)] = 1; }); meses[D.hoy.slice(0, 7)] = 1;
+    var ms = Object.keys(meses).sort().reverse(), msel = $('v-mes'), mv = msel.value || D.hoy.slice(0, 7);
+    msel.innerHTML = ms.map(function(m){ var t = new Date(m + '-15T12:00:00').toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }); return '<option value="' + m + '">' + t.charAt(0).toUpperCase() + t.slice(1) + '</option>'; }).join('') + '<option value="todas">Todas</option>';
+    msel.value = ms.indexOf(mv) >= 0 || mv === 'todas' ? mv : ms[0];
+    var lista = ventas.filter(function(v){ return msel.value === 'todas' || v.fecha.slice(0, 7) === msel.value; });
+    var tot = { total: 0 }; lista.forEach(function(v){ if (v.anulada) return; tot.total += +v.total; tot[v.metodo] = (tot[v.metodo] || 0) + (+v.total); });
+    $('v-totales').innerHTML = '<span>Total<b>' + euros(tot.total) + '</b></span>' + ['efectivo', 'datafono', 'bizum'].filter(function(m){ return tot[m]; }).map(function(m){ return '<span>' + esc(D.metodos[m]) + '<b>' + euros(tot[m]) + '</b></span>'; }).join('');
+    $('v-lista').innerHTML = lista.length ? lista.map(function(v){
+      return '<div class="venta' + (v.anulada ? ' anulada' : '') + '"><span class="q">' + esc(v.producto) + ' × ' + (+v.unidades) + '<small>' + esc(v.cliente) + ' · ' + esc(new Date(v.fecha).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })) + ' · ' + esc(D.metodos[v.metodo] || v.metodo) + (v.nota ? ' · ' + esc(v.nota) : '') + (v.anulada ? ' · ANULADA' : '') + '</small></span><span class="t">' + esc(euros(v.total)) + '</span>' +
+        (v.anulada ? '' : '<button class="btn danger sm" type="button" data-vanular="' + esc(v.id) + '">Anular</button>') + '</div>';
+    }).join('') : '<p class="muted">Sin ventas en este mes.</p>';
+  }
+  function calcTotal(){
+    var p = productosActivos().find(function(x){ return x.id === $('v-prod').value; }), n = Math.max(1, +$('v-uds').value || 1);
+    $('v-total').value = p ? String((+p.precio * n).toFixed(2)).replace('.', ',') : '';
+  }
+  $('v-prod').addEventListener('change', function(){ delete $('v-total').dataset.tocado; calcTotal(); });
+  $('v-uds').addEventListener('input', function(){ delete $('v-total').dataset.tocado; calcTotal(); });
+  $('v-total').addEventListener('input', function(){ this.dataset.tocado = '1'; });
+  $('v-mes').addEventListener('change', pintarVentas);
+  $('f-venta').addEventListener('submit', function(e){
+    e.preventDefault(); var err = $('v-err'); err.hidden = true;
+    if (!$('v-prod').value) { err.textContent = 'Primero añade el producto en «Productos y stock».'; err.hidden = false; return; }
+    api('venta_registrar', { cliente: $('v-cliente').value.trim(), producto: $('v-prod').value, unidades: +$('v-uds').value, total: $('v-total').value, metodo: $('v-met').value, nota: $('v-nota').value }).then(function(r){
+      if (!r.ok) { err.textContent = errTxt(r); err.hidden = false; return; }
+      toast('Venta registrada. Stock actualizado.'); $('v-cliente').value = ''; $('v-uds').value = 1; $('v-nota').value = ''; delete $('v-total').dataset.tocado; cargar();
+    });
+  });
+  function limpiarProd(){ $('f-prod').reset(); $('p-id').value = ''; $('p-titulo').textContent = 'Añadir producto'; $('p-btn').textContent = 'Añadir producto'; $('p-cancelar').hidden = true; $('p-err').hidden = true; }
+  $('p-cancelar').addEventListener('click', limpiarProd);
+  $('f-prod').addEventListener('submit', function(e){
+    e.preventDefault(); var err = $('p-err'); err.hidden = true;
+    api('producto_guardar', { id: $('p-id').value, nombre: $('p-nombre').value.trim(), precio: $('p-precio').value, stock: +$('p-stock').value }).then(function(r){
+      if (!r.ok) { err.textContent = r.error === 'datos' ? 'Revisa el nombre, el precio (por ejemplo 29,90) y las unidades.' : errTxt(r); err.hidden = false; return; }
+      toast($('p-id').value ? 'Producto actualizado.' : 'Producto añadido.'); limpiarProd(); cargar();
+    });
+  });
+  document.addEventListener('click', function(e){
+    var t;
+    if ((t = e.target.closest('[data-pedit]'))) {
+      var p = productosActivos().find(function(x){ return x.id === t.dataset.pedit; }); if (!p) return;
+      $('p-id').value = p.id; $('p-nombre').value = p.nombre; $('p-precio').value = String(p.precio).replace('.', ','); $('p-stock').value = p.stock;
+      $('p-titulo').textContent = 'Editar producto'; $('p-btn').textContent = 'Guardar cambios'; $('p-cancelar').hidden = false; $('p-nombre').focus();
+    } else if ((t = e.target.closest('[data-pdel]'))) {
+      if (!confirm('¿Quitar este producto de la lista? Las ventas que ya tiene se conservan.')) return;
+      api('producto_borrar', { id: t.dataset.pdel }).then(function(r){ if (!r.ok) return toast(errTxt(r)); cargar(); });
+    } else if ((t = e.target.closest('[data-ent]'))) {
+      var inp = document.querySelector('[data-ent-n="' + t.dataset.ent + '"]'), n = parseInt(inp.value, 10);
+      if (!n) { inp.focus(); return; }
+      api('producto_entrada', { id: t.dataset.ent, unidades: n }).then(function(r){ if (!r.ok) return toast(errTxt(r)); toast('Stock actualizado: +' + n + '.'); cargar(); });
+    } else if ((t = e.target.closest('[data-vanular]'))) {
+      if (!confirm('¿Anular esta venta? Las unidades vuelven al stock.')) return;
+      api('venta_anular', { id: t.dataset.vanular }).then(function(r){ if (!r.ok) return toast(errTxt(r)); toast('Venta anulada.'); cargar(); });
+    }
   });
 
   /* ---------- recordatorios de mañana ---------- */
@@ -1360,8 +1902,8 @@ Viernes 14/11
       return '<tr class="' + (ok ? '' : 'anulada') + '"><td class="n">' + esc(fechaCorta(c.fecha)) + '</td><td class="n">' + esc(c.hora) + '</td><td>' + esc(MOD[c.modalidad]) + '</td>' +
         '<td class="p">' + resaltar(nombre, q) + (c.motivo ? '<span class="motivo">' + esc(c.motivo) + '</span>' : '') + (c.origen === 'panel' ? '<span class="muted" style="display:block">Añadida por ti</span>' : '') + '</td>' +
         '<td>' + resaltar(c.telefono || '', q) + (c.email ? '<br>' + resaltar(c.email, q) : '') + '</td>' +
-        '<td><span class="est ' + EST[0] + '">' + EST[1] + '</span></td></tr>';
-    }).join('') : '<tr><td colspan="6" class="muted" style="text-align:center;padding:1.5rem">' + (HIST.citas.length ? 'No hay citas que coincidan con la búsqueda.' : 'Todavía no hay ninguna cita.') + '</td></tr>';
+        '<td><span class="est ' + EST[0] + '">' + EST[1] + '</span></td><td>' + (ok ? esc(textoCobro(c)) : '') + '</td></tr>';
+    }).join('') : '<tr><td colspan="7" class="muted" style="text-align:center;padding:1.5rem">' + (HIST.citas.length ? 'No hay citas que coincidan con la búsqueda.' : 'Todavía no hay ninguna cita.') + '</td></tr>';
   }
   ['h-q', 'h-est', 'h-cuando'].forEach(function(id){ $(id).addEventListener('input', pintarHistorial); });
   document.querySelector('[data-tab="historial"]').addEventListener('click', cargarHistorial);

@@ -432,6 +432,15 @@ nav.main a[aria-current="page"]{color:var(--primary);text-decoration:underline;t
 .bk-oksum{font-family:var(--font-display);font-size:1.25rem;color:var(--secondary-fg)}
 .bk-ok p{max-width:34rem}
 .bk-loading{opacity:.5;pointer-events:none}
+.bk-pago{border:0;margin:0;padding:0;display:grid;gap:.6rem}
+.bk-pago legend{font-size:.8rem;font-weight:500;color:var(--secondary-fg);margin-bottom:.45rem;padding:0}
+.bk-pop{display:flex;align-items:flex-start;gap:.7rem;padding:.8rem 1rem;border-radius:1rem;border:1.5px solid var(--border);background:var(--background);cursor:pointer;font-weight:400!important;color:var(--foreground)!important}
+.bk-pop:has(input:checked){border-color:var(--primary);background:color-mix(in oklab,var(--secondary) 55%,var(--card))}
+.bk-pop input{margin-top:.25rem;accent-color:var(--primary)}
+.bk-pop b{display:block;font-weight:600;font-size:.95rem}
+.bk-pop small{display:block;color:var(--muted-fg);font-size:.8rem;margin-top:.1rem}
+.bk-aviso{border-radius:1rem;padding:1rem 1.2rem;background:var(--secondary);color:var(--secondary-fg)}
+.bk-aviso.ko{background:#F6E7E3;color:#7A2E21}
 
 /* ---------- shared CTA + next ---------- */
 .cta-band{background:var(--primary);color:var(--primary-fg);text-align:center}
@@ -498,6 +507,7 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
   <section class="page-hero" data-hero="contacto" data-crumb="Reservar cita" data-ey="Calendario de citas" data-h1="Reserva tu cita" data-lead="Elige consulta presencial en Valladolid u online, el día y la hora. Tu hora queda reservada al momento y te confirmo la cita por email." data-extra="booking"><img src="img/contacto.webp" alt="" fetchpriority="high"><div class="page-hero-shade"></div><div class="wrap"><nav class="crumbs" aria-label="Ruta"><a href="./">Inicio</a><span>/</span><span class="cur">Reservar cita</span></nav><p class="ey">Calendario de citas</p><h1>Reserva tu cita</h1><p class="lead">Elige consulta presencial en Valladolid u online, el día y la hora. Tu hora queda reservada al momento y te confirmo la cita por email.</p><div class="ctas"><a class="btn btn-wa" href="https://wa.me/34669877052?text=Hola%20Andrea%2C%20me%20gustar%C3%ADa%20pedir%20cita.%20%C2%BFQu%C3%A9%20huecos%20tienes%20disponibles%3F" target="_blank" rel="noopener"><svg class="i" viewBox="0 0 24 24" data-ic="wa"></svg> Escribir por WhatsApp</a><a class="btn btn-outline-light" href="tel:+34669877052"><svg class="i" viewBox="0 0 24 24" data-ic="phone"></svg> Llamar</a></div></div></section>
   <div class="wrap editorial">
     <div class="bk" id="bk">
+      <p class="bk-aviso" id="bk-vuelta" hidden role="status"></p>
       <p class="bk-demo" id="bk-demo" hidden><strong>Vista previa:</strong> los días y horas son de ejemplo y no se guarda ninguna reserva. El calendario real funciona cuando la web está subida a tu hosting.</p>
 
       <div class="bk-section" id="bk-step1">
@@ -550,6 +560,11 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
           <option>Educación nutricional / hábitos saludables</option>
           <option>Otros</option>
         </select></label>
+        <fieldset class="bk-pago" id="bk-pago" hidden>
+          <legend>¿Cómo quieres pagar?</legend>
+          <label class="bk-pop"><input type="radio" name="pago" value="online"><span><b>Pagar ahora con tarjeta <span id="bk-precio"></span></b><small>Pago seguro en la pasarela de tu banco (Redsys).</small></span></label>
+          <label class="bk-pop"><input type="radio" name="pago" value="consulta" checked><span><b>Pagar en la consulta</b><small>En efectivo, con tarjeta o Bizum el día de la cita.</small></span></label>
+        </fieldset>
         <label class="chk" for="bk-priv"><input id="bk-priv" name="privacidad" value="si" type="checkbox" required> He leído la <a href="proteccion-de-datos.html">información sobre protección de datos</a>.</label>
         <label class="hp" for="bk-web" aria-hidden="true">No rellenar<input id="bk-web" name="web" tabindex="-1" autocomplete="off"></label>
         <p class="ferr" id="bk-err" hidden></p>
@@ -607,7 +622,7 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
 
 <a class="wa-float" href="https://wa.me/34669877052?text=Hola%20Andrea%2C%20me%20gustar%C3%ADa%20consultar%20sobre%20nutrici%C3%B3n." target="_blank" rel="noopener" aria-label="Escríbeme por WhatsApp"><svg class="i" viewBox="0 0 24 24" data-ic="wa"></svg><span>Escríbeme por WhatsApp</span></a>
 
-<script>window.__MPA={"page": "reservar", "files": {"inicio": "./", "dietista-nutricionista-en-valladolid": "dietista-nutricionista-en-valladolid.html", "nutricion-deportiva-valladolid": "nutricion-deportiva-valladolid.html", "nutricion-oncologica-valladolid": "nutricion-oncologica-valladolid.html", "perdida-de-peso-valladolid": "perdida-de-peso-valladolid.html", "patologias-digestivas-valladolid": "patologias-digestivas-valladolid.html", "alimentacion-vegetariana-vegana-valladolid": "alimentacion-vegetariana-vegana-valladolid.html", "nutricionista-online": "nutricionista-online.html", "nuestros-servicios": "nuestros-servicios.html", "reservar": "reservar.html", "asesoria-externa": "asesoria-externa.html", "publicaciones": "publicaciones.html", "cursos-talleres": "cursos-talleres.html", "blog-nutricion": "blog-nutricion.html", "tips": "tips.html", "contacto": "contacto.html", "proteccion-de-datos": "proteccion-de-datos.html", "servicios": "dietista-nutricionista-en-valladolid.html", "online": "nutricionista-online.html", "asesoria": "asesoria-externa.html", "colaboraciones": "publicaciones.html", "cursos": "cursos-talleres.html", "blog": "blog-nutricion.html", "todos-los-servicios": "nuestros-servicios.html", "nutricion-deportiva": "nutricion-deportiva-valladolid.html", "privacidad": "proteccion-de-datos.html", "reserva": "reservar.html", "cita": "reservar.html", "oncologica": "nutricion-oncologica-valladolid.html", "nutricion-oncologica": "nutricion-oncologica-valladolid.html", "perdida-de-peso": "perdida-de-peso-valladolid.html", "patologias-digestivas": "patologias-digestivas-valladolid.html", "vegana": "alimentacion-vegetariana-vegana-valladolid.html"}, "anchors": {"especialidades": "./#especialidades", "acc": "./#acc", "ptabs": "./#ptabs", "pt-1": "./#pt-1", "pt-2": "./#pt-2", "pt-3": "./#pt-3", "ppanel": "./#ppanel", "pp-k": "./#pp-k", "pp-t": "./#pp-t", "pp-d": "./#pp-d", "sobrepeso": "dietista-nutricionista-en-valladolid.html#sobrepeso", "patologias": "dietista-nutricionista-en-valladolid.html#patologias", "vegetariana": "dietista-nutricionista-en-valladolid.html#vegetariana", "faq-serv": "dietista-nutricionista-en-valladolid.html#faq-serv", "ct-prox": "cursos-talleres.html#ct-prox", "ct-past": "cursos-talleres.html#ct-past", "cp-prox": "cursos-talleres.html#cp-prox", "cp-past": "cursos-talleres.html#cp-past", "blog-q": "blog-nutricion.html#blog-q", "blog-posts": "blog-nutricion.html#blog-posts", "blog-empty": "blog-nutricion.html#blog-empty", "tips-posts": "tips.html#tips-posts", "formulario": "contacto.html#formulario", "rform": "contacto.html#rform", "rf-nombre": "contacto.html#rf-nombre", "rf-apellidos": "contacto.html#rf-apellidos", "rf-tel": "contacto.html#rf-tel", "rf-email": "contacto.html#rf-email", "rf-modo": "contacto.html#rf-modo", "rf-tema": "contacto.html#rf-tema", "rf-priv": "contacto.html#rf-priv", "rf-web": "contacto.html#rf-web", "rf-err": "contacto.html#rf-err", "rf-send-mail": "contacto.html#rf-send-mail", "rf-send-wa": "contacto.html#rf-send-wa", "rf-wadone": "contacto.html#rf-wadone", "rf-wa-open": "contacto.html#rf-wa-open", "rf-done": "contacto.html#rf-done", "faq-dep": "nutricion-deportiva-valladolid.html#faq-dep", "faq-onco": "nutricion-oncologica-valladolid.html#faq-onco", "ganancia-de-peso": "perdida-de-peso-valladolid.html#ganancia-de-peso", "faq-peso": "perdida-de-peso-valladolid.html#faq-peso", "faq-dig": "patologias-digestivas-valladolid.html#faq-dig", "faq-veg": "alimentacion-vegetariana-vegana-valladolid.html#faq-veg", "bk": "reservar.html#bk", "bk-demo": "reservar.html#bk-demo", "bk-step1": "reservar.html#bk-step1", "bk-prev": "reservar.html#bk-prev", "bk-mes": "reservar.html#bk-mes", "bk-next": "reservar.html#bk-next", "bk-days": "reservar.html#bk-days", "bk-slots": "reservar.html#bk-slots", "bk-form": "reservar.html#bk-form", "bk-sum": "reservar.html#bk-sum", "bk-nombre": "reservar.html#bk-nombre", "bk-apellidos": "reservar.html#bk-apellidos", "bk-tel": "reservar.html#bk-tel", "bk-email": "reservar.html#bk-email", "bk-motivo": "reservar.html#bk-motivo", "bk-priv": "reservar.html#bk-priv", "bk-web": "reservar.html#bk-web", "bk-err": "reservar.html#bk-err", "bk-send": "reservar.html#bk-send", "bk-ok": "reservar.html#bk-ok", "bk-oksum": "reservar.html#bk-oksum", "bk-okmsg": "reservar.html#bk-okmsg", "bk-otra": "reservar.html#bk-otra"}};</script>
+<script>window.__MPA={"page": "reservar", "files": {"inicio": "./", "dietista-nutricionista-en-valladolid": "dietista-nutricionista-en-valladolid.html", "nutricion-deportiva-valladolid": "nutricion-deportiva-valladolid.html", "nutricion-oncologica-valladolid": "nutricion-oncologica-valladolid.html", "perdida-de-peso-valladolid": "perdida-de-peso-valladolid.html", "patologias-digestivas-valladolid": "patologias-digestivas-valladolid.html", "alimentacion-vegetariana-vegana-valladolid": "alimentacion-vegetariana-vegana-valladolid.html", "nutricionista-online": "nutricionista-online.html", "nuestros-servicios": "nuestros-servicios.html", "reservar": "reservar.html", "asesoria-externa": "asesoria-externa.html", "publicaciones": "publicaciones.html", "cursos-talleres": "cursos-talleres.html", "blog-nutricion": "blog-nutricion.html", "tips": "tips.html", "contacto": "contacto.html", "proteccion-de-datos": "proteccion-de-datos.html", "servicios": "dietista-nutricionista-en-valladolid.html", "online": "nutricionista-online.html", "asesoria": "asesoria-externa.html", "colaboraciones": "publicaciones.html", "cursos": "cursos-talleres.html", "blog": "blog-nutricion.html", "todos-los-servicios": "nuestros-servicios.html", "nutricion-deportiva": "nutricion-deportiva-valladolid.html", "privacidad": "proteccion-de-datos.html", "reserva": "reservar.html", "cita": "reservar.html", "oncologica": "nutricion-oncologica-valladolid.html", "nutricion-oncologica": "nutricion-oncologica-valladolid.html", "perdida-de-peso": "perdida-de-peso-valladolid.html", "patologias-digestivas": "patologias-digestivas-valladolid.html", "vegana": "alimentacion-vegetariana-vegana-valladolid.html"}, "anchors": {"especialidades": "./#especialidades", "acc": "./#acc", "ptabs": "./#ptabs", "pt-1": "./#pt-1", "pt-2": "./#pt-2", "pt-3": "./#pt-3", "ppanel": "./#ppanel", "pp-k": "./#pp-k", "pp-t": "./#pp-t", "pp-d": "./#pp-d", "sobrepeso": "dietista-nutricionista-en-valladolid.html#sobrepeso", "patologias": "dietista-nutricionista-en-valladolid.html#patologias", "vegetariana": "dietista-nutricionista-en-valladolid.html#vegetariana", "faq-serv": "dietista-nutricionista-en-valladolid.html#faq-serv", "ct-prox": "cursos-talleres.html#ct-prox", "ct-past": "cursos-talleres.html#ct-past", "cp-prox": "cursos-talleres.html#cp-prox", "cp-past": "cursos-talleres.html#cp-past", "blog-q": "blog-nutricion.html#blog-q", "blog-posts": "blog-nutricion.html#blog-posts", "blog-empty": "blog-nutricion.html#blog-empty", "tips-posts": "tips.html#tips-posts", "formulario": "contacto.html#formulario", "rform": "contacto.html#rform", "rf-nombre": "contacto.html#rf-nombre", "rf-apellidos": "contacto.html#rf-apellidos", "rf-tel": "contacto.html#rf-tel", "rf-email": "contacto.html#rf-email", "rf-modo": "contacto.html#rf-modo", "rf-tema": "contacto.html#rf-tema", "rf-priv": "contacto.html#rf-priv", "rf-web": "contacto.html#rf-web", "rf-err": "contacto.html#rf-err", "rf-send-mail": "contacto.html#rf-send-mail", "rf-send-wa": "contacto.html#rf-send-wa", "rf-wadone": "contacto.html#rf-wadone", "rf-wa-open": "contacto.html#rf-wa-open", "rf-done": "contacto.html#rf-done", "faq-dep": "nutricion-deportiva-valladolid.html#faq-dep", "faq-onco": "nutricion-oncologica-valladolid.html#faq-onco", "ganancia-de-peso": "perdida-de-peso-valladolid.html#ganancia-de-peso", "faq-peso": "perdida-de-peso-valladolid.html#faq-peso", "faq-dig": "patologias-digestivas-valladolid.html#faq-dig", "faq-veg": "alimentacion-vegetariana-vegana-valladolid.html#faq-veg", "bk": "reservar.html#bk", "bk-vuelta": "reservar.html#bk-vuelta", "bk-demo": "reservar.html#bk-demo", "bk-step1": "reservar.html#bk-step1", "bk-prev": "reservar.html#bk-prev", "bk-mes": "reservar.html#bk-mes", "bk-next": "reservar.html#bk-next", "bk-days": "reservar.html#bk-days", "bk-slots": "reservar.html#bk-slots", "bk-form": "reservar.html#bk-form", "bk-sum": "reservar.html#bk-sum", "bk-nombre": "reservar.html#bk-nombre", "bk-apellidos": "reservar.html#bk-apellidos", "bk-tel": "reservar.html#bk-tel", "bk-email": "reservar.html#bk-email", "bk-motivo": "reservar.html#bk-motivo", "bk-pago": "reservar.html#bk-pago", "bk-precio": "reservar.html#bk-precio", "bk-priv": "reservar.html#bk-priv", "bk-web": "reservar.html#bk-web", "bk-err": "reservar.html#bk-err", "bk-send": "reservar.html#bk-send", "bk-ok": "reservar.html#bk-ok", "bk-oksum": "reservar.html#bk-oksum", "bk-okmsg": "reservar.html#bk-okmsg", "bk-otra": "reservar.html#bk-otra"}};</script>
 <script>
 (function(){
   // ---------- icons (lucide) ----------
@@ -856,6 +871,25 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
       return { ok: true, dias: dias, hoy: st.hoy, hasta: iso(lim) };
     }
 
+    function pintarPago(){
+      var on = !!(st.pago && st.pago.online && st.pago.precio);
+      $('bk-pago').hidden = !on;
+      if (on) $('bk-precio').textContent = '(' + st.pago.precio.replace('.', ',').replace(',00', '') + ' €)';
+      else { var c = document.querySelector('#bk-pago input[value="consulta"]'); if (c) c.checked = true; }
+    }
+    // Vuelta desde la pasarela de pago
+    (function(){
+      var m = /[?&]pago=(ok|ko)\b/.exec(location.search); if (!m) return;
+      var el = $('bk-vuelta'); el.hidden = false;
+      if (m[1] === 'ok') el.innerHTML = '<strong>¡Pago completado!</strong> Tu hora queda reservada. Te llegará un email y, en cuanto la revise, la confirmación definitiva de la cita.';
+      else { el.className = 'bk-aviso ko'; el.innerHTML = '<strong>El pago no se ha completado.</strong> Tu hora sigue reservada de momento: puedes pagar en la consulta o llamarme al <a href="tel:+34669877052">669 87 70 52</a>.'; }
+      try { history.replaceState(null, '', location.pathname + location.hash); } catch (e) {}
+    })();
+    function irAPagar(f){
+      var form = document.createElement('form'); form.method = 'POST'; form.action = f.url;
+      ['Ds_SignatureVersion', 'Ds_MerchantParameters', 'Ds_Signature'].forEach(function(k){ var i = document.createElement('input'); i.type = 'hidden'; i.name = k; i.value = f[k]; form.appendChild(i); });
+      document.body.appendChild(form); form.submit();
+    }
     function cargarMes(){
       var key = st.mod + '|' + st.ym;
       if (st.cache[key]) return Promise.resolve(st.cache[key]);
@@ -867,7 +901,7 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
           if (!PREVIEW) return { ok: false };
           st.demo = true; $('bk-demo').hidden = false; return demoMes(st.mod, st.ym);
         })
-        .then(function(res){ $('bk').classList.remove('bk-loading'); if (res.ok) { st.cache[key] = res; st.hoy = res.hoy || st.hoy; st.hasta = res.hasta || st.hasta; } return res; });
+        .then(function(res){ $('bk').classList.remove('bk-loading'); if (res.ok) { st.cache[key] = res; st.hoy = res.hoy || st.hoy; st.hasta = res.hasta || st.hasta; st.pago = res.pago || null; pintarPago(); } return res; });
     }
 
     function pintarMes(){
@@ -959,6 +993,7 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
           if (res && res.error === 'ocupado') { delete st.cache[st.mod + '|' + st.ym]; st.hora = ''; $('bk-form').hidden = true; pintarMes(); }
           return;
         }
+        if (res.redsys && res.redsys.url) { btn.disabled = true; btn.textContent = 'Abriendo el pago seguro…'; irAPagar(res.redsys); return; }
         $('bk-oksum').textContent = fechaLarga(st.fecha).replace(/^./, function(c){ return c.toUpperCase(); }) + ' a las ' + st.hora + ' · ' + NOMBRE_MOD[st.mod];
         $('bk-okmsg').textContent = res.demo ? 'Esto es una vista previa: no se ha guardado ni enviado nada. En la web real, la hora queda bloqueada, al paciente le llega un email de «solicitud recibida» y a ti el aviso «RESERVA WEB». La confirmación definitiva le llega cuando tú la confirmas en el panel.' : 'Esa hora queda reservada para ti. Te he enviado un email con los datos y en cuanto la revise te llegará otro con la confirmación definitiva. Si tienes dudas, llámame o escríbeme por WhatsApp al 669 87 70 52.';
         document.querySelectorAll('#bk > .bk-section, #bk-form').forEach(function(x){ x.hidden = true; });
