@@ -22,7 +22,7 @@
   --border: #E3E1D8;
   --leaf: #C2D8B9;
   --hero-overlay: #2E3B2B;
-  --whatsapp: oklch(60% .14 152);
+  --whatsapp: oklch(51% .13 152);
   --whatsapp-fg: oklch(99% .01 85);
   --radius: 1.25rem;
   --radius-xl: calc(var(--radius) + 4px);
@@ -104,7 +104,7 @@ nav.main a[aria-current="page"]{color:var(--primary);text-decoration:underline;t
 .ghost-light{display:inline-flex;align-items:center;gap:.5rem;height:3rem;padding:0 1.25rem;font-weight:500;font-size:.9rem;border-radius:999px}
 .ghost-light:hover{background:color-mix(in oklab,var(--primary-fg) 10%,transparent)}
 @media (min-width:768px){.home-hero .brand-big{font-size:4.5rem}.home-hero .tag{font-size:1.875rem}}
-.promise{background:var(--secondary);color:var(--primary);font-size:.875rem}
+.promise{background:var(--secondary);color:var(--secondary-fg);font-size:.875rem}
 .promise .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.75rem 1.5rem;padding-top:1rem;padding-bottom:1rem}
 .promise span{display:flex;align-items:center;gap:.5rem}
 
@@ -115,7 +115,7 @@ nav.main a[aria-current="page"]{color:var(--primary);text-decoration:underline;t
 .bg-secondary-soft{background:color-mix(in oklab,var(--secondary) 40%,var(--background))}
 .h2{font-size:2.25rem;line-height:1.1}
 @media (min-width:768px){.h2{font-size:3rem}}
-.eyebrow-leaf{margin-bottom:.75rem;font-size:.875rem;color:var(--leaf)}
+.eyebrow-leaf{margin-bottom:.75rem;font-size:.875rem;color:var(--secondary)}
 .acc-grid{margin-top:2.5rem;display:grid;gap:1.25rem;align-items:start}
 @media (min-width:640px){.acc-grid{grid-template-columns:1fr 1fr}}
 @media (min-width:1000px){.acc-grid{grid-template-columns:repeat(6,minmax(0,1fr))}.acc-grid .acc{grid-column:span 2}.acc-grid .acc:nth-child(n+4){grid-column:span 3}}
@@ -124,7 +124,7 @@ nav.main a[aria-current="page"]{color:var(--primary);text-decoration:underline;t
 .acc button{display:block;width:100%;text-align:left}
 .acc .top{display:flex;justify-content:space-between;align-items:center;color:color-mix(in oklab,var(--primary-fg) 85%,transparent)}
 .acc h3{margin-top:1rem;font-size:1.5rem;line-height:1.3}
-.acc .body{margin-top:1rem;font-size:.875rem;line-height:1.7;color:color-mix(in oklab,var(--primary-fg) 85%,transparent)}
+.acc .body{margin-top:1rem;font-size:.875rem;line-height:1.7;color:var(--primary-fg)}
 .acc .body a{display:inline-flex;margin-top:1.25rem;color:var(--primary-fg)}
 .acc:not(.open) .body{display:none}
 .after-acc{margin-top:2.5rem;padding-top:2rem;border-top:1px solid color-mix(in oklab,var(--primary-fg) 20%,transparent)}
@@ -135,7 +135,7 @@ nav.main a[aria-current="page"]{color:var(--primary);text-decoration:underline;t
 @media (min-width:768px){.about{grid-template-columns:1fr 1fr}}
 .about>*{min-width:0}
 .about img{aspect-ratio:4/3;width:100%;object-fit:cover;border-radius:var(--radius)}
-.label-accent{font-size:.875rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--accent)}
+.label-accent{font-size:.875rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:#685F58}
 .about h2{margin-top:.75rem;color:var(--primary)}
 .about .sub{margin-top:1rem;font-weight:500;color:var(--primary)}
 .about .txt{margin-top:1.25rem;font-size:1.125rem;color:var(--muted-fg)}
@@ -169,7 +169,7 @@ nav.main a[aria-current="page"]{color:var(--primary);text-decoration:underline;t
 .sport{display:grid;gap:2.5rem;align-items:center}
 @media (min-width:768px){.sport{grid-template-columns:1fr 1fr}}
 .sport>*{min-width:0}
-.sport .ey{font-size:.8rem;color:var(--accent)}
+.sport .ey{font-size:.8rem;color:#685F58}
 .sport h2{margin-top:.5rem;font-size:2.25rem;line-height:1.15;color:var(--primary)}
 .sport p{color:var(--muted-fg);font-size:1.05rem;line-height:1.7}
 .sport p+p{margin-top:1rem}
@@ -414,10 +414,10 @@ nav.main a[aria-current="page"]{color:var(--primary);text-decoration:underline;t
 /* ---------- shared CTA + next ---------- */
 .cta-band{background:var(--primary);color:var(--primary-fg);text-align:center}
 .cta-band .in{max-width:48rem;margin:0 auto;padding:4rem var(--gutter-r) 4rem var(--gutter-l)}
-.cta-band .ey{font-size:.875rem;color:color-mix(in oklab,var(--primary-fg) 70%,transparent)}
+.cta-band .ey{font-size:.875rem;color:var(--secondary)}
 .cta-band h2{margin-top:1rem;font-size:2.25rem;line-height:1.1}
 @media (min-width:768px){.cta-band h2{font-size:3rem}}
-.cta-band p{margin-top:1.25rem;font-size:1.125rem;line-height:1.625;color:color-mix(in oklab,var(--primary-fg) 80%,transparent)}
+.cta-band p{margin-top:1.25rem;font-size:1.125rem;line-height:1.625;color:var(--primary-fg)}
 .cta-band .ctas{margin-top:2rem;display:flex;flex-wrap:wrap;justify-content:center;gap:.75rem}
 .next{border-top:1px solid var(--border);background:color-mix(in oklab,var(--secondary) 40%,var(--background));padding-top:4rem;padding-bottom:4rem}
 .next .ey{font-size:.875rem;color:var(--foreground)}
@@ -477,7 +477,7 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
   <section class="home-hero">
     <img src="img/hero.webp" alt="Bowl saludable con verduras y legumbres">
     <div class="wrap">
-      <h1 class="kicker"><svg class="i" viewBox="0 0 24 24" data-ic="leaf"></svg> Nutricionista en Valladolid · Presencial y online</h1>
+      <h1 class="kicker"><svg class="i" viewBox="0 0 24 24" data-ic="leaf"></svg> Nutricionista en Valladolid · Nutrición presencial y online</h1>
       <p class="brand-big" aria-hidden="true">Nutriendo<br><em>Hábitos.</em></p>
       <p class="tag">No es hacer dieta, es aprender a comer.</p>
       <p class="body">Desde hace tiempo estamos demostrando que el éxito no se consigue llevando a cabo una dieta estricta, si no cambiando y consolidando hábitos. Es posible y yo puedo ayudarte a alcanzar tus metas.</p>
@@ -494,7 +494,7 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
   </div></div>
 
   <section class="sec bg-primary" id="especialidades"><div class="wrap">
-    <p class="eyebrow-leaf">01 / NUTRICIÓN PARA TI</p>
+    <p class="eyebrow-leaf">01 / NUTRICIÓN EN VALLADOLID Y ONLINE</p>
     <h2 class="h2">Cada persona, un camino.</h2>
     <div class="acc-grid" id="acc">
       <div class="acc open"><button aria-expanded="true"><span class="top"><svg class="i" viewBox="0 0 24 24" data-ic="stetho"></svg><svg class="i tog" viewBox="0 0 24 24"></svg></span><h3>Tratamiento de patologías</h3></button>
@@ -502,9 +502,9 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
       <div class="acc"><button aria-expanded="false"><span class="top"><svg class="i" viewBox="0 0 24 24" data-ic="scale"></svg><svg class="i tog" viewBox="0 0 24 24"></svg></span><h3>Sobrepeso, obesidad y ganancia de peso</h3></button>
         <div class="body"><p>Según palabras de la propia OMS ‘la obesidad ha alcanzado proporciones epidémicas a nivel mundial, y cada año mueren, como mínimo, 2,8 millones de personas a causa de la obesidad o sobrepeso.’ Por lo tanto, no debemos fijarnos en ellas como un problema estético, si no como algo mucho más serio que puede tener consecuencias graves para nuestra salud.</p><a class="link-arrow" href="#perdida-de-peso-valladolid">Ver pérdida y ganancia de peso <svg class="i" viewBox="0 0 24 24" data-ic="arrow"></svg></a></div></div>
       <div class="acc"><button aria-expanded="false"><span class="top"><svg class="i" viewBox="0 0 24 24" data-ic="mountain"></svg><svg class="i tog" viewBox="0 0 24 24"></svg></span><h3>Nutrición deportiva</h3></button>
-        <div class="body"><p>Una de las peticiones de los deportistas es “quiero mejorar mi rendimiento”. La nutrición, la alimentación, forma parte de ese llamado entrenamiento invisible, fundamental para esa mejora de resultados y alcanzar nuestra meta. Una correcta planificación de la dieta del deportista, pre, intra y post entrenamiento puede marcar la diferencia.</p><a class="link-arrow" href="#nutricion-deportiva-valladolid">Ver nutrición deportiva <svg class="i" viewBox="0 0 24 24" data-ic="arrow"></svg></a></div></div>
+        <div class="body"><p>Una de las peticiones de los deportistas es “quiero mejorar mi rendimiento”. La nutrición, la alimentación, forma parte de ese llamado entrenamiento invisible, fundamental para esa mejora de resultados y alcanzar nuestra meta. Una correcta planificación de la dieta del deportista, pre, intra y post entrenamiento puede marcar la diferencia.</p><a class="link-arrow" href="#nutricion-deportiva-valladolid">Ver nutrición deportiva en Valladolid <svg class="i" viewBox="0 0 24 24" data-ic="arrow"></svg></a></div></div>
       <div class="acc"><button aria-expanded="false"><span class="top"><svg class="i" viewBox="0 0 24 24" data-ic="heart"></svg><svg class="i tog" viewBox="0 0 24 24"></svg></span><h3>Nutrición oncológica</h3></button>
-        <div class="body"><p>Acompañamiento nutricional antes, durante y después del tratamiento oncológico, coordinado con tu equipo médico: pautas para los efectos secundarios que afectan a la alimentación (falta de apetito, náuseas, cambios en el gusto…) y para mantener el peso y la masa muscular.</p><a class="link-arrow" href="#nutricion-oncologica-valladolid">Ver nutrición oncológica <svg class="i" viewBox="0 0 24 24" data-ic="arrow"></svg></a></div></div>
+        <div class="body"><p>Acompañamiento nutricional antes, durante y después del tratamiento oncológico, coordinado con tu equipo médico: pautas para los efectos secundarios que afectan a la alimentación (falta de apetito, náuseas, cambios en el gusto…) y para mantener el peso y la masa muscular.</p><a class="link-arrow" href="#nutricion-oncologica-valladolid">Ver nutrición oncológica en Valladolid y online <svg class="i" viewBox="0 0 24 24" data-ic="arrow"></svg></a></div></div>
       <div class="acc"><button aria-expanded="false"><span class="top"><svg class="i" viewBox="0 0 24 24" data-ic="leaf"></svg><svg class="i tog" viewBox="0 0 24 24"></svg></span><h3>Vegetariana y vegana</h3></button>
         <div class="body"><p>Cada vez más personas optan por cambiar su alimentación dada la repercusión que tiene esta, ya no sobre su salud, si no sobre el entorno en el que vivimos. Pero no se puede hacer de cualquier manera y hay que tener en cuenta algunos factores si queremos hacer las cosas bien.</p><a class="link-arrow" href="#alimentacion-vegetariana-vegana-valladolid">Ver alimentación vegetariana y vegana <svg class="i" viewBox="0 0 24 24" data-ic="arrow"></svg></a></div></div>
     </div>
@@ -521,7 +521,7 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
       <p class="label-accent">Quién soy</p>
       <h2 class="h2">Andrea Argüello Arbe</h2>
       <p class="sub">Tu dietista-nutricionista en Valladolid desde 2013.</p>
-      <p class="txt">Nutricionista con consulta en Valladolid, presencial y online. Formo parte del Equipo Sputnik y de Sputnik Investigación, uno de los mayores proyectos de investigación en escalada del mundo.</p>
+      <p class="txt">Dietista-nutricionista con consulta de nutrición en Valladolid (Calle Gregorio Fernández, 4) y online para toda España. Especializada en nutrición deportiva y nutrición oncológica. Formo parte del Equipo Sputnik y de Sputnik Investigación, uno de los mayores proyectos de investigación en escalada del mundo.</p>
       <ul>
         <li><span>✦</span>Diplomada en Nutrición y Dietética · Universidad de Valladolid</li>
         <li><span>✦</span>Máster en Nutrición · Universidad de Barcelona</li>
@@ -876,7 +876,7 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
 <div data-page="nutricion-deportiva-valladolid" hidden>
   <section class="page-hero" data-hero="climb" data-crumb="Nutrición deportiva en Valladolid" data-ey="Alimentación y entrenamiento" data-h1="Nutrición deportiva en Valladolid" data-lead="Planificación de tu alimentación antes, durante y después del entrenamiento, para escalada, running, trail, ciclismo o fuerza. Consulta con Andrea Argüello, miembro del Equipo Sputnik y Sputnik Investigación, en Valladolid y online." data-chips="Planes personalizados|Escalada|Resistencia|Composición corporal"></section>
   <div class="wrap editorial">
-    <div class="band" style="margin-top:0"><h2>Alimentación que acompaña tu entrenamiento</h2>
+    <div class="band" style="margin-top:0"><h2>Tu nutricionista deportiva en Valladolid</h2>
       <div class="oc" style="max-width:40rem"><p>Entrenar y comer son partes del mismo proceso. En Nutriendo Hábitos trabajamos la alimentación del deportista de forma personalizada, teniendo en cuenta sus objetivos y su día a día. La consulta puede ser presencial en Valladolid u online.</p><p>Soy Andrea Argüello Arbe, dietista-nutricionista. Trabajo en consulta desde 2013, soy diplomada en Nutrición y Dietética por la Universidad de Valladolid y tengo un Máster en Nutrición por la Universidad de Barcelona y un Máster en Nutrición Oncológica (2026). Formo parte del Equipo Sputnik y de Sputnik Investigación, un proyecto de investigación en escalada.</p></div></div>
     <div class="lead-rule"></div>
     <div>
@@ -906,6 +906,7 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
     <section class="faq" aria-labelledby="faq-dep">
       <h2 class="bar-h2" id="faq-dep">Preguntas frecuentes sobre nutrición deportiva</h2>
       <div class="faq-list">
+        <details><summary>¿Qué hace una nutricionista deportiva?</summary><div class="oc small"><p>Ajusta tu alimentación a tu deporte, tus entrenamientos y tus objetivos: cuánta energía y proteína necesitas, qué comer antes, durante y después de entrenar o competir, cómo hidratarte y cómo mejorar tu composición corporal sin perder rendimiento ni salud.</p></div></details>
         <details><summary>¿Qué incluye la consulta de nutrición deportiva?</summary><div class="oc small"><p>Una primera consulta con tu historia clínica y nutricional y la valoración de tu composición corporal por antropometría y bioimpedancia, una pauta personalizada para antes, durante y después del entrenamiento, y revisiones periódicas en las que adaptamos la pauta a tu evolución.</p></div></details>
         <details><summary>¿Tengo que tomar suplementos?</summary><div class="oc small"><p>No como norma. Las pautas se basan en alimentación real. Solo en casos concretos de planificación deportiva puede ser útil complementar la dieta, y en ese caso te explico las opciones que hay.</p></div></details>
         <details><summary>¿Trabajas la alimentación para escalada?</summary><div class="oc small"><p>Sí. Formo parte del Equipo Sputnik y de Sputnik Investigación, un proyecto de investigación en escalada, y trabajo la alimentación de las jornadas de escalada y del entrenamiento.</p></div></details>
@@ -920,7 +921,7 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
 
 <!-- ================= NUTRICIÓN ONCOLÓGICA ================= -->
 <div data-page="nutricion-oncologica-valladolid" hidden>
-  <section class="page-hero" data-hero="tips" data-crumb="Nutrición oncológica" data-ey="Alimentación y tratamiento oncológico" data-h1="Nutrición oncológica en Valladolid" data-lead="Te acompaño con la alimentación antes, durante y después del tratamiento oncológico, de forma personalizada y coordinada con tu equipo médico. Consulta presencial en Valladolid u online."></section>
+  <section class="page-hero" data-hero="tips" data-crumb="Nutrición oncológica" data-ey="Alimentación y tratamiento oncológico" data-h1="Nutrición oncológica en Valladolid y online" data-lead="Nutricionista oncológica con Máster en Nutrición Oncológica. Te acompaño con la alimentación antes, durante y después del tratamiento del cáncer, de forma personalizada y coordinada con tu equipo médico. Presencial en Valladolid u online desde cualquier lugar de España."></section>
   <div class="wrap editorial">
     <div class="band" style="margin-top:0"><h2>Comer bien también forma parte del tratamiento</h2>
       <div class="oc" style="max-width:42rem"><p>Durante un tratamiento oncológico es frecuente que cambien el apetito, el gusto o la forma de tolerar los alimentos, y que se pierda peso o masa muscular sin quererlo. Una alimentación adaptada a cada momento ayuda a tolerar mejor el tratamiento, a mantener el estado nutricional y a sentirse con más fuerzas.</p><p>Soy Andrea Argüello Arbe, dietista-nutricionista en Valladolid desde 2013, con un <strong>Máster en Nutrición Oncológica</strong> (2026). Trabajo la pauta contigo, de forma personalizada, y siempre como complemento del tratamiento que te indica tu equipo de oncología.</p></div></div>
@@ -931,18 +932,27 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
       <article class="stmt"><div class="left"><span class="card-icon sq" data-ic2="heart"></span><h3 class="card-title">Durante el tratamiento</h3></div>
         <div class="oc small"><p>Adaptamos la alimentación a los efectos que estés notando en cada fase:</p><ul><li>Falta de apetito o saciedad rápida.</li><li>Náuseas o vómitos.</li><li>Cambios en el gusto y el olfato.</li><li>Llagas en la boca o dificultad para tragar.</li><li>Diarrea o estreñimiento.</li></ul><p>Buscamos texturas, cantidades y horarios que te resulten fáciles, y vamos ajustando la pauta en cada revisión.</p></div></article>
       <article class="stmt"><div class="left"><span class="card-icon sq" data-ic2="gauge"></span><h3 class="card-title">Mantener el peso y la masa muscular</h3></div>
-        <div class="oc small"><p>Evitar una pérdida de peso y de músculo no deseada es uno de los objetivos principales. Por eso en cada consulta seguimos tu composición corporal y no solo el número de la báscula.</p></div></article>
+        <div class="oc small"><p>Evitar una pérdida de peso y de músculo no deseada es uno de los objetivos principales. Por eso en cada consulta seguimos tu composición corporal y no solo el número de la báscula.</p><p>Cuando la comida no basta para cubrir lo que necesitas, valoramos con tu equipo médico si conviene enriquecer los platos o usar suplementos nutricionales.</p></div></article>
+      <article class="stmt"><div class="left"><span class="card-icon sq" data-ic2="drop"></span><h3 class="card-title">Quimioterapia, radioterapia, inmunoterapia y cirugía</h3></div>
+        <div class="oc small"><p>Cada tratamiento afecta de forma distinta a la alimentación. En quimioterapia son frecuentes las náuseas y los cambios de sabor; la radioterapia en cabeza y cuello o en la zona abdominal puede causar mucositis, dificultad para tragar o diarrea; y antes y después de una cirugía es clave llegar con buen estado nutricional y recuperar bien.</p><p>Ajustamos la pauta a tu tipo de tumor, a tu tratamiento y al momento en el que estés.</p></div></article>
+      <article class="stmt"><div class="left"><span class="card-icon sq" data-ic2="apple"></span><h3 class="card-title">Información con evidencia, sin mitos</h3></div>
+        <div class="oc small"><p>Alrededor del cáncer circulan muchos mensajes sobre dietas alcalinas, ayunos, zumos «depurativos» o alimentos prohibidos. Muchos no tienen respaldo científico y algunos pueden ser perjudiciales durante el tratamiento. En consulta resolvemos tus dudas con información contrastada, para que comas con tranquilidad.</p></div></article>
+      <article class="stmt"><div class="left"><span class="card-icon sq" data-ic2="stetho"></span><h3 class="card-title">Adaptada a cada tipo de cáncer y tratamiento</h3></div>
+        <div class="oc small"><p>No es lo mismo un cáncer de mama que uno de colon, de estómago, de páncreas o de cabeza y cuello, ni una quimioterapia que una radioterapia, una inmunoterapia o una cirugía. Cada situación cambia lo que necesitas comer y cómo tolerarlo, y la pauta se adapta a ello.</p><p>Cuando hace falta, valoramos con tu equipo médico el uso de suplementos nutricionales.</p></div></article>
       <article class="stmt"><div class="left"><span class="card-icon sq" data-ic2="leaf"></span><h3 class="card-title">Después del tratamiento</h3></div>
         <div class="oc small"><p>Te ayudo a recuperar el apetito y una alimentación variada y a consolidar hábitos saludables para la nueva etapa, a tu ritmo.</p></div></article>
       <article class="stmt"><div class="left"><span class="card-icon sq" data-ic2="video"></span><h3 class="card-title">Presencial en Valladolid u online</h3></div>
-        <div class="oc small"><p>Si te cuesta desplazarte, podemos hacer la consulta por videollamada con el mismo seguimiento. Las personas que te cuidan también pueden acompañarte en la consulta.</p><p>Puedes <a href="#reservar">reservar tu cita en el calendario</a> o llamarme al <strong>669 87 70 52</strong>.</p></div></article>
+        <div class="oc small"><p>Si te cuesta desplazarte, podemos hacer la consulta por videollamada con el mismo seguimiento: la <strong>nutrición oncológica online</strong> te permite empezar desde casa, estés en Valladolid o en cualquier lugar de España. Las personas que te cuidan también pueden acompañarte en la consulta.</p><p>Puedes <a href="#reservar">reservar tu cita en el calendario</a> o llamarme al <strong>669 87 70 52</strong>.</p></div></article>
     </div>
     <section class="faq" aria-labelledby="faq-onco">
       <h2 class="bar-h2" id="faq-onco">Preguntas frecuentes sobre nutrición oncológica</h2>
       <div class="faq-list">
+        <details><summary>¿Qué es la nutrición oncológica?</summary><div class="oc small"><p>Es la parte de la nutrición que se ocupa de la alimentación de las personas con cáncer: antes, durante y después del tratamiento. Su objetivo es prevenir o tratar la desnutrición y la pérdida de masa muscular, aliviar con la comida los efectos secundarios del tratamiento y ayudarte a sentirte con más fuerzas, siempre junto a tu equipo de oncología.</p></div></details>
         <details><summary>¿Hay alimentos o dietas que curen el cáncer?</summary><div class="oc small"><p>No. Ningún alimento ni dieta cura el cáncer, y desconfía de quien lo prometa. La alimentación ayuda a tolerar mejor el tratamiento, a mantener el estado nutricional y a cuidar tu calidad de vida, siempre junto al tratamiento médico.</p></div></details>
         <details><summary>¿Cuándo conviene empezar con la nutricionista?</summary><div class="oc small"><p>Cuanto antes, mejor: desde el diagnóstico o al empezar el tratamiento. Pero en cualquier momento se puede empezar, también cuando el tratamiento ya ha terminado.</p></div></details>
         <details><summary>¿La pauta sustituye a lo que me indica mi oncólogo?</summary><div class="oc small"><p>No. La pauta nutricional complementa el tratamiento y tiene en cuenta las indicaciones de tu equipo médico. Si tienes informes o analíticas, tráelos a la consulta.</p></div></details>
+        <details><summary>¿Qué puedo comer si tengo náuseas o se me ha ido el apetito?</summary><div class="oc small"><p>Suele ayudar comer poca cantidad y más veces al día, elegir alimentos fríos o templados y con poco olor, y beber entre horas en lugar de durante las comidas. En consulta lo adaptamos a lo que te apetece y toleras en cada momento.</p></div></details>
+        <details><summary>¿Atiendes a pacientes de fuera de Valladolid?</summary><div class="oc small"><p>Sí. La consulta de nutrición oncológica online por videollamada está disponible desde cualquier lugar de España, con el mismo seguimiento que la presencial.</p></div></details>
         <details><summary>¿Puedo hacer la consulta online?</summary><div class="oc small"><p>Sí, por videollamada desde casa, con el mismo método y seguimiento que en la consulta de Valladolid.</p></div></details>
       </div>
     </section>

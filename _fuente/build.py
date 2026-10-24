@@ -22,13 +22,13 @@ HOY = datetime.date.today().isoformat()
 # slug de data-page -> (archivo, título, descripción, prioridad sitemap)
 PAGINAS = {
     'inicio': ('index.html',
-        'Nutricionista en Valladolid | Andrea Argüello · Nutriendo Hábitos',
-        'Dietista-nutricionista en Valladolid desde 2013. Consulta presencial y online: nutrición deportiva, nutrición oncológica, pérdida de peso y patología digestiva. Reserva tu cita.', '1.0'),
+        'Nutricionista en Valladolid · Consulta de nutrición | Nutriendo Hábitos',
+        'Nutrición en Valladolid con Andrea Argüello, dietista-nutricionista desde 2013: nutrición deportiva, nutrición oncológica, pérdida de peso y digestiva. Presencial y online. Reserva tu cita.', '1.0'),
     'dietista-nutricionista-en-valladolid': ('dietista-nutricionista-en-valladolid.html',
         'Dietista-nutricionista en Valladolid · Consulta y servicios | Nutriendo Hábitos',
         'Consulta de nutrición en Valladolid con Andrea Argüello: pérdida y ganancia de peso, nutrición deportiva, patologías digestivas, oncológica y vegetariana. Bioimpedancia y seguimiento.', '0.9'),
     'nutricion-deportiva-valladolid': ('nutricion-deportiva-valladolid.html',
-        'Nutrición deportiva en Valladolid | Nutricionista deportiva · Nutriendo Hábitos',
+        'Nutrición deportiva en Valladolid · Nutricionista deportiva | Nutriendo Hábitos',
         'Nutricionista deportiva en Valladolid y online: escalada, running, trail, ciclismo y fuerza. Alimentación antes, durante y después del entrenamiento, hidratación y composición corporal.', '0.9'),
     'nutricion-oncologica-valladolid': ('nutricion-oncologica-valladolid.html',
         'Nutrición oncológica en Valladolid y online | Nutriendo Hábitos',
@@ -180,6 +180,7 @@ NEGOCIO = {
                 'addressLocality': 'Valladolid', 'addressRegion': 'Castilla y León', 'addressCountry': 'ES'},
     'areaServed': [{'@type': 'City', 'name': 'Valladolid'}, {'@type': 'Country', 'name': 'España'}],
     'founder': {'@id': BASE + '#andrea'}, 'sameAs': ['https://www.instagram.com/nutrir_habitos/'],
+    'medicalSpecialty': 'DietNutrition', 'hasMap': MAPS,
     'knowsAbout': ['Nutrición deportiva', 'Nutrición oncológica', 'Pérdida de peso', 'Patología digestiva', 'SIBO', 'Celiaquía', 'Alimentación vegetariana y vegana', 'Dietética', 'Bioimpedancia'],
 }
 ANDREA = {'@type': 'Person', '@id': BASE + '#andrea', 'name': 'Andrea Argüello Arbe', 'jobTitle': 'Dietista-nutricionista',
@@ -288,9 +289,36 @@ admin = (OUT / 'reservas' / 'admin.php').read_text(encoding='utf-8').replace('hr
 
 # Página de error 404 (rutas absolutas: se muestra en cualquier dirección que no exista)
 (OUT / '404.html').write_text((SITE / '404.tpl.html').read_text(encoding='utf-8').replace('{{RAIZ}}', RAIZ), encoding='utf-8')
-(OUT / '.htaccess').write_text(f'# Nutriendo Hábitos\nErrorDocument 404 {RAIZ}404.html\n', encoding='utf-8')
+(OUT / '.htaccess').write_text(f'''# Nutriendo Hábitos
+ErrorDocument 404 {RAIZ}404.html
+
+# Comprimir texto (páginas más rápidas)
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/plain text/xml application/javascript application/json image/svg+xml
+</IfModule>
+
+# Guardar en caché imágenes y archivos que no cambian
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType image/webp "access plus 1 month"
+  ExpiresByType image/jpeg "access plus 1 month"
+  ExpiresByType image/png "access plus 1 month"
+  ExpiresByType application/javascript "access plus 1 month"
+  ExpiresByType application/wasm "access plus 1 month"
+  ExpiresByType text/html "access plus 0 seconds"
+</IfModule>
+''', encoding='utf-8')
 
 if MODO == 'definitiva':
+    # Una sola dirección para Google: sin «www» redirige a https://www.nutriendohabitos.es (la que usan canonical y sitemap)
+    ht = (OUT / '.htaccess').read_text(encoding='utf-8')
+    (OUT / '.htaccess').write_text('''<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTP_HOST} ^nutriendohabitos\\.es$ [NC]
+  RewriteRule ^ https://www.nutriendohabitos.es%{REQUEST_URI} [L,R=301]
+</IfModule>
+
+''' + ht, encoding='utf-8')
     urls = ''.join(f'  <url><loc>{BASE if a == "index.html" else BASE + a}</loc><lastmod>{HOY}</lastmod><priority>{p}</priority></url>\n'
                    for s_, (a, t, d, p) in PAGINAS.items() if s_ != 'proteccion-de-datos')
     (OUT / 'sitemap.xml').write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + urls + '</urlset>\n', encoding='utf-8')
