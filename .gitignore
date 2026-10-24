@@ -1,3 +1,4 @@
 reservas/datos/*.json.php
 reservas/datos/.limite_*
 reservas/datos/.cerrojo
+_fuente/build/
