@@ -287,6 +287,35 @@ shutil.copytree(SITE / 'reservas', OUT / 'reservas', ignore=shutil.ignore_patter
 admin = (OUT / 'reservas' / 'admin.php').read_text(encoding='utf-8').replace('href="../#reservar"', 'href="../reservar.html"')
 (OUT / 'reservas' / 'admin.php').write_text(admin, encoding='utf-8')
 
+# llms.txt: resumen en texto claro para ChatGPT, Claude, Perplexity y otros asistentes
+LLMS = f"""# Nutriendo Hábitos · Andrea Argüello Arbe, nutricionista en Valladolid
+
+> Consulta de dietética y nutrición en Valladolid (Calle Gregorio Fernández, 4, 47006) y online para toda España. Andrea Argüello Arbe es dietista-nutricionista desde 2013, diplomada en Nutrición Humana y Dietética (Universidad de Valladolid), con Máster en Nutrición (Universidad de Barcelona) y Máster en Nutrición Oncológica (2026). Miembro del Equipo Sputnik y de Sputnik Investigación (escalada).
+
+Especialidades: nutrición deportiva (escalada, running, trail, ciclismo, fuerza), nutrición oncológica (antes, durante y después del tratamiento del cáncer), pérdida y ganancia de peso, patologías digestivas (SIBO, intestino irritable, dieta FODMAP, intolerancias, DAO, celiaquía, Crohn, reflujo), alimentación vegetariana y vegana, diabetes, TCA, alimentación infantil y educación nutricional. Composición corporal con bioimpedancia en cada consulta. Primera consulta de unos 75 minutos; revisiones de unos 45 minutos.
+
+Contacto: teléfono y WhatsApp 669 87 70 52 · nutricion.arguello@gmail.com · reserva online de citas presenciales y por videollamada.
+
+## Especialidades
+- [Nutricionista en Valladolid: servicios y consulta]({BASE}dietista-nutricionista-en-valladolid.html)
+- [Nutrición deportiva en Valladolid]({BASE}nutricion-deportiva-valladolid.html)
+- [Nutrición oncológica en Valladolid y online]({BASE}nutricion-oncologica-valladolid.html)
+- [Pérdida y ganancia de peso]({BASE}perdida-de-peso-valladolid.html)
+- [Patologías digestivas: SIBO, intolerancias, celiaquía]({BASE}patologias-digestivas-valladolid.html)
+- [Alimentación vegetariana y vegana]({BASE}alimentacion-vegetariana-vegana-valladolid.html)
+- [Consulta de nutrición online]({BASE}nutricionista-online.html)
+
+## Reservar y contactar
+- [Reservar cita (calendario online)]({BASE}reservar.html)
+- [Contacto y ubicación]({BASE}contacto.html)
+
+## Más
+- [Asesoría nutricional para colegios, comedores y empresas]({BASE}asesoria-externa.html)
+- [Cursos y talleres de nutrición]({BASE}cursos-talleres.html)
+- [Blog de nutrición]({BASE}blog-nutricion.html)
+"""
+(OUT / 'llms.txt').write_text(LLMS, encoding='utf-8')
+
 # Página de error 404 (rutas absolutas: se muestra en cualquier dirección que no exista)
 (OUT / '404.html').write_text((SITE / '404.tpl.html').read_text(encoding='utf-8').replace('{{RAIZ}}', RAIZ), encoding='utf-8')
 (OUT / '.htaccess').write_text(f'''# Nutriendo Hábitos
