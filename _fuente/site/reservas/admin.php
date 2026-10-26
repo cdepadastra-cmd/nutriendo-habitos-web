@@ -807,8 +807,18 @@ input,select{height:2.4rem;border:1px solid var(--border);border-radius:.6rem;ba
 .cobro-w select{height:2rem;width:auto;font-size:.8rem;padding:0 .5rem}
 .cobro-w input{height:2rem;width:5rem;font-size:.8rem;padding:0 .5rem;text-align:right}
 .cobro-w .lnk,.lnk{border:0;background:none;color:var(--primary);font-size:.78rem;cursor:pointer;padding:0;text-decoration:underline}
+.resumen{display:grid;gap:.6rem;border:1px solid var(--border);border-radius:.9rem;padding:.9rem 1rem;background:color-mix(in oklab,var(--secondary) 35%,var(--card))}
+.resumen h3{font-size:.8rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-fg);margin:0}
+.resumen .fila{display:flex;flex-wrap:wrap;gap:.5rem;align-items:stretch}
+.resumen .fila span{background:var(--card);border:1px solid var(--border);border-radius:.7rem;padding:.4rem .7rem;font-size:.8rem;min-width:7.5rem}
+.resumen .fila b{display:block;font-size:1.05rem;font-variant-numeric:tabular-nums;color:var(--fg)}
+.resumen .fila span.tot{background:var(--primary);border-color:var(--primary);color:var(--primary-fg)}
+.resumen .fila span.tot b{color:var(--primary-fg)}
+.resumen .gran{display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid var(--border);padding-top:.6rem;font-weight:600}
+.resumen .gran b{font-size:1.3rem;font-variant-numeric:tabular-nums;color:var(--primary)}
 .totales{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:.8rem}
-.totales span{background:var(--muted);border-radius:.7rem;padding:.45rem .7rem;font-size:.82rem}
+.totales span{background:var(--muted);border-radius:.7rem;padding:.45rem .7rem;font-size:.82rem;min-width:7rem}
+.totales span.tot{background:var(--primary);color:var(--primary-fg)}
 .totales b{display:block;font-size:1.05rem;font-variant-numeric:tabular-nums}
 .venta{display:flex;flex-wrap:wrap;gap:.3rem 1rem;align-items:center;padding:.6rem .75rem;border-radius:.7rem;background:var(--muted);margin:.35rem 0}
 .venta .q{flex:1;min-width:12rem}.venta small{display:block;color:var(--muted-fg)}
@@ -1083,10 +1093,12 @@ Viernes 14/11
         <div class="row" style="align-items:end">
           <label for="h-q" style="flex:2 1 16rem">Buscar paciente<input id="h-q" type="search" placeholder="Nombre, apellidos, teléfono o email" autocomplete="off"></label>
           <label for="h-est" style="flex:1 1 10rem">Mostrar<select id="h-est"><option value="todas">Todas</option><option value="pendiente">Pendientes</option><option value="confirmada">Confirmadas</option><option value="cancelada">Anuladas</option></select></label>
+          <label for="h-mes" style="flex:1 1 10rem">Mes<select id="h-mes"><option value="todos">Todos los meses</option></select></label>
           <label for="h-cuando" style="flex:1 1 10rem">Fechas<select id="h-cuando"><option value="todas">Todas</option><option value="pasadas">Pasadas</option><option value="proximas">Próximas</option></select></label>
           <button class="btn" type="button" id="h-excel" style="flex:0 0 auto">Descargar en Excel</button>
         </div>
         <p class="muted" id="h-count" style="margin:0"></p>
+        <div class="resumen" id="h-resumen"></div>
         <div class="tbl-wrap"><table class="tbl">
           <thead><tr><th>Fecha</th><th>Hora</th><th>Consulta</th><th>Paciente</th><th>Contacto</th><th>Estado</th><th>Cobro</th></tr></thead>
           <tbody id="h-body"></tbody>
@@ -1481,7 +1493,7 @@ Viernes 14/11
     msel.value = ms.indexOf(mv) >= 0 || mv === 'todas' ? mv : ms[0];
     var lista = ventas.filter(function(v){ return msel.value === 'todas' || v.fecha.slice(0, 7) === msel.value; });
     var tot = { total: 0 }; lista.forEach(function(v){ if (v.anulada) return; tot.total += +v.total; tot[v.metodo] = (tot[v.metodo] || 0) + (+v.total); });
-    $('v-totales').innerHTML = '<span>Total<b>' + euros(tot.total) + '</b></span>' + ['efectivo', 'datafono', 'bizum'].filter(function(m){ return tot[m]; }).map(function(m){ return '<span>' + esc(D.metodos[m]) + '<b>' + euros(tot[m]) + '</b></span>'; }).join('');
+    $('v-totales').innerHTML = ['efectivo', 'datafono', 'bizum'].map(function(m){ return '<span>' + esc(NOMBRE_MET[m]) + '<b>' + euros(tot[m] || 0) + '</b></span>'; }).join('') + '<span class="tot">Total' + (msel.value === 'todas' ? '' : ' del mes') + '<b>' + euros(tot.total) + '</b></span>';
     $('v-lista').innerHTML = lista.length ? lista.map(function(v){
       return '<div class="venta' + (v.anulada ? ' anulada' : '') + '"><span class="q">' + esc(v.producto) + ' × ' + (+v.unidades) + '<small>' + esc(v.cliente) + ' · ' + esc(new Date(v.fecha).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })) + ' · ' + esc(D.metodos[v.metodo] || v.metodo) + (v.nota ? ' · ' + esc(v.nota) : '') + (v.anulada ? ' · ANULADA' : '') + '</small></span><span class="t">' + esc(euros(v.total)) + '</span>' +
         (v.anulada ? '' : '<button class="btn danger sm" type="button" data-vanular="' + esc(v.id) + '">Anular</button>') + '</div>';
@@ -1877,6 +1889,40 @@ Viernes 14/11
   /* ---------- historial ---------- */
   var HIST = null;
   function norm(t){ return String(t || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, ' '); }
+  /* ---------- resumen de cobros (consultas + productos) ---------- */
+  var ORDEN_MET = ['efectivo', 'datafono', 'online', 'bizum'];
+  var NOMBRE_MET = { efectivo: 'Efectivo', datafono: 'Datáfono (tarjeta)', online: 'Pagado online (tarjeta)', bizum: 'Bizum / transferencia' };
+  function nombreMes(m){ var t = new Date(m + '-15T12:00:00').toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }); return t.charAt(0).toUpperCase() + t.slice(1); }
+  function pintarMesesHist(){
+    var sel = $('h-mes'), v = sel.value, ms = {};
+    (HIST.citas || []).forEach(function(c){ ms[c.fecha.slice(0, 7)] = 1; });
+    ((D && D.tienda && D.tienda.ventas) || []).forEach(function(x){ ms[x.fecha.slice(0, 7)] = 1; });
+    var lista = Object.keys(ms).sort().reverse();
+    var html = '<option value="todos">Todos los meses</option>' + lista.map(function(m){ return '<option value="' + m + '">' + esc(nombreMes(m)) + '</option>'; }).join('');
+    if (sel.innerHTML !== html) { sel.innerHTML = html; sel.value = lista.indexOf(v) >= 0 ? v : 'todos'; }
+  }
+  function sumaCobros(items){ var t = { total: 0, n: 0 }; items.forEach(function(x){ t[x.m] = (t[x.m] || 0) + x.v; t.total += x.v; t.n++; }); return t; }
+  function filaResumen(t){
+    return '<div class="fila">' + ORDEN_MET.filter(function(m){ return t[m]; }).map(function(m){ return '<span>' + esc(NOMBRE_MET[m]) + '<b>' + euros(t[m]) + '</b></span>'; }).join('') +
+      '<span class="tot">Total<b>' + euros(t.total) + '</b></span></div>';
+  }
+  function pintarResumen(lista, q, mes){
+    var cons = sumaCobros(lista.filter(function(c){ return c.estado !== 'cancelada' && c.pago && c.pago.estado === 'pagado'; }).map(function(c){ return { m: c.pago.metodo, v: +c.pago.importe || 0 }; }));
+    var ventas = ((D && D.tienda && D.tienda.ventas) || []).filter(function(x){
+      if (x.anulada) return false;
+      if (mes !== 'todos' && x.fecha.slice(0, 7) !== mes) return false;
+      return !q || norm(x.cliente).indexOf(q) >= 0;
+    });
+    var prod = sumaCobros(ventas.map(function(x){ return { m: x.metodo, v: +x.total || 0 }; }));
+    var todo = { total: cons.total + prod.total }; ORDEN_MET.forEach(function(m){ var v = (cons[m] || 0) + (prod[m] || 0); if (v) todo[m] = v; });
+    var pend = lista.filter(function(c){ return c.estado !== 'cancelada' && c.fecha < HIST.hoy && !(c.pago && c.pago.estado === 'pagado'); }).length;
+    $('h-resumen').innerHTML =
+      '<h3>Cobrado en consultas' + (cons.n ? ' · ' + cons.n + (cons.n === 1 ? ' cita' : ' citas') : '') + '</h3>' + (cons.n ? filaResumen(cons) : '<p class="muted" style="margin:0;font-size:.85rem">Sin cobros marcados.</p>') +
+      '<h3>Ventas de productos' + (prod.n ? ' · ' + prod.n + (prod.n === 1 ? ' venta' : ' ventas') : '') + '</h3>' + (prod.n ? filaResumen(prod) : '<p class="muted" style="margin:0;font-size:.85rem">Sin ventas.</p>') +
+      '<h3>Todo junto por forma de pago</h3>' + filaResumen(todo) +
+      '<div class="gran"><span>Total cobrado' + (mes !== 'todos' ? ' en ' + esc(nombreMes(mes).toLowerCase()) : '') + '</span><b>' + euros(todo.total) + '</b></div>' +
+      (pend ? '<p class="muted" style="margin:0;font-size:.8rem">Hay ' + pend + (pend === 1 ? ' cita pasada sin cobro marcado.' : ' citas pasadas sin cobro marcado.') + '</p>' : '');
+  }
   function cargarHistorial(){
     return api('historial').then(function(r){ if (!r.ok) return toast(errTxt(r)); HIST = r; pintarHistorial(); });
   }
@@ -1887,14 +1933,17 @@ Viernes 14/11
   }
   function pintarHistorial(){
     if (!HIST) return;
-    var q = norm($('h-q').value.trim()), est = $('h-est').value, cuando = $('h-cuando').value;
+    pintarMesesHist();
+    var q = norm($('h-q').value.trim()), est = $('h-est').value, cuando = $('h-cuando').value, mes = $('h-mes').value;
     var lista = HIST.citas.filter(function(c){
       if (est !== 'todas' && c.estado !== est) return false;
+      if (mes !== 'todos' && c.fecha.slice(0, 7) !== mes) return false;
       if (cuando === 'pasadas' && c.fecha >= HIST.hoy) return false;
       if (cuando === 'proximas' && c.fecha < HIST.hoy) return false;
       if (!q) return true;
       return norm([c.nombre, c.apellidos, c.telefono, c.email].join(' ')).indexOf(q) >= 0 || norm(c.telefono).replace(/\D/g, '').indexOf(q.replace(/\D/g, '') || '§') >= 0;
     });
+    pintarResumen(lista, q, mes);
     var n = function(e){ return lista.filter(function(c){ return c.estado === e; }).length; };
     var conf = n('confirmada'), pe = n('pendiente'), an = n('cancelada');
     $('h-count').textContent = lista.length ? lista.length + (lista.length === 1 ? ' cita' : ' citas') + ' · ' + conf + ' confirmada' + (conf === 1 ? '' : 's') + ', ' + pe + ' pendiente' + (pe === 1 ? '' : 's') + ', ' + an + ' anulada' + (an === 1 ? '' : 's') : '';
@@ -1907,7 +1956,7 @@ Viernes 14/11
         '<td><span class="est ' + EST[0] + '">' + EST[1] + '</span></td><td>' + (ok ? esc(textoCobro(c)) : '') + '</td></tr>';
     }).join('') : '<tr><td colspan="7" class="muted" style="text-align:center;padding:1.5rem">' + (HIST.citas.length ? 'No hay citas que coincidan con la búsqueda.' : 'Todavía no hay ninguna cita.') + '</td></tr>';
   }
-  ['h-q', 'h-est', 'h-cuando'].forEach(function(id){ $(id).addEventListener('input', pintarHistorial); });
+  ['h-q', 'h-est', 'h-cuando', 'h-mes'].forEach(function(id){ $(id).addEventListener('input', pintarHistorial); });
   document.querySelector('[data-tab="historial"]').addEventListener('click', cargarHistorial);
 
   /* ---------- contraseña ---------- */
