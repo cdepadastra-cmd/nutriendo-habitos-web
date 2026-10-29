@@ -8,9 +8,8 @@
 header('Content-Type: application/json; charset=utf-8');
 header('X-Content-Type-Options: nosniff');
 
-const DESTINO   = 'nutricion.arguello@gmail.com';
+require __DIR__ . '/reservas/lib.php';         // DESTINO, envío de correo (Gmail o correo del hosting)
 const ASUNTO    = 'RESERVA WEB';
-const REMITENTE = 'web@nutriendohabitos.es';   // dirección del propio dominio
 const MAX_POR_HORA = 5;                        // envíos por IP y hora (anti-spam)
 
 function responder(bool $ok, int $codigo = 200, string $error = ''): void {
@@ -80,22 +79,6 @@ $cuerpo = "Nueva solicitud de cita desde la web\n\n"
         . "Ha aceptado la información sobre protección de datos.\n"
         . "Enviado el " . date('d/m/Y \a \l\a\s H:i') . "\n";
 
-$cabeceras = [
-    'From: =?UTF-8?B?' . base64_encode('Web Nutriendo Hábitos') . '?= <' . REMITENTE . '>',
-    'Reply-To: ' . $email,
-    'MIME-Version: 1.0',
-    'Content-Type: text/plain; charset=UTF-8',
-    'Content-Transfer-Encoding: 8bit',
-];
-
-$enviado = false;
-if (function_exists('mail')) {
-    try {
-        $enviado = @mail(DESTINO, '=?UTF-8?B?' . base64_encode(ASUNTO) . '?=', $cuerpo,
-                         implode("\r\n", $cabeceras), '-f' . REMITENTE);
-    } catch (Throwable $e) {
-        error_log('Formulario Nutriendo Hábitos: ' . $e->getMessage());
-    }
-}
+$enviado = enviar_correo(DESTINO, ASUNTO, $cuerpo, $email);
 
 responder($enviado, $enviado ? 200 : 500, $enviado ? '' : 'envio');

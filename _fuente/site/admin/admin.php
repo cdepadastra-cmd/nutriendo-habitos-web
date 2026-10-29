@@ -207,6 +207,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'precio' => importe((string)$cfg['precio']), 'pago_online' => !empty($cfg['pago_online']), 'redsys_listo' => redsys_listo($cfg),
                 'redsys' => ['comercio' => $cfg['redsys']['comercio'], 'terminal' => $cfg['redsys']['terminal'], 'entorno' => $cfg['redsys']['entorno'], 'clave' => $cfg['redsys']['clave'] !== ''],
                 'sheets' => ['url' => $cfg['sheets']['url'], 'token' => token_sheets()],
+                'smtp' => ['usuario' => $cfg['smtp']['usuario'], 'clave' => $cfg['smtp']['clave'] !== '', 'destino' => DESTINO, 'correo_hosting' => function_exists('mail')],
                 'metodos' => METODOS_PAGO, 'tienda' => cargar_tienda(), 'clientes' => lista_clientes()]);
 
         case 'guardar_horario':
@@ -594,6 +595,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 json_salida(['ok' => false, 'error' => 'redsys_incompleto'], 422);
             }
             json_salida(['ok' => true]);
+
+        case 'smtp_guardar':
+            // Cuenta de Gmail para enviar los correos de la web (contraseña de aplicación de Google)
+            $u = strtolower(trim((string)($in['usuario'] ?? '')));
+            $k = preg_replace('/\s+/', '', (string)($in['clave'] ?? ''));
+            if ($u !== '' && !filter_var($u, FILTER_VALIDATE_EMAIL)) {
+                json_salida(['ok' => false, 'error' => 'datos'], 422);
+            }
+            if ($k !== '' && !preg_match('/^[a-zA-Z]{16}$/', $k)) {
+                json_salida(['ok' => false, 'error' => 'clave_app'], 422);
+            }
+            con_cerrojo(function () use ($u, $k) {
+                $c = cargar_config();
+                $c['smtp']['usuario'] = $u;
+                if ($k !== '') {
+                    $c['smtp']['clave'] = $k;
+                }
+                if ($u === '') {
+                    $c['smtp']['clave'] = '';
+                }
+                guardar_datos('config', $c);
+            });
+            json_salida(['ok' => true]);
+
+        case 'smtp_probar':
+            $smtp = cargar_config()['smtp'];
+            if ($smtp['usuario'] === '' || $smtp['clave'] === '') {
+                $ok = enviar_correo(DESTINO, 'Prueba de correo · ' . NOMBRE_WEB, "Correo de prueba enviado desde el panel de reservas.\n");
+                json_salida(['ok' => $ok, 'error' => $ok ? null : 'correo_hosting']);
+            }
+            $err = smtp_enviar($smtp, DESTINO, 'Prueba de correo · ' . NOMBRE_WEB,
+                "¡Funciona! Los correos de la web (reservas, recordatorios, recuperar contraseña…) se envían ahora desde {$smtp['usuario']}.\n");
+            json_salida(['ok' => $err === '', 'error' => $err === '' ? null : 'smtp', 'detalle' => $err === '' ? null : mb_substr($err, 0, 160)]);
 
         case 'sheets_guardar':
             $url = trim((string)($in['url'] ?? ''));
@@ -1265,6 +1299,22 @@ Viernes 14/11
           <div><button class="btn" type="button" id="b-guardar-g">Guardar</button></div>
         </div>
         <div class="card" style="display:grid;gap:.7rem;align-content:start">
+          <h2 style="font-size:1.2rem">Envío de correos</h2>
+          <p class="msg" id="m-estado"></p>
+          <p class="muted" style="margin:0;font-size:.85rem">Los avisos de reservas, los recordatorios y el enlace para recuperar la contraseña se envían con tu cuenta de Gmail. Google pide una <b>contraseña de aplicación</b> (no es tu contraseña normal):</p>
+          <details class="ej"><summary>Cómo conseguir la contraseña de aplicación</summary>
+            <ol class="pasos">
+              <li>Entra en Google con <b>nutricion.arguello@gmail.com</b>. Necesita tener activada la <b>verificación en dos pasos</b> (Cuenta de Google → Seguridad).</li>
+              <li>Abre <a href="https://myaccount.google.com/apppasswords" target="_blank" rel="noopener">myaccount.google.com/apppasswords</a>, escribe un nombre (por ejemplo «Web Nutriendo Hábitos») y pulsa <b>Crear</b>.</li>
+              <li>Google muestra 16 letras. Cópialas, pégalas aquí abajo y pulsa «Guardar y enviar prueba».</li>
+            </ol>
+          </details>
+          <label for="m-usuario">Cuenta de Gmail<input id="m-usuario" type="email" autocomplete="off" placeholder="nutricion.arguello@gmail.com"></label>
+          <label for="m-clave">Contraseña de aplicación (16 letras)<input id="m-clave" type="password" autocomplete="off" placeholder="xxxx xxxx xxxx xxxx"></label>
+          <p class="msg err" id="m-err" hidden></p>
+          <div><button class="btn" type="button" id="b-smtp">Guardar y enviar prueba</button></div>
+        </div>
+        <div class="card" style="display:grid;gap:.7rem;align-content:start">
           <h2 style="font-size:1.2rem">Copia en Google Sheets</h2>
           <p class="muted" style="margin:0" id="s-estado"></p>
           <details class="ej"><summary>Cómo conectarla (solo una vez)</summary>
@@ -1328,7 +1378,7 @@ Viernes 14/11
     return d.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
   }
   function fechaCorta(f){ var d = new Date(f + 'T12:00:00'); return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }); }
-  var ERR_EXTRA = { enlace: 'El enlace ha caducado o ya se ha usado. Vuelve a pedir otro desde «¿Has olvidado tu contraseña?».', limite_olvido: 'Ya se han enviado varios correos. Espera una hora y vuelve a probar.', correo: 'No se ha podido enviar el correo. Prueba más tarde.', importe: 'Pon un importe válido (por ejemplo 45 o 45,50).', pagado_online: 'Esta cita ya está pagada online y no se puede cambiar a mano.', clave_redsys: 'La clave secreta de Redsys no parece correcta: cópiala tal cual te la da el banco.', redsys_incompleto: 'Para activar el pago online faltan datos: precio, número de comercio, terminal y clave secreta.', url_sheets: 'La dirección tiene que ser la de la aplicación web de Apps Script (empieza por https://script.google.com/macros/s/ y termina en /exec).', sheets: 'No se ha podido conectar con la hoja de Google. Revisa que la implementación sea «Aplicación web» con acceso «Cualquier usuario» y que hayas pegado el código completo.', stock: 'No hay unidades suficientes en stock.', no_encontrada: 'No se ha encontrado. Recarga la página.' };
+  var ERR_EXTRA = { clave_app: 'La contraseña de aplicación son 16 letras (puedes pegarla con o sin espacios).', smtp: 'Gmail no ha aceptado el envío.', correo_hosting: 'El correo de tu hosting no funciona: configura aquí la cuenta de Gmail.', enlace: 'El enlace ha caducado o ya se ha usado. Vuelve a pedir otro desde «¿Has olvidado tu contraseña?».', limite_olvido: 'Ya se han enviado varios correos. Espera una hora y vuelve a probar.', correo: 'No se ha podido enviar el correo. Prueba más tarde.', importe: 'Pon un importe válido (por ejemplo 45 o 45,50).', pagado_online: 'Esta cita ya está pagada online y no se puede cambiar a mano.', clave_redsys: 'La clave secreta de Redsys no parece correcta: cópiala tal cual te la da el banco.', redsys_incompleto: 'Para activar el pago online faltan datos: precio, número de comercio, terminal y clave secreta.', url_sheets: 'La dirección tiene que ser la de la aplicación web de Apps Script (empieza por https://script.google.com/macros/s/ y termina en /exec).', sheets: 'No se ha podido conectar con la hoja de Google. Revisa que la implementación sea «Aplicación web» con acceso «Cualquier usuario» y que hayas pegado el código completo.', stock: 'No hay unidades suficientes en stock.', no_encontrada: 'No se ha encontrado. Recarga la página.' };
   var ERR = { password: 'Contraseña incorrecta.', limite: 'Demasiados intentos. Espera 15 minutos y vuelve a probar.', corta: 'La contraseña debe tener al menos 8 caracteres.', ocupado: 'Ese hueco ya tiene una cita.', datos: 'Revisa los datos: falta algo o no es válido.', red: 'No hay conexión con el servidor.', sesion: 'La sesión ha caducado. Recarga la página.', no_autorizado: 'La sesión ha caducado. Recarga la página.', tramo: 'Hay un tramo con la hora de fin antes que la de inicio.', escritura: 'El servidor no deja guardar datos en la carpeta reservas/datos. En el administrador de archivos de DonDominio, pon permisos 755 a las carpetas «reservas» y «datos».', servidor: 'Ha fallado algo en el servidor. Prueba otra vez en un momento.' };
   function errTxt(r){ return (ERR[r && r.error] || ERR_EXTRA[r && r.error] || 'No se ha podido guardar. Prueba otra vez.') + (r && r.detalle ? ' [' + r.detalle + ']' : ''); }
 
@@ -1522,7 +1572,27 @@ Viernes 14/11
     '}',
     'function salida(o) { return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON); }'
   ].join('\n');
+  function pintarCorreo(){
+    var m = D.smtp || {}, est = $('m-estado');
+    if (document.activeElement && /^m-(usuario|clave)$/.test(document.activeElement.id)) return;
+    $('m-usuario').value = m.usuario || ''; $('m-clave').value = '';
+    $('m-clave').placeholder = m.clave ? 'Guardada ✓ (escribe solo para cambiarla)' : 'xxxx xxxx xxxx xxxx';
+    if (m.usuario && m.clave) { est.className = 'msg ok'; est.textContent = 'Los correos se envían con ' + m.usuario + '.'; }
+    else { est.className = 'msg err'; est.textContent = 'Sin configurar: ' + (m.correo_hosting ? 'se intenta con el correo del hosting, que puede no llegar.' : 'tu hosting no permite enviar correos, así que ahora mismo NO salen (avisos, recordatorios ni recuperar contraseña).'); }
+  }
+  $('b-smtp').addEventListener('click', function(){
+    var b = this, err = $('m-err'); err.hidden = true; b.disabled = true; b.textContent = 'Enviando prueba…';
+    api('smtp_guardar', { usuario: $('m-usuario').value.trim() || (D.smtp && D.smtp.destino) || '', clave: $('m-clave').value }).then(function(r){
+      if (!r.ok) throw r;
+      return api('smtp_probar');
+    }).then(function(r){
+      if (!r.ok) throw r;
+      err.className = 'msg ok'; err.textContent = '¡Correo de prueba enviado! Mira la bandeja de ' + ((D.smtp && D.smtp.destino) || 'tu correo') + '.'; err.hidden = false; $('m-clave').value = ''; cargar();
+    }).catch(function(r){ err.className = 'msg err'; err.textContent = errTxt(r || {}); err.hidden = false; })
+      .then(function(){ b.disabled = false; b.textContent = 'Guardar y enviar prueba'; });
+  });
   function pintarAjustesPago(){
+    pintarCorreo();
     if (document.activeElement && /^g-|^s-url/.test(document.activeElement.id)) return;
     $('g-precio').value = (D.precio || '').replace('.', ',');
     $('g-on').checked = !!D.pago_online; $('g-com').value = D.redsys.comercio || ''; $('g-ter').value = D.redsys.terminal || '1'; $('g-ent').value = D.redsys.entorno || 'pruebas';

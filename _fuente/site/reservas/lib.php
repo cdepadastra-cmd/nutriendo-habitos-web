@@ -130,6 +130,7 @@ function config_por_defecto(): array {
         'pago_online'      => false, // pago con tarjeta al reservar (Redsys); apagado hasta tener los datos del banco
         'redsys'           => ['comercio' => '', 'terminal' => '1', 'clave' => '', 'entorno' => 'pruebas'],
         'sheets'           => ['url' => '', 'token' => ''],   // copia en Google Sheets
+        'smtp'             => ['usuario' => '', 'clave' => '', 'servidor' => 'smtp.gmail.com', 'puerto' => 465],   // envío de correos con Gmail
     ];
 }
 
@@ -284,6 +285,11 @@ function choca_con_cita(array $reservas, string $fecha, string $hora, string $ig
 /* ---------- correo ---------- */
 
 function enviar_correo(string $para, string $asunto, string $cuerpo, string $responderA = ''): bool {
+    $smtp = cargar_config()['smtp'];
+    if ($smtp['usuario'] !== '' && $smtp['clave'] !== '') {
+        return smtp_enviar($smtp, $para, $asunto, $cuerpo, $responderA) === '';
+    }
+    // Sin Gmail configurado: correo del propio hosting (algunos hostings lo tienen desactivado)
     $cab = [
         'From: =?UTF-8?B?' . base64_encode('Web ' . NOMBRE_WEB) . '?= <' . REMITENTE . '>',
         'MIME-Version: 1.0',
@@ -303,6 +309,64 @@ function enviar_correo(string $para, string $asunto, string $cuerpo, string $res
         error_log('Reservas Nutriendo Hábitos: fallo al enviar correo: ' . $e->getMessage());
         return false;
     }
+}
+
+/**
+ * Envía un correo por SMTP con la cuenta de Gmail de la consulta (contraseña de aplicación).
+ * Devuelve '' si ha ido bien o un texto con el motivo del fallo.
+ */
+function smtp_enviar(array $smtp, string $para, string $asunto, string $cuerpo, string $responderA = ''): string {
+    $host = (string)$smtp['servidor'];
+    $puerto = (int)$smtp['puerto'] ?: 465;
+    $local = in_array($host, ['127.0.0.1', 'localhost'], true);   // solo para pruebas en local
+    $ctx = stream_context_create(['ssl' => ['verify_peer' => !$local, 'verify_peer_name' => !$local, 'allow_self_signed' => $local]]);
+    $fp = @stream_socket_client('ssl://' . $host . ':' . $puerto, $errno, $errstr, 12, STREAM_CLIENT_CONNECT, $ctx);
+    if (!$fp) {
+        return 'No se puede conectar con ' . $host . ' (' . $errstr . ')';
+    }
+    stream_set_timeout($fp, 15);
+    $leer = function () use ($fp): string {
+        $r = '';
+        while (($l = fgets($fp, 1024)) !== false) {
+            $r .= $l;
+            if (strlen($l) < 4 || $l[3] === ' ') {
+                break;
+            }
+        }
+        return $r;
+    };
+    $paso = function (?string $cmd, array $codigos) use ($fp, $leer): string {
+        if ($cmd !== null) {
+            fwrite($fp, $cmd . "\r\n");
+        }
+        $r = $leer();
+        return in_array((int)substr($r, 0, 3), $codigos, true) ? '' : (trim($r) ?: 'sin respuesta');
+    };
+    $usuario = (string)$smtp['usuario'];
+    $from = '=?UTF-8?B?' . base64_encode(NOMBRE_WEB) . '?= <' . $usuario . '>';
+    $cab = 'From: ' . $from . "\r\nTo: <" . $para . ">\r\nSubject: =?UTF-8?B?" . base64_encode($asunto) . "?=\r\n"
+         . 'Date: ' . date('r') . "\r\nMessage-ID: <" . bin2hex(random_bytes(8)) . '@nutriendohabitos.es>' . "\r\n"
+         . (filter_var($responderA, FILTER_VALIDATE_EMAIL) ? 'Reply-To: <' . $responderA . ">\r\n" : '')
+         . "MIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n";
+    $datos = $cab . "\r\n" . chunk_split(base64_encode($cuerpo), 76, "\r\n");
+    $err = $paso(null, [220])
+        ?: $paso('EHLO nutriendohabitos.es', [250])
+        ?: $paso('AUTH LOGIN', [334])
+        ?: $paso(base64_encode($usuario), [334])
+        ?: $paso(base64_encode(str_replace(' ', '', (string)$smtp['clave'])), [235])
+        ?: $paso('MAIL FROM:<' . $usuario . '>', [250])
+        ?: $paso('RCPT TO:<' . $para . '>', [250, 251])
+        ?: $paso('DATA', [354])
+        ?: $paso($datos . '.', [250]);
+    @fwrite($fp, "QUIT\r\n");
+    fclose($fp);
+    if ($err !== '') {
+        error_log('Reservas Nutriendo Hábitos: SMTP: ' . $err);
+        if (strpos($err, '535') === 0 || stripos($err, 'Username and Password') !== false) {
+            return 'Gmail no acepta el usuario o la contraseña de aplicación.';
+        }
+    }
+    return $err;
 }
 
 function texto_cita(array $r): string {
