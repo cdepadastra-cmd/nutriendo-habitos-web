@@ -407,9 +407,7 @@ function url_web(): string {
 }
 
 function url_panel(): string {
-    $host = host_web();
-    $dir = rtrim(str_replace('\\', '/', dirname((string)($_SERVER['SCRIPT_NAME'] ?? '/reservas/api.php'))), '/');
-    return 'https://' . $host . $dir . '/admin.php';
+    return url_web() . 'admin/admin.php';
 }
 
 /* ---------- límite de peticiones por IP ---------- */

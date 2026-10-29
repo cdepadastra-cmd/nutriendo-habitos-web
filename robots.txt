@@ -1,6 +1,7 @@
 User-agent: *
 Allow: /
 Disallow: /reservas/
+Disallow: /admin/
 Disallow: /nueva/
 Disallow: /NUEVA/
 

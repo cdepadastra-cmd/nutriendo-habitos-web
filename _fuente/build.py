@@ -284,8 +284,9 @@ for slug, (archivo, titulo, desc, _prio) in PAGINAS.items():
 shutil.copytree(SITE / 'img', OUT / 'img')
 shutil.copy(SITE / 'enviar.php', OUT / 'enviar.php')
 shutil.copytree(SITE / 'reservas', OUT / 'reservas', ignore=shutil.ignore_patterns('*.json.php', '.limite_*', '.cerrojo'))
-admin = (OUT / 'reservas' / 'admin.php').read_text(encoding='utf-8').replace('href="../#reservar"', 'href="../reservar.html"')
-(OUT / 'reservas' / 'admin.php').write_text(admin, encoding='utf-8')
+shutil.copytree(SITE / 'admin', OUT / 'admin')
+admin = (OUT / 'admin' / 'admin.php').read_text(encoding='utf-8').replace('href="../#reservar"', 'href="../reservar.html"')
+(OUT / 'admin' / 'admin.php').write_text(admin, encoding='utf-8')
 
 # llms.txt: resumen en texto claro para ChatGPT, Claude, Perplexity y otros asistentes
 LLMS = f"""# Nutriendo Hábitos · Andrea Argüello Arbe, nutricionista en Valladolid
@@ -351,6 +352,6 @@ if MODO == 'definitiva':
     urls = ''.join(f'  <url><loc>{BASE if a == "index.html" else BASE + a}</loc><lastmod>{HOY}</lastmod><priority>{p}</priority></url>\n'
                    for s_, (a, t, d, p) in PAGINAS.items() if s_ != 'proteccion-de-datos')
     (OUT / 'sitemap.xml').write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + urls + '</urlset>\n', encoding='utf-8')
-    (OUT / 'robots.txt').write_text(f'User-agent: *\nAllow: /\nDisallow: /reservas/\nDisallow: /nueva/\nDisallow: /NUEVA/\n\nSitemap: {BASE}sitemap.xml\n', encoding='utf-8')
+    (OUT / 'robots.txt').write_text(f'User-agent: *\nAllow: /\nDisallow: /reservas/\nDisallow: /admin/\nDisallow: /nueva/\nDisallow: /NUEVA/\n\nSitemap: {BASE}sitemap.xml\n', encoding='utf-8')
 
 print(MODO, '->', OUT, '|', len(PAGINAS), 'páginas')
