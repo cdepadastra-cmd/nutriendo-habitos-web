@@ -55,7 +55,9 @@ set_exception_handler(function (Throwable $e) {
         http_response_code(500);
         header('Content-Type: application/json; charset=utf-8');
     }
-    echo json_encode(['ok' => false, 'error' => $esc ? 'escritura' : 'servidor'], JSON_UNESCAPED_UNICODE);
+    // «detalle» ayuda a localizar el fallo sin mostrar rutas del servidor
+    $detalle = get_class($e) . ': ' . preg_replace('~(/[\w.-]+)+/~', '', $e->getMessage()) . ' (línea ' . $e->getLine() . ' de ' . basename($e->getFile()) . ')';
+    echo json_encode(['ok' => false, 'error' => $esc ? 'escritura' : 'servidor', 'detalle' => mb_substr($detalle, 0, 200)], JSON_UNESCAPED_UNICODE);
 });
 
 function asegurar_datos(): void {
@@ -291,7 +293,16 @@ function enviar_correo(string $para, string $asunto, string $cuerpo, string $res
     if ($responderA !== '' && filter_var($responderA, FILTER_VALIDATE_EMAIL)) {
         $cab[] = 'Reply-To: ' . $responderA;
     }
-    return @mail($para, '=?UTF-8?B?' . base64_encode($asunto) . '?=', $cuerpo, implode("\r\n", $cab), '-f' . REMITENTE);
+    if (!function_exists('mail')) {
+        error_log('Reservas Nutriendo Hábitos: la función mail() está desactivada en el hosting');
+        return false;
+    }
+    try {
+        return @mail($para, '=?UTF-8?B?' . base64_encode($asunto) . '?=', $cuerpo, implode("\r\n", $cab), '-f' . REMITENTE);
+    } catch (Throwable $e) {
+        error_log('Reservas Nutriendo Hábitos: fallo al enviar correo: ' . $e->getMessage());
+        return false;
+    }
 }
 
 function texto_cita(array $r): string {

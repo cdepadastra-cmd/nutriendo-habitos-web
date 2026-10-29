@@ -88,7 +88,14 @@ $cabeceras = [
     'Content-Transfer-Encoding: 8bit',
 ];
 
-$enviado = mail(DESTINO, '=?UTF-8?B?' . base64_encode(ASUNTO) . '?=', $cuerpo,
-                implode("\r\n", $cabeceras), '-f' . REMITENTE);
+$enviado = false;
+if (function_exists('mail')) {
+    try {
+        $enviado = @mail(DESTINO, '=?UTF-8?B?' . base64_encode(ASUNTO) . '?=', $cuerpo,
+                         implode("\r\n", $cabeceras), '-f' . REMITENTE);
+    } catch (Throwable $e) {
+        error_log('Formulario Nutriendo Hábitos: ' . $e->getMessage());
+    }
+}
 
 responder($enviado, $enviado ? 200 : 500, $enviado ? '' : 'envio');

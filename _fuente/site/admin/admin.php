@@ -85,7 +85,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     $accion = (string)($in['accion'] ?? '');
     $cfg = cargar_config();
-    $configurado = $cfg['password'] !== '';
+    // Recuperación de emergencia: si en reservas/datos existe un archivo «restablecer.txt»
+    // (solo se puede crear con acceso al hosting), el panel deja crear una contraseña nueva.
+    $porArchivo = is_file(DIR_DATOS . '/restablecer.txt');
+    $configurado = $cfg['password'] !== '' && !$porArchivo;
     $token = (string)($in['_t'] ?? ($_SERVER['HTTP_X_TOKEN'] ?? ''));
     $dentro = sesion_valida($token);
 
@@ -101,13 +104,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (strlen($p) < 8) {
             json_salida(['ok' => false, 'error' => 'corta'], 422);
         }
-        con_cerrojo(function () use ($p) {
+        con_cerrojo(function () use ($p, $porArchivo) {
             $c = cargar_config();
-            if ($c['password'] === '') {
+            if ($c['password'] === '' || $porArchivo) {
                 $c['password'] = password_hash($p, PASSWORD_DEFAULT);
+                unset($c['recuperar']);
                 guardar_datos('config', $c);
             }
         });
+        if ($porArchivo) {
+            @unlink(DIR_DATOS . '/restablecer.txt');
+            borrar_sesiones();
+        }
         json_salida(['ok' => true, 'token' => crear_sesion()]);
     }
 
@@ -1322,7 +1330,7 @@ Viernes 14/11
   function fechaCorta(f){ var d = new Date(f + 'T12:00:00'); return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }); }
   var ERR_EXTRA = { enlace: 'El enlace ha caducado o ya se ha usado. Vuelve a pedir otro desde «¿Has olvidado tu contraseña?».', limite_olvido: 'Ya se han enviado varios correos. Espera una hora y vuelve a probar.', correo: 'No se ha podido enviar el correo. Prueba más tarde.', importe: 'Pon un importe válido (por ejemplo 45 o 45,50).', pagado_online: 'Esta cita ya está pagada online y no se puede cambiar a mano.', clave_redsys: 'La clave secreta de Redsys no parece correcta: cópiala tal cual te la da el banco.', redsys_incompleto: 'Para activar el pago online faltan datos: precio, número de comercio, terminal y clave secreta.', url_sheets: 'La dirección tiene que ser la de la aplicación web de Apps Script (empieza por https://script.google.com/macros/s/ y termina en /exec).', sheets: 'No se ha podido conectar con la hoja de Google. Revisa que la implementación sea «Aplicación web» con acceso «Cualquier usuario» y que hayas pegado el código completo.', stock: 'No hay unidades suficientes en stock.', no_encontrada: 'No se ha encontrado. Recarga la página.' };
   var ERR = { password: 'Contraseña incorrecta.', limite: 'Demasiados intentos. Espera 15 minutos y vuelve a probar.', corta: 'La contraseña debe tener al menos 8 caracteres.', ocupado: 'Ese hueco ya tiene una cita.', datos: 'Revisa los datos: falta algo o no es válido.', red: 'No hay conexión con el servidor.', sesion: 'La sesión ha caducado. Recarga la página.', no_autorizado: 'La sesión ha caducado. Recarga la página.', tramo: 'Hay un tramo con la hora de fin antes que la de inicio.', escritura: 'El servidor no deja guardar datos en la carpeta reservas/datos. En el administrador de archivos de DonDominio, pon permisos 755 a las carpetas «reservas» y «datos».', servidor: 'Ha fallado algo en el servidor. Prueba otra vez en un momento.' };
-  function errTxt(r){ return ERR[r && r.error] || ERR_EXTRA[r && r.error] || 'No se ha podido guardar. Prueba otra vez.'; }
+  function errTxt(r){ return (ERR[r && r.error] || ERR_EXTRA[r && r.error] || 'No se ha podido guardar. Prueba otra vez.') + (r && r.detalle ? ' [' + r.detalle + ']' : ''); }
 
   /* ---------- acceso ---------- */
   var primeraVez = false;
