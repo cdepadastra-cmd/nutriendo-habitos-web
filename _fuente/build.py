@@ -193,7 +193,9 @@ ANDREA = {'@type': 'Person', '@id': BASE + '#andrea', 'name': 'Andrea Argüello 
           'hasCredential': [
               {'@type': 'EducationalOccupationalCredential', 'credentialCategory': 'degree', 'name': 'Diplomatura en Nutrición Humana y Dietética', 'recognizedBy': {'@type': 'CollegeOrUniversity', 'name': 'Universidad de Valladolid'}},
               {'@type': 'EducationalOccupationalCredential', 'credentialCategory': 'Máster', 'name': 'Máster en Nutrición', 'recognizedBy': {'@type': 'CollegeOrUniversity', 'name': 'Universidad de Barcelona'}},
-              {'@type': 'EducationalOccupationalCredential', 'credentialCategory': 'Máster', 'name': 'Máster en Nutrición Oncológica', 'dateCreated': '2026'}]}
+              {'@type': 'EducationalOccupationalCredential', 'credentialCategory': 'Máster', 'name': 'Máster en Nutrición Oncológica', 'dateCreated': '2026'},
+              {'@type': 'EducationalOccupationalCredential', 'credentialCategory': 'certificate', 'name': 'Antropometrista ISAK nivel 1'},
+              {'@type': 'EducationalOccupationalCredential', 'credentialCategory': 'Colegiación profesional', 'name': 'Dietista-nutricionista colegiada nº CYL00060', 'recognizedBy': {'@type': 'Organization', 'name': 'Colegio Profesional de Dietistas-Nutricionistas de Castilla y León'}}]}
 WEB = {'@type': 'WebSite', '@id': BASE + '#web', 'url': BASE, 'name': 'Nutriendo Hábitos', 'inLanguage': 'es-ES', 'publisher': {'@id': BASE + '#negocio'}}
 
 SERVICIOS = {
@@ -294,7 +296,7 @@ admin = (OUT / 'admin' / 'admin.php').read_text(encoding='utf-8').replace('href=
 # llms.txt: resumen en texto claro para ChatGPT, Claude, Perplexity y otros asistentes
 LLMS = f"""# Nutriendo Hábitos · Andrea Argüello Arbe, nutricionista en Valladolid
 
-> Consulta de dietética y nutrición en Valladolid (Calle Gregorio Fernández, 4, 47006) y online para toda España. Andrea Argüello Arbe es dietista-nutricionista desde 2013, diplomada en Nutrición Humana y Dietética (Universidad de Valladolid), con Máster en Nutrición (Universidad de Barcelona) y Máster en Nutrición Oncológica (2026). Miembro del Equipo Sputnik y de Sputnik Investigación (escalada).
+> Consulta de dietética y nutrición en Valladolid (Calle Gregorio Fernández, 4, 47006) y online para toda España. Andrea Argüello Arbe es dietista-nutricionista desde 2013, diplomada en Nutrición Humana y Dietética (Universidad de Valladolid), con Máster en Nutrición (Universidad de Barcelona) y Máster en Nutrición Oncológica (2026). Antropometrista ISAK 1. Colegiada nº CYL00060 (Colegio de Dietistas-Nutricionistas de Castilla y León). Miembro del Equipo Sputnik y de Sputnik Investigación (escalada).
 
 Especialidades: nutrición deportiva (escalada, running, trail, ciclismo, fuerza), nutrición oncológica (antes, durante y después del tratamiento del cáncer), pérdida y ganancia de peso, patologías digestivas (SIBO, intestino irritable, dieta FODMAP, intolerancias, DAO, celiaquía, Crohn, reflujo), alimentación vegetariana y vegana, diabetes, TCA, alimentación infantil y educación nutricional. Composición corporal con bioimpedancia en cada consulta. Primera consulta de unos 75 minutos; revisiones de unos 45 minutos.
 
