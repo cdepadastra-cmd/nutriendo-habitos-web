@@ -288,7 +288,11 @@ function choca_con_cita(array $reservas, string $fecha, string $hora, string $ig
 function enviar_correo(string $para, string $asunto, string $cuerpo, string $responderA = ''): bool {
     $smtp = cargar_config()['smtp'];
     if ($smtp['usuario'] !== '' && $smtp['clave'] !== '') {
-        return smtp_enviar($smtp, $para, $asunto, $cuerpo, $responderA) === '';
+        if (smtp_enviar($smtp, $para, $asunto, $cuerpo, $responderA) === '') return true;
+    }
+    // Sin Gmail o si ha fallado: a través de la hoja de Google (Apps Script), si está conectada
+    if (script_listo() && correo_por_script($para, $asunto, $cuerpo, $responderA)) {
+        return true;
     }
     // Sin Gmail configurado: correo del propio hosting (algunos hostings lo tienen desactivado)
     $cab = [
@@ -631,6 +635,37 @@ function fila_producto(array $p): array {
  * Envía a la hoja de Google las filas que han cambiado (o todo si $todo).
  * Si no está configurado o Google no responde, no pasa nada: el panel sigue funcionando.
  */
+/** Manda datos al Apps Script de la hoja de Google y devuelve su respuesta (o null). */
+function script_post(string $url, array $datos, int $timeout = 6): ?string {
+    $json = json_encode($datos, JSON_UNESCAPED_UNICODE);
+    if (function_exists('curl_init')) {
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [CURLOPT_POST => true, CURLOPT_POSTFIELDS => $json, CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+            CURLOPT_RETURNTRANSFER => true, CURLOPT_FOLLOWLOCATION => true, CURLOPT_TIMEOUT => $timeout, CURLOPT_CONNECTTIMEOUT => 4]);
+        $res = curl_exec($ch);   // (curl_close ya no hace falta y en PHP 8.5 da aviso)
+    } else {
+        $res = @file_get_contents($url, false, stream_context_create(['http' => ['method' => 'POST', 'header' => "Content-Type: application/json\r\n", 'content' => $json, 'timeout' => $timeout]]));
+    }
+    return is_string($res) ? $res : null;
+}
+
+/** ¿Está conectada la hoja de Google (Apps Script)? */
+function script_listo(): bool {
+    $s = cargar_config()['sheets'];
+    return $s['token'] !== '' && preg_match('~^https://script\.google\.com/(a/macros/[a-z0-9.-]+|macros)/s/[A-Za-z0-9_-]+/exec$~', (string)$s['url']) === 1;
+}
+
+/** Envía un correo a través del Apps Script de la hoja (sale desde la cuenta de Google dueña de la hoja). */
+function correo_por_script(string $para, string $asunto, string $cuerpo, string $responderA = ''): bool {
+    if (!script_listo()) return false;
+    $s = cargar_config()['sheets'];
+    $res = script_post($s['url'], ['token' => $s['token'], 'accion' => 'correo', 'para' => $para, 'asunto' => $asunto,
+        'cuerpo' => $cuerpo, 'responder' => filter_var($responderA, FILTER_VALIDATE_EMAIL) ? $responderA : ''], 15);
+    $ok = is_string($res) && strpos($res, '"correo":true') !== false;
+    if (!$ok) error_log('Reservas Nutriendo Hábitos: la hoja de Google no ha enviado el correo (¿código del Apps Script sin actualizar?)');
+    return $ok;
+}
+
 function sheets_enviar(array $citas = [], array $ventas = [], bool $stock = false, bool $todo = false): bool {
     $cfg = cargar_config();
     $url = (string)$cfg['sheets']['url'];
@@ -647,15 +682,7 @@ function sheets_enviar(array $citas = [], array $ventas = [], bool $stock = fals
     if ($stock || $todo) {
         $datos['Stock'] = array_map('fila_producto', array_values(array_filter($tienda['productos'], fn($p) => empty($p['borrado']))));
     }
-    $json = json_encode($datos, JSON_UNESCAPED_UNICODE);
-    if (function_exists('curl_init')) {
-        $ch = curl_init($url);
-        curl_setopt_array($ch, [CURLOPT_POST => true, CURLOPT_POSTFIELDS => $json, CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
-            CURLOPT_RETURNTRANSFER => true, CURLOPT_FOLLOWLOCATION => true, CURLOPT_TIMEOUT => $todo ? 30 : 6, CURLOPT_CONNECTTIMEOUT => 4]);
-        $res = curl_exec($ch);   // (curl_close ya no hace falta y en PHP 8.5 da aviso)
-    } else {
-        $res = @file_get_contents($url, false, stream_context_create(['http' => ['method' => 'POST', 'header' => "Content-Type: application/json\r\n", 'content' => $json, 'timeout' => $todo ? 30 : 6]]));
-    }
+    $res = script_post($url, $datos, $todo ? 30 : 6);
     $ok = is_string($res) && strpos($res, '"ok":true') !== false;
     if (!$ok) {
         error_log('Reservas Nutriendo Hábitos: no se pudo copiar en Google Sheets');

@@ -208,7 +208,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'precio' => importe((string)$cfg['precio']), 'pago_online' => !empty($cfg['pago_online']), 'redsys_listo' => redsys_listo($cfg),
                 'redsys' => ['comercio' => $cfg['redsys']['comercio'], 'terminal' => $cfg['redsys']['terminal'], 'entorno' => $cfg['redsys']['entorno'], 'clave' => $cfg['redsys']['clave'] !== ''],
                 'sheets' => ['url' => $cfg['sheets']['url'], 'token' => token_sheets()],
-                'smtp' => ['usuario' => $cfg['smtp']['usuario'], 'clave' => $cfg['smtp']['clave'] !== '', 'destino' => DESTINO, 'correo_hosting' => function_exists('mail')],
+                'smtp' => ['usuario' => $cfg['smtp']['usuario'], 'clave' => $cfg['smtp']['clave'] !== '', 'destino' => DESTINO, 'correo_hosting' => function_exists('mail'), 'hoja' => script_listo()],
                 'metodos' => METODOS_PAGO, 'tienda' => cargar_tienda(), 'clientes' => lista_clientes(),
                 'mensajes' => array_reverse(leer_datos('mensajes', []))]);
 
@@ -1327,7 +1327,7 @@ Viernes 14/11
         <div class="card" style="display:grid;gap:.7rem;align-content:start">
           <h2 style="font-size:1.2rem">Envío de correos</h2>
           <p class="msg" id="m-estado"></p>
-          <p class="muted" style="margin:0;font-size:.85rem">Los avisos de reservas, los recordatorios y el enlace para recuperar la contraseña se envían con tu cuenta de Gmail. Google pide una <b>contraseña de aplicación</b> (no es tu contraseña normal):</p>
+          <p class="muted" style="margin:0;font-size:.85rem"><b>Forma fácil:</b> si conectas la <b>Copia en Google Sheets</b> (tarjeta de al lado), los correos salen solos desde tu Gmail a través de la hoja y no tienes que tocar nada aquí. <b>Otra forma:</b> con una <b>contraseña de aplicación</b> de Gmail:</p>
           <details class="ej"><summary>Cómo conseguir la contraseña de aplicación</summary>
             <ol class="pasos">
               <li>Entra en Google con <b>nutricion.arguello@gmail.com</b>. Necesita tener activada la <b>verificación en dos pasos</b> (Cuenta de Google → Seguridad).</li>
@@ -1356,7 +1356,8 @@ Viernes 14/11
           </details>
           <label for="s-url">URL de la aplicación web<input id="s-url" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off"></label>
           <p class="msg err" id="sh-err" hidden></p>
-          <div class="row"><button class="btn" type="button" id="b-sheets">Guardar y enviar todo</button></div>
+          <div class="row"><button class="btn" type="button" id="b-sheets">Guardar y enviar todo</button><button class="btn sec" type="button" id="b-hoja-correo">Enviar correo de prueba</button></div>
+          <p class="muted" style="margin:0;font-size:.8rem">La hoja también <b>envía los correos de la web</b> (formulario de contacto, confirmaciones, recordatorios y recuperar contraseña) desde tu Gmail. Si ya la tenías conectada, copia el código otra vez, pégalo en Apps Script y haz <b>Implementar → Gestionar implementaciones → editar (lápiz) → Versión: nueva versión → Implementar</b>, aceptando el permiso para enviar correos.</p>
           <p class="muted" style="margin:0;font-size:.8rem">Desde ese momento, cada cita, cobro y venta se copia sola en la hoja (pestañas «Citas», «Ventas» y «Stock»). Contiene datos de salud de tus pacientes: no compartas la hoja.</p>
         </div>
         <div class="card">
@@ -1567,12 +1568,18 @@ Viernes 14/11
 
   /* ---------- ajustes: precio, Redsys y Google Sheets ---------- */
   var CODIGO_GS = [
-    '// Nutriendo Hábitos: recibe las citas, ventas y stock del panel de reservas',
+    '// Nutriendo Hábitos: recibe las citas, ventas y stock del panel de reservas y envía los correos de la web',
     "const CLAVE = '{TOKEN}';",
     '',
     'function doPost(e) {',
     '  const d = JSON.parse(e.postData.contents);',
     '  if (d.token !== CLAVE) return salida({ ok: false });',
+    "  if (d.accion === 'correo') {",
+    "    const o = { to: d.para, subject: d.asunto, body: d.cuerpo, name: 'Nutriendo Hábitos' };",
+    '    if (d.responder) o.replyTo = d.responder;',
+    '    MailApp.sendEmail(o);',
+    '    return salida({ ok: true, correo: true });',
+    '  }',
     '  const cerrojo = LockService.getScriptLock(); cerrojo.waitLock(20000);',
     '  try {',
     '    const libro = SpreadsheetApp.getActiveSpreadsheet();',
@@ -1604,6 +1611,7 @@ Viernes 14/11
     $('m-usuario').value = m.usuario || ''; $('m-clave').value = '';
     $('m-clave').placeholder = m.clave ? 'Guardada ✓ (escribe solo para cambiarla)' : 'xxxx xxxx xxxx xxxx';
     if (m.usuario && m.clave) { est.className = 'msg ok'; est.textContent = 'Los correos se envían con ' + m.usuario + '.'; }
+    else if (m.hoja) { est.className = 'msg ok'; est.textContent = 'Los correos se envían a través de tu hoja de Google (no hace falta contraseña de aplicación). Pulsa «Enviar correo de prueba» en la tarjeta de Google Sheets para comprobarlo.'; }
     else { est.className = 'msg err'; est.textContent = 'Sin configurar: ' + (m.correo_hosting ? 'se intenta con el correo del hosting, que puede no llegar.' : 'tu hosting no permite enviar correos, así que ahora mismo NO salen (avisos, recordatorios ni recuperar contraseña).'); }
   }
   $('b-smtp').addEventListener('click', function(){
@@ -1616,6 +1624,13 @@ Viernes 14/11
       err.className = 'msg ok'; err.textContent = '¡Correo de prueba enviado! Mira la bandeja de ' + ((D.smtp && D.smtp.destino) || 'tu correo') + '.'; err.hidden = false; $('m-clave').value = ''; cargar();
     }).catch(function(r){ err.className = 'msg err'; err.textContent = errTxt(r || {}); err.hidden = false; })
       .then(function(){ b.disabled = false; b.textContent = 'Guardar y enviar prueba'; });
+  });
+  $('b-hoja-correo').addEventListener('click', function(){
+    var b = this, err = $('sh-err'); b.disabled = true; err.className = 'msg'; err.textContent = 'Enviando correo de prueba…'; err.hidden = false;
+    api('smtp_probar').then(function(r){
+      if (r && r.ok) { err.className = 'msg ok'; err.textContent = '¡Correo de prueba enviado! Mira la bandeja de ' + ((D.smtp && D.smtp.destino) || 'tu correo') + ' (y spam).'; }
+      else { err.className = 'msg err'; err.textContent = 'No ha salido el correo. Revisa que has pegado el código nuevo en Apps Script, que has hecho una nueva versión de la implementación y que diste el permiso para enviar correos.'; }
+    }).catch(function(){ err.className = 'msg err'; err.textContent = 'No se ha podido comprobar.'; }).then(function(){ b.disabled = false; });
   });
   function pintarSeguimiento(){
     var u = D.url_seguimiento || '';
