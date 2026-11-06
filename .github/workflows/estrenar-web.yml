@@ -30,8 +30,12 @@ jobs:
           echo "Archivos de datos en NUEVA: $N"
           if [ "$N" -eq 0 ]; then echo "::error::No hay datos en NUEVA/reservas/datos. No se mueve nada."; exit 1; fi
           L "mkdir -f reservas" || true
-          L "rmdir reservas/datos" 2>/dev/null || true
-          L "mv NUEVA/reservas/datos reservas/datos"
+          L "mkdir -f reservas/datos" || true
+          echo "Antes en la raíz:"; L "cls -1a reservas/datos/" || true
+          for f in $(L "cls -1 NUEVA/reservas/datos/" | grep '\.json\.php$'); do
+            f=$(basename "$f"); echo "Moviendo $f"
+            L "mv NUEVA/reservas/datos/$f reservas/datos/$f"
+          done
           echo "Datos en la raíz ahora:"; L "cls -1 reservas/datos/" | grep -c '\.json\.php'
       - name: Construir la web definitiva
         run: cd _fuente && python3 build.py definitiva
