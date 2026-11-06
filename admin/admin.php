@@ -1368,8 +1368,8 @@ Viernes 14/11
           </details>
           <label for="s-url">URL de la aplicación web<input id="s-url" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off"></label>
           <p class="msg err" id="sh-err" hidden></p>
-          <div class="row"><button class="btn" type="button" id="b-sheets">Guardar y enviar todo</button><button class="btn sec" type="button" id="b-hoja-correo">Enviar correo de prueba</button></div>
-          <p class="muted" style="margin:0;font-size:.8rem">La hoja también <b>envía los correos de la web</b> (formulario de contacto, confirmaciones, recordatorios y recuperar contraseña) desde tu Gmail. Si ya la tenías conectada, copia el código otra vez, pégalo en Apps Script y haz <b>Implementar → Gestionar implementaciones → editar (lápiz) → Versión: nueva versión → Implementar</b>, aceptando el permiso para enviar correos.</p>
+          <div class="row"><button class="btn" type="button" id="b-sheets">Guardar y enviar todo</button><button class="btn sec" type="button" id="b-hoja-correo">Enviar correo de prueba</button><button class="btn sec" type="button" id="b-copiar-codigo">Copiar código para Apps Script</button></div>
+          <p class="muted" style="margin:0;font-size:.8rem">La hoja también <b>envía los correos de la web</b> (formulario de contacto, confirmaciones, recordatorios y recuperar contraseña) desde tu Gmail. Si ya la tenías conectada, pulsa <b>«Copiar código para Apps Script»</b>, pégalo en Apps Script en lugar del que había, guarda y haz <b>Implementar → Gestionar implementaciones → editar (lápiz) → Versión: nueva versión → Implementar</b>, aceptando el permiso para enviar correos.</p>
           <p class="muted" style="margin:0;font-size:.8rem">Desde ese momento, cada cita, cobro y venta se copia sola en la hoja (pestañas «Citas», «Ventas» y «Stock»). Contiene datos de salud de tus pacientes: no compartas la hoja.</p>
         </div>
         <div class="card">
@@ -1636,6 +1636,11 @@ Viernes 14/11
       err.className = 'msg ok'; err.textContent = '¡Correo de prueba enviado! Mira la bandeja de ' + ((D.smtp && D.smtp.destino) || 'tu correo') + '.'; err.hidden = false; $('m-clave').value = ''; cargar();
     }).catch(function(r){ err.className = 'msg err'; err.textContent = errTxt(r || {}); err.hidden = false; })
       .then(function(){ b.disabled = false; b.textContent = 'Guardar y enviar prueba'; });
+  });
+  $('b-copiar-codigo').addEventListener('click', function(){
+    var t = $('s-code'), v = CODIGO_GS.replace('{TOKEN}', (D.sheets && D.sheets.token) || '');
+    t.value = v;
+    (navigator.clipboard ? navigator.clipboard.writeText(v) : Promise.reject()).then(function(){ toast('Código copiado. Pégalo en Apps Script.'); }, function(){ t.closest('details').open = true; t.select(); document.execCommand('copy'); toast('Código copiado. Pégalo en Apps Script.'); });
   });
   $('b-hoja-correo').addEventListener('click', function(){
     var b = this, err = $('sh-err'); b.disabled = true; err.className = 'msg'; err.textContent = 'Enviando correo de prueba…'; err.hidden = false;
