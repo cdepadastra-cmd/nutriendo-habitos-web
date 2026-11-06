@@ -1,7 +1,7 @@
 # Publica la web de pruebas en la carpeta NUEVA del hosting (DonDominio) por FTP.
 # Se lanza a mano desde GitHub: Actions → «Subir a NUEVA» → Run workflow.
 # Los datos de acceso NO están en el código: se guardan como «secrets» del repositorio
-#   FTP_SERVIDOR, FTP_USUARIO, FTP_CONTRASENA  y, opcional, FTP_CARPETA (por defecto /nutriendohabitos.es/NUEVA/)
+#   FTP_SERVIDOR, FTP_USUARIO, FTP_CONTRASENA  y, opcional, FTP_CARPETA (por defecto ./NUEVA/ dentro de la carpeta de la cuenta FTP)
 name: Subir a NUEVA
 on:
   workflow_dispatch:
@@ -20,7 +20,7 @@ jobs:
           username: ${{ secrets.FTP_USUARIO }}
           password: ${{ secrets.FTP_CONTRASENA }}
           local-dir: _fuente/build/prueba/
-          server-dir: ${{ secrets.FTP_CARPETA || '/nutriendohabitos.es/NUEVA/' }}
+          server-dir: ${{ secrets.FTP_CARPETA || './NUEVA/' }}
           exclude: |
             **/.git*
             **/.git*/**
