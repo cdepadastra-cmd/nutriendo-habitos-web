@@ -1,0 +1,57 @@
+# UNA SOLA VEZ: convierte la web de NUEVA en la web principal.
+#  1. Mueve (renombra dentro del propio hosting, sin descargar nada) la carpeta de datos del panel
+#     NUEVA/reservas/datos -> reservas/datos. Si ya existe reservas/datos en la raíz, se para sin tocar nada.
+#  2. Publica la web definitiva en la raíz (sin tocar reservas/datos).
+#  3. Deja en NUEVA una redirección: cualquier dirección /NUEVA/... lleva a la misma página de la raíz.
+name: Estrenar web
+on:
+  workflow_dispatch:
+concurrency: publicar-web
+jobs:
+  estrenar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Instalar lftp
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+      - name: Mover los datos del panel de NUEVA a la raíz (dentro del hosting)
+        env:
+          FTP_SERVIDOR: ${{ secrets.FTP_SERVIDOR }}
+          FTP_USUARIO: ${{ secrets.FTP_USUARIO }}
+          FTP_CONTRASENA: ${{ secrets.FTP_CONTRASENA }}
+        run: |
+          set -e
+          L() { lftp -u "$FTP_USUARIO","$FTP_CONTRASENA" -e "set ftp:ssl-allow no; set net:max-retries 2; $1; bye" "$FTP_SERVIDOR"; }
+          echo "Contenido de la raíz:"; L "cls -1" | head -50
+          if L "cls -1 reservas/datos/" 2>/dev/null | grep -q '\.json\.php'; then
+            echo "::error::Ya hay datos del panel en la raíz (reservas/datos). No se mueve nada."; exit 1
+          fi
+          N=$(L "cls -1 NUEVA/reservas/datos/" 2>/dev/null | grep -c '\.json\.php' || true)
+          echo "Archivos de datos en NUEVA: $N"
+          if [ "$N" -eq 0 ]; then echo "::error::No hay datos en NUEVA/reservas/datos. No se mueve nada."; exit 1; fi
+          L "mkdir -f reservas" || true
+          L "rmdir reservas/datos" 2>/dev/null || true
+          L "mv NUEVA/reservas/datos reservas/datos"
+          echo "Datos en la raíz ahora:"; L "cls -1 reservas/datos/" | grep -c '\.json\.php'
+      - name: Construir la web definitiva
+        run: cd _fuente && python3 build.py definitiva
+      - name: Publicar en la raíz (sin tocar reservas/datos)
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVIDOR }}
+          username: ${{ secrets.FTP_USUARIO }}
+          password: ${{ secrets.FTP_CONTRASENA }}
+          local-dir: _fuente/build/definitiva/
+          server-dir: ./
+          exclude: |
+            **/.git*
+            **/.git*/**
+            reservas/datos/**
+      - name: Redirigir NUEVA a la web principal
+        env:
+          FTP_SERVIDOR: ${{ secrets.FTP_SERVIDOR }}
+          FTP_USUARIO: ${{ secrets.FTP_USUARIO }}
+          FTP_CONTRASENA: ${{ secrets.FTP_CONTRASENA }}
+        run: |
+          printf 'RewriteEngine On\nRewriteRule ^(.*)$ https://www.nutriendohabitos.es/$1 [R=301,L]\n' > nueva.htaccess
+          lftp -u "$FTP_USUARIO","$FTP_CONTRASENA" -e "set ftp:ssl-allow no; put nueva.htaccess -o NUEVA/.htaccess; bye" "$FTP_SERVIDOR"
