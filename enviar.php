@@ -1,8 +1,9 @@
 <?php
 /**
- * Formulario de reserva de Nutriendo Hábitos.
- * Envía cada solicitud a nutricion.arguello@gmail.com con el asunto "RESERVA WEB"
- * usando el correo del propio hosting (sin servicios externos, sin claves).
+ * Formulario de contacto / petición de cita de Nutriendo Hábitos.
+ * Cada solicitud se GUARDA en el panel (Citas → Solicitudes desde la web) y además se intenta
+ * enviar por correo a nutricion.arguello@gmail.com con el asunto "RESERVA WEB".
+ * Si el correo falla (Gmail sin configurar), la solicitud no se pierde: queda en el panel.
  */
 
 header('Content-Type: application/json; charset=utf-8');
@@ -79,6 +80,23 @@ $cuerpo = "Nueva solicitud de cita desde la web\n\n"
         . "Ha aceptado la información sobre protección de datos.\n"
         . "Enviado el " . date('d/m/Y \a \l\a\s H:i') . "\n";
 
-$enviado = enviar_correo(DESTINO, ASUNTO, $cuerpo, $email);
+$enviado = false;
+try { $enviado = enviar_correo(DESTINO, ASUNTO, $cuerpo, $email); } catch (Throwable $e) { error_log('Formulario: ' . $e->getMessage()); }
 
-responder($enviado, $enviado ? 200 : 500, $enviado ? '' : 'envio');
+$guardado = false;
+try {
+    con_cerrojo(function () use ($nombre, $apellidos, $telefono, $email, $modalidad, $tema, $enviado) {
+        $ms = leer_datos('mensajes', []);
+        $ms[] = ['id' => bin2hex(random_bytes(6)), 'fecha' => date('c'), 'nombre' => $nombre, 'apellidos' => $apellidos,
+                 'telefono' => $telefono, 'email' => $email, 'modalidad' => $modalidad, 'tema' => $tema,
+                 'correo' => $enviado, 'atendido' => false];
+        if (count($ms) > 500) $ms = array_slice($ms, -500);
+        guardar_datos('mensajes', $ms);
+    });
+    $guardado = true;
+} catch (Throwable $e) {
+    error_log('Formulario: no se pudo guardar la solicitud: ' . $e->getMessage());
+}
+
+$ok = $enviado || $guardado;
+responder($ok, $ok ? 200 : 500, $ok ? '' : 'envio');

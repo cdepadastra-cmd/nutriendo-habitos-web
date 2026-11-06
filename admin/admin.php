@@ -209,7 +209,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'redsys' => ['comercio' => $cfg['redsys']['comercio'], 'terminal' => $cfg['redsys']['terminal'], 'entorno' => $cfg['redsys']['entorno'], 'clave' => $cfg['redsys']['clave'] !== ''],
                 'sheets' => ['url' => $cfg['sheets']['url'], 'token' => token_sheets()],
                 'smtp' => ['usuario' => $cfg['smtp']['usuario'], 'clave' => $cfg['smtp']['clave'] !== '', 'destino' => DESTINO, 'correo_hosting' => function_exists('mail')],
-                'metodos' => METODOS_PAGO, 'tienda' => cargar_tienda(), 'clientes' => lista_clientes()]);
+                'metodos' => METODOS_PAGO, 'tienda' => cargar_tienda(), 'clientes' => lista_clientes(),
+                'mensajes' => array_reverse(leer_datos('mensajes', []))]);
 
         case 'seguimiento_nuevo':
             clave_seguimiento(true);
@@ -452,6 +453,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         case 'recordar_ahora':
             json_salida(['ok' => true] + enviar_recordatorios());
+
+        case 'mensaje_estado':
+            $id = (string)($in['id'] ?? ''); $borrar = !empty($in['borrar']); $at = !empty($in['atendido']);
+            con_cerrojo(function () use ($id, $borrar, $at) {
+                $ms = leer_datos('mensajes', []);
+                $out = [];
+                foreach ($ms as $m) {
+                    if ($m['id'] === $id) { if ($borrar) continue; $m['atendido'] = $at; }
+                    $out[] = $m;
+                }
+                guardar_datos('mensajes', $out);
+            });
+            json_salida(['ok' => true]);
 
         case 'marcar_wa':
             $id = (string)($in['id'] ?? '');
@@ -1060,6 +1074,7 @@ table.imp td.ie{font-size:.78rem;color:#9A3B2E;min-width:9rem}table.imp td.ie sm
     <div data-panel="citas">
       <div class="grid2">
         <div style="display:grid;gap:1.25rem;align-content:start">
+          <div class="card" id="msg-card" style="border-color:var(--p,#7a1f17)"><h2 style="font-size:1.3rem;margin-bottom:.25rem">Solicitudes desde la web <span id="msg-n" class="ok-tag" hidden></span></h2><p class="muted" style="margin:0 0 .5rem">Personas que han pedido cita con el formulario de contacto. Llámalas o escríbeles y márcalas como atendidas.</p><div id="msg-list"></div><button class="btn sec sm" type="button" id="msg-ver" style="margin-top:.5rem" hidden>Ver también las atendidas</button></div>
           <div class="card manana" id="man-card">
             <h2 style="font-size:1.3rem;margin-bottom:.25rem">Recordatorios de mañana</h2>
             <p class="muted" style="margin:0 0 .5rem" id="man-sub"></p>
@@ -1452,7 +1467,7 @@ Viernes 14/11
       $('dur').textContent = r.duracion; document.querySelectorAll('.dur2').forEach(function(e){ e.textContent = r.duracion; });
       ['c-motivo', 'imp-motivo'].forEach(function(id){ if ($(id).options.length < 2) (r.motivos || []).forEach(function(m){ var o = document.createElement('option'); o.value = o.textContent = m; $(id).appendChild(o); }); });
       $('r-on').checked = !!r.recordatorios; $('r-url').value = r.url_cron || '';
-      pintarManana(); pintarAjustesPago(); pintarVentas(); pintarSeguimiento();
+      pintarMensajes(); pintarManana(); pintarAjustesPago(); pintarVentas(); pintarSeguimiento();
       pintarCitas(); pintarHorario(); pintarBloqueos();
       $('a-ant').value = r.antelacion_horas; $('a-vista').value = r.dias_vista;
       $('h-abierto').value = r.abierto_hasta || ''; $('h-abierto').min = r.hoy; pintarLimite(); if (!SUCIO) { if (SEM) abrirSemana(SEM); else pintarSemana(); }
@@ -1738,6 +1753,37 @@ Viernes 14/11
       (c.modalidad === 'presencial' ? ', en ' + D.direccion + '.' : ' (consulta online; te mando el enlace de la videollamada).') +
       ' Si no puedes venir, avísame por aquí. ¡Hasta mañana!';
   }
+  var verAtendidos = false;
+  function pintarMensajes(){
+    var ms = D.mensajes || [], nuevos = ms.filter(function(m){ return !m.atendido; });
+    var lista = verAtendidos ? ms : nuevos;
+    $('msg-n').hidden = !nuevos.length; $('msg-n').textContent = nuevos.length + (nuevos.length === 1 ? ' nueva' : ' nuevas');
+    $('msg-ver').hidden = nuevos.length === ms.length; $('msg-ver').textContent = verAtendidos ? 'Ocultar las atendidas' : 'Ver también las atendidas';
+    $('msg-list').innerHTML = lista.length ? lista.map(function(m){
+      var tel = telWa(m.telefono), f = new Date(m.fecha);
+      var hola = 'Hola ' + m.nombre + ', soy Andrea, de Nutriendo Hábitos. He recibido tu solicitud de cita (' + m.modalidad.toLowerCase() + ', ' + m.tema.toLowerCase() + '). ';
+      return '<div class="cita" style="' + (m.atendido ? 'opacity:.55' : '') + '"><span class="h" style="font-size:.75rem">' + esc(f.toLocaleDateString('es-ES', {day:'numeric', month:'short'})) + '<br>' + esc(f.toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'})) + '</span>'
+        + '<span class="who">' + esc(m.nombre + ' ' + m.apellidos) + '<small>' + esc(m.modalidad + ' · ' + m.tema) + '<br>' + esc(m.telefono) + ' · ' + esc(m.email) + '</small></span><span class="rec">'
+        + (tel ? '<a class="btn wa sm" target="_blank" rel="noopener" href="https://wa.me/' + tel + '?text=' + encodeURIComponent(hola) + '">WhatsApp</a>' : '')
+        + '<a class="btn sec sm" href="tel:' + esc(m.telefono.replace(/\s/g, '')) + '">Llamar</a>'
+        + '<a class="btn sec sm" href="mailto:' + esc(m.email) + '?subject=' + encodeURIComponent('Tu cita en Nutriendo Hábitos') + '">Email</a>'
+        + '<button class="btn sec sm" type="button" data-msg="' + esc(m.id) + '" data-at="' + (m.atendido ? '0' : '1') + '">' + (m.atendido ? 'Marcar pendiente' : '✓ Atendida') + '</button>'
+        + (m.atendido ? '<button class="btn sec sm" type="button" data-msgdel="' + esc(m.id) + '">Borrar</button>' : '')
+        + '</span></div>';
+    }).join('') : '<p class="muted" style="margin:0">No hay solicitudes ' + (verAtendidos ? '' : 'nuevas ') + 'por ahora.</p>';
+  }
+  $('msg-ver').addEventListener('click', function(){ verAtendidos = !verAtendidos; pintarMensajes(); });
+  document.addEventListener('click', function(e){
+    var b = e.target.closest('[data-msg],[data-msgdel]'); if (!b) return;
+    var id = b.getAttribute('data-msg') || b.getAttribute('data-msgdel'), del = b.hasAttribute('data-msgdel');
+    if (del && !confirm('¿Borrar esta solicitud?')) return;
+    var at = b.getAttribute('data-at') === '1';
+    api('mensaje_estado', { id: id, atendido: at, borrar: del }).then(function(r){
+      if (!r || !r.ok) return toast('No se ha podido guardar');
+      D.mensajes = del ? D.mensajes.filter(function(m){ return m.id !== id; }) : D.mensajes.map(function(m){ if (m.id === id) m.atendido = at; return m; });
+      pintarMensajes();
+    });
+  });
   function pintarManana(){
     var lista = D.citas.filter(function(c){ return c.fecha === D.manana && c.estado === 'confirmada'; });
     $('man-sub').textContent = lista.length ? fechaLarga(D.manana) + '. ' + (D.recordatorios ? 'Los que tienen email reciben el recordatorio automático.' : 'El email automático está desactivado (Ajustes).') + ' Para WhatsApp, pulsa el botón y dale a enviar.' : 'Mañana (' + fechaLarga(D.manana) + ') no hay citas confirmadas.';
