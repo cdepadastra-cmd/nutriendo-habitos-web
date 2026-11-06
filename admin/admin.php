@@ -510,6 +510,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             sheets_enviar([$cita]);
             json_salida(['ok' => true, 'avisado' => $avisado]);
 
+        case 'borrar_citas':
+            $ids = array_map('strval', (array)($in['ids'] ?? []));
+            if (!$ids) json_salida(['ok' => false, 'error' => 'datos'], 422);
+            $n = con_cerrojo(function () use ($ids) {
+                $rs = cargar_reservas();
+                $quedan = array_values(array_filter($rs, fn($c) => !in_array((string)$c['id'], $ids, true)));
+                guardar_datos('reservas', $quedan);
+                return count($rs) - count($quedan);
+            });
+            json_salida(['ok' => true, 'borradas' => $n]);
+
         case 'cancelar_cita':
             $id = (string)($in['id'] ?? '');
             $avisar = !empty($in['avisar']);
@@ -1218,11 +1229,12 @@ Viernes 14/11
           <label for="h-mes" style="flex:1 1 10rem">Mes<select id="h-mes"><option value="todos">Todos los meses</option></select></label>
           <label for="h-cuando" style="flex:1 1 10rem">Fechas<select id="h-cuando"><option value="todas">Todas</option><option value="pasadas">Pasadas</option><option value="proximas">Próximas</option></select></label>
           <button class="btn" type="button" id="h-excel" style="flex:0 0 auto">Descargar en Excel</button>
+          <button class="btn sec" type="button" id="h-borrar" style="flex:0 0 auto">Borrar las citas mostradas</button>
         </div>
         <p class="muted" id="h-count" style="margin:0"></p>
         <div class="resumen" id="h-resumen"></div>
         <div class="tbl-wrap"><table class="tbl">
-          <thead><tr><th>Fecha</th><th>Hora</th><th>Consulta</th><th>Paciente</th><th>Contacto</th><th>Estado</th><th>Cobro</th></tr></thead>
+          <thead><tr><th>Fecha</th><th>Hora</th><th>Consulta</th><th>Paciente</th><th>Contacto</th><th>Estado</th><th>Cobro</th><th></th></tr></thead>
           <tbody id="h-body"></tbody>
         </table></div>
         <p class="muted" style="margin:0">El archivo de Excel incluye todas las citas, también las anuladas. Guárdalo de vez en cuando como copia de seguridad.</p>
@@ -2131,7 +2143,7 @@ Viernes 14/11
   });
 
   /* ---------- historial ---------- */
-  var HIST = null;
+  var HIST = null, HLISTA = [];
   function norm(t){ return String(t || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, ' '); }
   /* ---------- resumen de cobros (consultas + productos) ---------- */
   var ORDEN_MET = ['efectivo', 'datafono', 'online', 'bizum'];
@@ -2187,7 +2199,7 @@ Viernes 14/11
       if (!q) return true;
       return norm([c.nombre, c.apellidos, c.telefono, c.email].join(' ')).indexOf(q) >= 0 || norm(c.telefono).replace(/\D/g, '').indexOf(q.replace(/\D/g, '') || '§') >= 0;
     });
-    pintarResumen(lista, q, mes);
+    pintarResumen(lista, q, mes); HLISTA = lista;
     var n = function(e){ return lista.filter(function(c){ return c.estado === e; }).length; };
     var conf = n('confirmada'), pe = n('pendiente'), an = n('cancelada');
     $('h-count').textContent = lista.length ? lista.length + (lista.length === 1 ? ' cita' : ' citas') + ' · ' + conf + ' confirmada' + (conf === 1 ? '' : 's') + ', ' + pe + ' pendiente' + (pe === 1 ? '' : 's') + ', ' + an + ' anulada' + (an === 1 ? '' : 's') : '';
@@ -2197,10 +2209,35 @@ Viernes 14/11
       return '<tr class="' + (ok ? '' : 'anulada') + '"><td class="n">' + esc(fechaCorta(c.fecha)) + '</td><td class="n">' + esc(c.hora) + '</td><td>' + esc(MOD[c.modalidad]) + '</td>' +
         '<td class="p">' + resaltar(nombre, q) + (c.motivo ? '<span class="motivo">' + esc(c.motivo) + '</span>' : '') + (c.origen === 'panel' ? '<span class="muted" style="display:block">Añadida por ti</span>' : '') + '</td>' +
         '<td>' + resaltar(c.telefono || '', q) + (c.email ? '<br>' + resaltar(c.email, q) : '') + '</td>' +
-        '<td><span class="est ' + EST[0] + '">' + EST[1] + '</span></td><td>' + (ok ? esc(textoCobro(c)) : '') + '</td></tr>';
-    }).join('') : '<tr><td colspan="7" class="muted" style="text-align:center;padding:1.5rem">' + (HIST.citas.length ? 'No hay citas que coincidan con la búsqueda.' : 'Todavía no hay ninguna cita.') + '</td></tr>';
+        '<td><span class="est ' + EST[0] + '">' + EST[1] + '</span></td><td>' + (ok ? esc(textoCobro(c)) : '') + '</td>' +
+        '<td><button class="btn sec sm" type="button" data-hdel="' + esc(c.id) + '" title="Borrar esta cita" aria-label="Borrar esta cita">Borrar</button></td></tr>';
+    }).join('') : '<tr><td colspan="8" class="muted" style="text-align:center;padding:1.5rem">' + (HIST.citas.length ? 'No hay citas que coincidan con la búsqueda.' : 'Todavía no hay ninguna cita.') + '</td></tr>';
   }
   ['h-q', 'h-est', 'h-cuando', 'h-mes'].forEach(function(id){ $(id).addEventListener('input', pintarHistorial); });
+
+  function borrarCitas(ids, txt){
+    if (!ids.length) return;
+    if (!confirm(txt)) return;
+    api('borrar_citas', { ids: ids }).then(function(r){
+      if (!r || !r.ok) return toast('No se han podido borrar');
+      toast(r.borradas === 1 ? 'Cita borrada.' : r.borradas + ' citas borradas.');
+      cargarHistorial(); cargar();
+    });
+  }
+  document.addEventListener('click', function(e){
+    var b = e.target.closest('[data-hdel]'); if (!b) return;
+    borrarCitas([b.getAttribute('data-hdel')], '¿Borrar esta cita para siempre? No se puede deshacer.');
+  });
+  $('h-borrar').addEventListener('click', function(){
+    var ids = HLISTA.map(function(c){ return c.id; });
+    if (!ids.length) return toast('No hay citas en la lista.');
+    var t = prompt('Vas a borrar PARA SIEMPRE las ' + ids.length + ' citas que se ven en la lista (usa los filtros para elegir). Si las borras, desaparecen también del calendario.\n\nEscribe BORRAR para confirmar:');
+    if ((t || '').trim().toUpperCase() !== 'BORRAR') return toast('No se ha borrado nada.');
+    api('borrar_citas', { ids: ids }).then(function(r){
+      if (!r || !r.ok) return toast('No se han podido borrar');
+      toast(r.borradas + ' citas borradas.'); cargarHistorial(); cargar();
+    });
+  });
   document.querySelector('[data-tab="historial"]').addEventListener('click', cargarHistorial);
 
   /* ---------- contraseña ---------- */
