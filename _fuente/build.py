@@ -51,9 +51,9 @@ PAGINAS = {
     'nuestros-servicios': ('nuestros-servicios.html',
         'Servicios de nutrición y dietética en Valladolid | Nutriendo Hábitos',
         'Todos los servicios de la consulta: sobrepeso, ganancia de peso, TCA, educación nutricional, nutrición deportiva, alimentación infantil (BLW), patología digestiva y diabetes.', '0.7'),
-    'reservar': ('reservar.html',
-        'Reservar cita con nutricionista en Valladolid | Nutriendo Hábitos',
-        'Reserva tu cita con la nutricionista Andrea Argüello: consulta presencial en Valladolid u online. Elige día y hora en el calendario.', '0.8'),
+    'reserva-seguimiento': ('reserva-seguimiento.html',
+        'Citas de seguimiento | Nutriendo Hábitos',
+        'Página privada de reservas para pacientes en seguimiento de Nutriendo Hábitos.', '0'),
     'asesoria-externa': ('asesoria-externa.html',
         'Asesoría nutricional para colegios, comedores y empresas en Valladolid | Nutriendo Hábitos',
         'Asesoría nutricional externa en Valladolid para colegios, comedores escolares, residencias, empresas y madres de día.', '0.6'),
@@ -79,7 +79,7 @@ PAGINAS = {
 ALIAS = {'servicios': 'dietista-nutricionista-en-valladolid', 'online': 'nutricionista-online', 'asesoria': 'asesoria-externa',
          'colaboraciones': 'publicaciones', 'cursos': 'cursos-talleres', 'blog': 'blog-nutricion',
          'todos-los-servicios': 'nuestros-servicios', 'nutricion-deportiva': 'nutricion-deportiva-valladolid',
-         'privacidad': 'proteccion-de-datos', 'reserva': 'reservar', 'cita': 'reservar',
+         'privacidad': 'proteccion-de-datos', 'reserva': 'contacto', 'cita': 'contacto', 'reservar': 'contacto',
          'oncologica': 'nutricion-oncologica-valladolid', 'nutricion-oncologica': 'nutricion-oncologica-valladolid',
          'perdida-de-peso': 'perdida-de-peso-valladolid', 'patologias-digestivas': 'patologias-digestivas-valladolid',
          'vegana': 'alimentacion-vegetariana-vegana-valladolid', 'fodmap': 'dieta-fodmap'}
@@ -150,7 +150,7 @@ def hero_estatico(seg: str) -> str:
             ctas = (f'<a class="btn btn-wa" href="{WA}" target="_blank" rel="noopener"><svg class="i" viewBox="0 0 24 24" data-ic="wa"></svg> Escribir por WhatsApp</a>'
                     f'<a class="btn btn-outline-light" href="tel:+34669877052"><svg class="i" viewBox="0 0 24 24" data-ic="phone"></svg> Llamar</a>')
         else:
-            ctas = f'<a class="btn btn-secondary" href="#reservar">Encuentra tu consulta {ARROW}</a>'
+            ctas = f'<a class="btn btn-secondary" href="#formulario">Pide tu cita {ARROW}</a>'
             if attrs.get('extra') == 'contact':
                 ctas += (f'<a class="btn btn-outline-light" href="{MAPS}" target="_blank" rel="noopener">Ver ubicación</a>'
                          f'<a class="btn btn-wa" href="{WA}" target="_blank" rel="noopener"><svg class="i" viewBox="0 0 24 24" data-ic="wa"></svg> Escribir por WhatsApp</a>')
@@ -246,7 +246,7 @@ OUT.mkdir(parents=True)
 for slug, (archivo, titulo, desc, _prio) in PAGINAS.items():
     url = BASE if archivo == 'index.html' else BASE + archivo
     seg = hero_estatico(segmentos[slug])
-    robots = 'noindex, nofollow' if MODO == 'prueba' else ('noindex, follow' if slug == 'proteccion-de-datos' else 'index, follow, max-image-preview:large')
+    robots = 'noindex, nofollow' if (MODO == 'prueba' or slug == 'reserva-seguimiento') else ('noindex, follow' if slug == 'proteccion-de-datos' else 'index, follow, max-image-preview:large')
     head = f'''<!doctype html>
 <html lang="es">
 <head>
@@ -290,7 +290,7 @@ shutil.copytree(SITE / 'img', OUT / 'img')
 shutil.copy(SITE / 'enviar.php', OUT / 'enviar.php')
 shutil.copytree(SITE / 'reservas', OUT / 'reservas', ignore=shutil.ignore_patterns('*.json.php', '.limite_*', '.cerrojo'))
 shutil.copytree(SITE / 'admin', OUT / 'admin')
-admin = (OUT / 'admin' / 'admin.php').read_text(encoding='utf-8').replace('href="../#reservar"', 'href="../reservar.html"')
+admin = (OUT / 'admin' / 'admin.php').read_text(encoding='utf-8')
 (OUT / 'admin' / 'admin.php').write_text(admin, encoding='utf-8')
 
 # llms.txt: resumen en texto claro para ChatGPT, Claude, Perplexity y otros asistentes
@@ -313,7 +313,7 @@ Contacto: teléfono y WhatsApp 669 87 70 52 · nutricion.arguello@gmail.com · r
 - [Consulta de nutrición online]({BASE}nutricionista-online.html)
 
 ## Reservar y contactar
-- [Reservar cita (calendario online)]({BASE}reservar.html)
+- [Pedir cita (formulario de contacto, WhatsApp o teléfono 669 87 70 52)]({BASE}contacto.html#formulario)
 - [Contacto y ubicación]({BASE}contacto.html)
 
 ## Más
@@ -327,6 +327,16 @@ Contacto: teléfono y WhatsApp 669 87 70 52 · nutricion.arguello@gmail.com · r
 (OUT / '404.html').write_text((SITE / '404.tpl.html').read_text(encoding='utf-8').replace('{{RAIZ}}', RAIZ), encoding='utf-8')
 (OUT / '.htaccess').write_text(f'''# Nutriendo Hábitos
 ErrorDocument 404 {RAIZ}404.html
+
+# Las reservas online ya no son públicas: la antigua página de reservas lleva al formulario de contacto
+RedirectMatch 301 ^{RAIZ}reservar\\.html$ {RAIZ}contacto.html
+# Página privada de citas de seguimiento: fuera de Google y sin pasar el enlace a otras webs
+<Files "reserva-seguimiento.html">
+  <IfModule mod_headers.c>
+    Header set X-Robots-Tag "noindex, nofollow"
+    Header set Referrer-Policy "no-referrer"
+  </IfModule>
+</Files>
 
 # Comprimir texto (páginas más rápidas)
 <IfModule mod_deflate.c>
@@ -356,7 +366,7 @@ if MODO == 'definitiva':
 
 ''' + ht, encoding='utf-8')
     urls = ''.join(f'  <url><loc>{BASE if a == "index.html" else BASE + a}</loc><lastmod>{HOY}</lastmod><priority>{p}</priority></url>\n'
-                   for s_, (a, t, d, p) in PAGINAS.items() if s_ != 'proteccion-de-datos')
+                   for s_, (a, t, d, p) in PAGINAS.items() if s_ not in ('proteccion-de-datos', 'reserva-seguimiento'))
     (OUT / 'sitemap.xml').write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + urls + '</urlset>\n', encoding='utf-8')
     (OUT / 'robots.txt').write_text(f'User-agent: *\nAllow: /\nDisallow: /reservas/\nDisallow: /admin/\nDisallow: /nueva/\nDisallow: /NUEVA/\n\nSitemap: {BASE}sitemap.xml\n', encoding='utf-8')
 

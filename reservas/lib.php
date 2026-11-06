@@ -126,6 +126,7 @@ function config_por_defecto(): array {
         'dias_vista'       => 60,   // cuántos días hacia delante se puede reservar
         'recordatorios'    => true, // email automático el día antes de la cita
         'clave_cron'       => '',   // clave aleatoria para la tarea programada (se crea sola)
+        'clave_seguimiento' => '',  // clave del enlace privado de reservas para pacientes en seguimiento (se crea sola)
         'precio'           => '',   // importe de la consulta en euros, p. ej. "45.00"
         'pago_online'      => false, // pago con tarjeta al reservar (Redsys); apagado hasta tener los datos del banco
         'redsys'           => ['comercio' => '', 'terminal' => '1', 'clave' => '', 'entorno' => 'pruebas'],
@@ -435,6 +436,27 @@ function enviar_recordatorios(): array {
     return ['fecha' => $manana, 'pendientes' => count($toca), 'enviados' => $enviados];
 }
 
+/** Clave del enlace privado de reservas de seguimiento (se genera la primera vez; $nueva=true la cambia). */
+function clave_seguimiento(bool $nueva = false): string {
+    return con_cerrojo(function () use ($nueva) {
+        $c = cargar_config();
+        if ($nueva || !preg_match('/^[a-f0-9]{20}$/', (string)$c['clave_seguimiento'])) {
+            $c['clave_seguimiento'] = bin2hex(random_bytes(10));
+            guardar_datos('config', $c);
+        }
+        return $c['clave_seguimiento'];
+    });
+}
+
+function url_seguimiento(): string {
+    return url_web() . 'reserva-seguimiento.html?k=' . clave_seguimiento();
+}
+
+/** ¿La clave que llega del enlace es la buena? */
+function clave_seguimiento_ok(string $k): bool {
+    return $k !== '' && hash_equals(clave_seguimiento(), $k);
+}
+
 /** Clave de la tarea programada (se genera la primera vez). */
 function clave_cron(): string {
     return con_cerrojo(function () {
@@ -547,8 +569,8 @@ function redsys_formulario(array $cita, array $cfg): array {
         'DS_MERCHANT_TRANSACTIONTYPE'    => '0',
         'DS_MERCHANT_TERMINAL'           => (string)$r['terminal'],
         'DS_MERCHANT_MERCHANTURL'        => url_web() . 'reservas/redsys.php',
-        'DS_MERCHANT_URLOK'              => url_web() . 'reservar.html?pago=ok',
-        'DS_MERCHANT_URLKO'              => url_web() . 'reservar.html?pago=ko',
+        'DS_MERCHANT_URLOK'              => url_seguimiento() . '&pago=ok',
+        'DS_MERCHANT_URLKO'              => url_seguimiento() . '&pago=ko',
         'DS_MERCHANT_PRODUCTDESCRIPTION' => 'Consulta de nutricion ' . date('d/m/Y', strtotime($cita['fecha'])) . ' ' . $cita['hora'],
         'DS_MERCHANT_TITULAR'            => mb_substr($cita['nombre'] . ' ' . $cita['apellidos'], 0, 60, 'UTF-8'),
         'DS_MERCHANT_MERCHANTNAME'       => 'Nutriendo Habitos',

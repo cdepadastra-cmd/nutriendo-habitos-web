@@ -7,6 +7,16 @@
 # Nutriendo Hábitos
 ErrorDocument 404 /404.html
 
+# Las reservas online ya no son públicas: la antigua página de reservas lleva al formulario de contacto
+RedirectMatch 301 ^/reservar\.html$ /contacto.html
+# Página privada de citas de seguimiento: fuera de Google y sin pasar el enlace a otras webs
+<Files "reserva-seguimiento.html">
+  <IfModule mod_headers.c>
+    Header set X-Robots-Tag "noindex, nofollow"
+    Header set Referrer-Policy "no-referrer"
+  </IfModule>
+</Files>
+
 # Comprimir texto (páginas más rápidas)
 <IfModule mod_deflate.c>
   AddOutputFilterByType DEFLATE text/html text/css text/plain text/xml application/javascript application/json image/svg+xml

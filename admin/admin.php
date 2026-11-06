@@ -202,13 +202,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'citas' => $citas, 'hoy' => date('Y-m-d'), 'manana' => date('Y-m-d', strtotime('tomorrow')),
                 'duracion' => DURACION, 'motivos' => MOTIVOS,
                 'recordatorios' => !empty($cfg['recordatorios']),
-                'url_cron' => preg_replace('~/admin\.php$~', '/recordatorios.php', url_panel()) . '?clave=' . clave_cron(),
+                'url_seguimiento' => url_seguimiento(),
+                'url_cron' => url_web() . 'reservas/recordatorios.php?clave=' . clave_cron(),
                 'direccion' => DIRECCION, 'telefono' => TELEFONO,
                 'precio' => importe((string)$cfg['precio']), 'pago_online' => !empty($cfg['pago_online']), 'redsys_listo' => redsys_listo($cfg),
                 'redsys' => ['comercio' => $cfg['redsys']['comercio'], 'terminal' => $cfg['redsys']['terminal'], 'entorno' => $cfg['redsys']['entorno'], 'clave' => $cfg['redsys']['clave'] !== ''],
                 'sheets' => ['url' => $cfg['sheets']['url'], 'token' => token_sheets()],
                 'smtp' => ['usuario' => $cfg['smtp']['usuario'], 'clave' => $cfg['smtp']['clave'] !== '', 'destino' => DESTINO, 'correo_hosting' => function_exists('mail')],
                 'metodos' => METODOS_PAGO, 'tienda' => cargar_tienda(), 'clientes' => lista_clientes()]);
+
+        case 'seguimiento_nuevo':
+            clave_seguimiento(true);
+            json_salida(['ok' => true, 'url_seguimiento' => url_seguimiento()]);
 
         case 'guardar_horario':
             $horario = $in['horario'] ?? null;
@@ -514,12 +519,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($avisar && !empty($cita['email']) && ($cita['estado_previo'] ?? '') === 'pendiente') {
                 $avisado = enviar_correo($cita['email'], 'Solicitud de cita no confirmada · ' . NOMBRE_WEB,
                     "Hola {$cita['nombre']}:\n\nLo siento, no puedo confirmarte la cita que solicitaste.\n\n" . texto_cita($cita) . "\n"
-                    . "Puedes elegir otro día y hora en el calendario de la web, o llamarme o escribirme por WhatsApp al " . TELEFONO . " y lo buscamos juntas.\n\n"
+                    . "Puedes elegir otro día y hora con tu enlace de reservas de seguimiento, o llamarme o escribirme por WhatsApp al " . TELEFONO . " y lo buscamos juntas.\n\n"
                     . "Un saludo,\nAndrea Argüello · " . NOMBRE_WEB . "\n", DESTINO);
             } elseif ($avisar && !empty($cita['email'])) {
                 $avisado = enviar_correo($cita['email'], 'Cita anulada · ' . NOMBRE_WEB,
                     "Hola {$cita['nombre']}:\n\nTu cita ha quedado anulada.\n\n" . texto_cita($cita) . "\n"
-                    . "Si quieres buscar otro día, puedes reservar de nuevo en la web o llamarme al " . TELEFONO . ".\n\n"
+                    . "Si quieres buscar otro día, puedes reservar de nuevo con tu enlace de reservas de seguimiento o llamarme al " . TELEFONO . ".\n\n"
                     . "Un saludo,\nAndrea Argüello · " . NOMBRE_WEB . "\n", DESTINO);
             }
             sheets_enviar([$cita]);
@@ -942,7 +947,7 @@ table.imp td{padding:.4rem;border-bottom:1px solid var(--border);vertical-align:
 table.imp td small{display:block;color:var(--muted-fg)}
 table.imp tr.mal td{background:#FBEFEC}
 table.imp td.ie{font-size:.78rem;color:#9A3B2E;min-width:9rem}table.imp td.ie small{font-size:.72rem}table.imp td:first-child{white-space:nowrap}
-.copy{display:flex;gap:.4rem}.copy input{flex:1;min-width:0;font-size:.78rem}
+.copy{display:flex;gap:.4rem;flex-wrap:wrap}.copy input{flex:1 1 14rem;min-width:0;font-size:.78rem}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 .cita.cancelada .who{text-decoration:line-through}
 .week{display:grid;gap:.6rem}
@@ -1039,7 +1044,7 @@ table.imp td.ie{font-size:.78rem;color:#9A3B2E;min-width:9rem}table.imp td.ie sm
   <section id="v-panel" hidden>
     <header>
       <div class="brand"><img src="../img/logo.webp" alt=""><div><h1 style="font-size:1.4rem">Reservas</h1><span class="muted">Nutriendo Hábitos · citas de <span id="dur">45</span> min</span></div></div>
-      <div style="display:flex;gap:.5rem;flex-wrap:wrap"><a class="btn sec sm" href="../reservar.html" target="_blank" rel="noopener">Ver calendario público</a><button class="btn sec sm" id="b-salir">Salir</button></div>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap"><a class="btn sec sm" id="b-ver-seg" href="#" target="_blank" rel="noopener">Ver página de citas de seguimiento</a><button class="btn sec sm" id="b-salir">Salir</button></div>
     </header>
 
     <div class="tabs" role="tablist">
@@ -1264,6 +1269,12 @@ Viernes 14/11
     <!-- AJUSTES -->
     <div data-panel="ajustes" hidden>
       <div class="grid2">
+        <div class="card" style="display:grid;gap:.7rem;align-content:start;grid-column:1/-1;border-color:var(--p,#7a1f17)">
+          <h2 style="font-size:1.2rem">Enlace privado de citas de seguimiento</h2>
+          <p class="muted" style="margin:0">La web pública ya no tiene calendario: los pacientes nuevos piden cita con el formulario de contacto. Pasa este enlace <b>solo a pacientes en seguimiento</b>; con él ven tu calendario y reservan como siempre.</p>
+          <div class="copy"><input id="s-url" readonly aria-label="Enlace privado de reservas"><button class="btn sec sm" type="button" id="s-copiar">Copiar</button><a class="btn sec sm" id="s-wa" href="#" target="_blank" rel="noopener">Enviar por WhatsApp</a></div>
+          <p class="muted" style="margin:0;font-size:.8rem">Si el enlace se comparte con quien no debe, pulsa «Cambiar enlace»: el anterior deja de funcionar y tendrás que pasar el nuevo a tus pacientes. <button class="btn sec sm" type="button" id="s-nuevo">Cambiar enlace</button></p>
+        </div>
         <div class="card" style="display:grid;gap:.8rem;align-content:start">
           <h2 style="font-size:1.2rem">Reservas</h2>
           <label for="a-ant">Antelación mínima (horas)<input id="a-ant" type="number" min="0" max="168"></label>
@@ -1441,7 +1452,7 @@ Viernes 14/11
       $('dur').textContent = r.duracion; document.querySelectorAll('.dur2').forEach(function(e){ e.textContent = r.duracion; });
       ['c-motivo', 'imp-motivo'].forEach(function(id){ if ($(id).options.length < 2) (r.motivos || []).forEach(function(m){ var o = document.createElement('option'); o.value = o.textContent = m; $(id).appendChild(o); }); });
       $('r-on').checked = !!r.recordatorios; $('r-url').value = r.url_cron || '';
-      pintarManana(); pintarAjustesPago(); pintarVentas();
+      pintarManana(); pintarAjustesPago(); pintarVentas(); pintarSeguimiento();
       pintarCitas(); pintarHorario(); pintarBloqueos();
       $('a-ant').value = r.antelacion_horas; $('a-vista').value = r.dias_vista;
       $('h-abierto').value = r.abierto_hasta || ''; $('h-abierto').min = r.hoy; pintarLimite(); if (!SUCIO) { if (SEM) abrirSemana(SEM); else pintarSemana(); }
@@ -1590,6 +1601,19 @@ Viernes 14/11
       err.className = 'msg ok'; err.textContent = '¡Correo de prueba enviado! Mira la bandeja de ' + ((D.smtp && D.smtp.destino) || 'tu correo') + '.'; err.hidden = false; $('m-clave').value = ''; cargar();
     }).catch(function(r){ err.className = 'msg err'; err.textContent = errTxt(r || {}); err.hidden = false; })
       .then(function(){ b.disabled = false; b.textContent = 'Guardar y enviar prueba'; });
+  });
+  function pintarSeguimiento(){
+    var u = D.url_seguimiento || '';
+    $('s-url').value = u; $('b-ver-seg').href = u;
+    $('s-wa').href = 'https://wa.me/?text=' + encodeURIComponent('Hola, este es tu enlace para reservar las citas de seguimiento en Nutriendo Hábitos: ' + u);
+  }
+  $('s-copiar').addEventListener('click', function(){
+    var i = $('s-url'); i.select();
+    (navigator.clipboard ? navigator.clipboard.writeText(i.value) : Promise.reject()).then(function(){ toast('Enlace copiado'); }, function(){ document.execCommand('copy'); toast('Enlace copiado'); });
+  });
+  $('s-nuevo').addEventListener('click', function(){
+    if (!confirm('¿Cambiar el enlace? El anterior dejará de funcionar y tendrás que pasar el nuevo a tus pacientes.')) return;
+    api('seguimiento_nuevo').then(function(r){ if (r && r.ok) { D.url_seguimiento = r.url_seguimiento; pintarSeguimiento(); toast('Enlace nuevo creado'); } else toast('No se ha podido cambiar'); });
   });
   function pintarAjustesPago(){
     pintarCorreo();

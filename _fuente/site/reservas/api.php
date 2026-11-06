@@ -1,6 +1,6 @@
 <?php
 /**
- * API pública del calendario de reservas.
+ * API del calendario de reservas de SEGUIMIENTO (solo con el enlace privado: parámetro k).
  *   GET  api.php?accion=mes&modalidad=presencial&mes=2026-11   -> días y horas libres
  *   POST api.php  (accion=reservar, modalidad, fecha, hora, nombre, apellidos, telefono, email, privacidad)
  */
@@ -8,6 +8,11 @@ declare(strict_types=1);
 require __DIR__ . '/lib.php';
 
 $accion = $_GET['accion'] ?? $_POST['accion'] ?? '';
+
+// Solo pacientes con el enlace privado (reserva-seguimiento.html?k=...)
+if (!clave_seguimiento_ok((string)($_GET['k'] ?? $_POST['k'] ?? ''))) {
+    json_salida(['ok' => false, 'error' => 'enlace'], 403);
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && $accion === 'mes') {
     $modalidad = (string)($_GET['modalidad'] ?? '');
