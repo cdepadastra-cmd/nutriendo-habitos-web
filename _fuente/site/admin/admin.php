@@ -1287,8 +1287,8 @@ Viernes 14/11
         <div class="card" style="display:grid;gap:.7rem;align-content:start;grid-column:1/-1;border-color:var(--p,#7a1f17)">
           <h2 style="font-size:1.2rem">Enlace privado de citas de seguimiento</h2>
           <p class="muted" style="margin:0">La web pública ya no tiene calendario: los pacientes nuevos piden cita con el formulario de contacto. Pasa este enlace <b>solo a pacientes en seguimiento</b>; con él ven tu calendario y reservan como siempre.</p>
-          <div class="copy"><input id="s-url" readonly aria-label="Enlace privado de reservas"><button class="btn sec sm" type="button" id="s-copiar">Copiar</button><a class="btn sec sm" id="s-wa" href="#" target="_blank" rel="noopener">Enviar por WhatsApp</a></div>
-          <p class="muted" style="margin:0;font-size:.8rem">Si el enlace se comparte con quien no debe, pulsa «Cambiar enlace»: el anterior deja de funcionar y tendrás que pasar el nuevo a tus pacientes. <button class="btn sec sm" type="button" id="s-nuevo">Cambiar enlace</button></p>
+          <div class="copy"><input id="seg-url" readonly aria-label="Enlace privado de reservas"><button class="btn sec sm" type="button" id="seg-copiar">Copiar</button><a class="btn sec sm" id="seg-wa" href="#" target="_blank" rel="noopener">Enviar por WhatsApp</a></div>
+          <p class="muted" style="margin:0;font-size:.8rem">Si el enlace se comparte con quien no debe, pulsa «Cambiar enlace»: el anterior deja de funcionar y tendrás que pasar el nuevo a tus pacientes. <button class="btn sec sm" type="button" id="seg-nuevo">Cambiar enlace</button></p>
         </div>
         <div class="card" style="display:grid;gap:.8rem;align-content:start">
           <h2 style="font-size:1.2rem">Reservas</h2>
@@ -1355,7 +1355,7 @@ Viernes 14/11
             </ol>
           </details>
           <label for="s-url">URL de la aplicación web<input id="s-url" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off"></label>
-          <p class="msg err" id="s-err" hidden></p>
+          <p class="msg err" id="sh-err" hidden></p>
           <div class="row"><button class="btn" type="button" id="b-sheets">Guardar y enviar todo</button></div>
           <p class="muted" style="margin:0;font-size:.8rem">Desde ese momento, cada cita, cobro y venta se copia sola en la hoja (pestañas «Citas», «Ventas» y «Stock»). Contiene datos de salud de tus pacientes: no compartas la hoja.</p>
         </div>
@@ -1619,14 +1619,14 @@ Viernes 14/11
   });
   function pintarSeguimiento(){
     var u = D.url_seguimiento || '';
-    $('s-url').value = u; $('b-ver-seg').href = u;
-    $('s-wa').href = 'https://wa.me/?text=' + encodeURIComponent('Hola, este es tu enlace para reservar las citas de seguimiento en Nutriendo Hábitos: ' + u);
+    $('seg-url').value = u; $('b-ver-seg').href = u;
+    $('seg-wa').href = 'https://wa.me/?text=' + encodeURIComponent('Hola, este es tu enlace para reservar las citas de seguimiento en Nutriendo Hábitos: ' + u);
   }
-  $('s-copiar').addEventListener('click', function(){
-    var i = $('s-url'); i.select();
+  $('seg-copiar').addEventListener('click', function(){
+    var i = $('seg-url'); i.select();
     (navigator.clipboard ? navigator.clipboard.writeText(i.value) : Promise.reject()).then(function(){ toast('Enlace copiado'); }, function(){ document.execCommand('copy'); toast('Enlace copiado'); });
   });
-  $('s-nuevo').addEventListener('click', function(){
+  $('seg-nuevo').addEventListener('click', function(){
     if (!confirm('¿Cambiar el enlace? El anterior dejará de funcionar y tendrás que pasar el nuevo a tus pacientes.')) return;
     api('seguimiento_nuevo').then(function(r){ if (r && r.ok) { D.url_seguimiento = r.url_seguimiento; pintarSeguimiento(); toast('Enlace nuevo creado'); } else toast('No se ha podido cambiar'); });
   });
@@ -1656,7 +1656,7 @@ Viernes 14/11
     (navigator.clipboard ? navigator.clipboard.writeText(t.value) : Promise.reject()).then(function(){ toast('Código copiado.'); }, function(){ document.execCommand('copy'); toast('Código copiado.'); });
   });
   $('b-sheets').addEventListener('click', function(){
-    var b = this, err = $('s-err'); err.className = 'msg'; err.textContent = 'Conectando con Google… (puede tardar hasta medio minuto la primera vez)'; err.hidden = false; b.disabled = true; b.textContent = 'Enviando…';
+    var b = this, err = $('sh-err'); err.className = 'msg'; err.textContent = 'Conectando con Google… (puede tardar hasta medio minuto la primera vez)'; err.hidden = false; b.disabled = true; b.textContent = 'Enviando…';
     api('sheets_guardar', { url: $('s-url').value.trim() }).then(function(r){
       if (!r.ok) throw r;
       if (!$('s-url').value.trim()) return { ok: true, vacio: true };
