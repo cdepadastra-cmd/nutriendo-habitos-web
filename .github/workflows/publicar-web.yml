@@ -1,0 +1,40 @@
+# Publica la web DEFINITIVA en la raíz de nutriendohabitos.es (DonDominio) por FTP.
+# Se lanza sola cada vez que cambian las fuentes (_fuente/) en main, y también a mano:
+# GitHub → Actions → «Publicar web» → Run workflow.
+# Los datos de acceso NO están en el código: son «secrets» del repositorio que pone Andrea:
+#   FTP_SERVIDOR, FTP_USUARIO, FTP_CONTRASENA  y, opcional, FTP_CARPETA_WEB (por defecto ./ = carpeta de la cuenta FTP)
+# Nunca se sube ni se borra reservas/datos (citas, pacientes, contraseña del panel).
+name: Publicar web
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['_fuente/**']
+concurrency: publicar-web
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    env:
+      HAY_FTP: ${{ secrets.FTP_SERVIDOR != '' && secrets.FTP_USUARIO != '' && secrets.FTP_CONTRASENA != '' }}
+    steps:
+      - name: Comprobar datos FTP
+        if: env.HAY_FTP != 'true'
+        run: echo "::notice::Faltan los secrets FTP_SERVIDOR, FTP_USUARIO y FTP_CONTRASENA. No se publica nada."
+      - uses: actions/checkout@v4
+        if: env.HAY_FTP == 'true'
+      - name: Construir la web definitiva
+        if: env.HAY_FTP == 'true'
+        run: cd _fuente && python3 build.py definitiva
+      - name: Subir por FTP (sin tocar reservas/datos)
+        if: env.HAY_FTP == 'true'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVIDOR }}
+          username: ${{ secrets.FTP_USUARIO }}
+          password: ${{ secrets.FTP_CONTRASENA }}
+          local-dir: _fuente/build/definitiva/
+          server-dir: ${{ secrets.FTP_CARPETA_WEB || './' }}
+          exclude: |
+            **/.git*
+            **/.git*/**
+            reservas/datos/**
