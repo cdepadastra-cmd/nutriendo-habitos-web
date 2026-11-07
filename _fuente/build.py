@@ -42,6 +42,9 @@ PAGINAS = {
     'alimentacion-vegetariana-vegana-valladolid': ('alimentacion-vegetariana-vegana-valladolid.html',
         'Nutricionista vegetariana y vegana en Valladolid | Nutriendo Hábitos',
         'Nutricionista en Valladolid y online para alimentación vegetariana y vegana bien planificada: proteína, B12, hierro y menús para cada etapa de la vida.', '0.8'),
+    'nutricion-infantil-valladolid': ('nutricion-infantil-valladolid.html',
+        'Nutricionista infantil en Valladolid · Alimentación infantil y BLW | Nutriendo Hábitos',
+        'Nutricionista infantil en Valladolid y online: alimentación complementaria y Baby Led Weaning, niños que comen poco, peso en la infancia, alergias y menús familiares.', '0.8'),
     'dieta-fodmap': ('dieta-fodmap.html',
         'Dieta FODMAP: qué es, fases y lista de alimentos | Nutriendo Hábitos',
         'Guía de la dieta baja en FODMAP: qué son los FODMAP, para quién está indicada (colon irritable, SIBO), sus 3 fases, alimentos y alternativas y errores frecuentes.', '0.8'),
@@ -82,7 +85,8 @@ ALIAS = {'servicios': 'dietista-nutricionista-en-valladolid', 'online': 'nutrici
          'privacidad': 'proteccion-de-datos', 'reserva': 'contacto', 'cita': 'contacto', 'reservar': 'contacto',
          'oncologica': 'nutricion-oncologica-valladolid', 'nutricion-oncologica': 'nutricion-oncologica-valladolid',
          'perdida-de-peso': 'perdida-de-peso-valladolid', 'patologias-digestivas': 'patologias-digestivas-valladolid',
-         'vegana': 'alimentacion-vegetariana-vegana-valladolid', 'fodmap': 'dieta-fodmap'}
+         'vegana': 'alimentacion-vegetariana-vegana-valladolid', 'fodmap': 'dieta-fodmap',
+         'infantil': 'nutricion-infantil-valladolid', 'nutricion-infantil': 'nutricion-infantil-valladolid'}
 FILES = {k: v[0] for k, v in PAGINAS.items()}
 FILES_JS = {k: ('./' if v == 'index.html' else v) for k, v in FILES.items()}
 for a, b in ALIAS.items():
@@ -96,7 +100,7 @@ NAV = [('inicio', 'Inicio'), ('dietista-nutricionista-en-valladolid', 'Servicios
        ('asesoria-externa', 'Asesoría externa'), ('publicaciones', 'Colaboraciones'), ('cursos-talleres', 'Cursos/Talleres'),
        ('blog-nutricion', 'Blog'), ('contacto', 'Contacto')]
 NAVMAP = {'dieta-fodmap': 'blog-nutricion', 'perdida-de-peso-valladolid': 'dietista-nutricionista-en-valladolid', 'patologias-digestivas-valladolid': 'dietista-nutricionista-en-valladolid',
-          'alimentacion-vegetariana-vegana-valladolid': 'dietista-nutricionista-en-valladolid', 'nutricion-oncologica-valladolid': 'dietista-nutricionista-en-valladolid', 'nuestros-servicios': 'dietista-nutricionista-en-valladolid',
+          'alimentacion-vegetariana-vegana-valladolid': 'dietista-nutricionista-en-valladolid', 'nutricion-infantil-valladolid': 'dietista-nutricionista-en-valladolid', 'nutricion-oncologica-valladolid': 'dietista-nutricionista-en-valladolid', 'nuestros-servicios': 'dietista-nutricionista-en-valladolid',
           'nutricion-deportiva-valladolid': 'dietista-nutricionista-en-valladolid', 'tips': 'blog-nutricion'}
 
 WA = 'https://wa.me/34669877052?text=Hola%20Andrea%2C%20me%20gustar%C3%ADa%20pedir%20cita.%20%C2%BFQu%C3%A9%20huecos%20tienes%20disponibles%3F'
@@ -155,7 +159,7 @@ def hero_estatico(seg: str) -> str:
                 ctas += (f'<a class="btn btn-outline-light" href="{MAPS}" target="_blank" rel="noopener">Ver ubicación</a>'
                          f'<a class="btn btn-wa" href="{WA}" target="_blank" rel="noopener"><svg class="i" viewBox="0 0 24 24" data-ic="wa"></svg> Escribir por WhatsApp</a>')
             else:
-                ctas += '<a class="btn btn-outline-light" href="#contacto">Pide tu cita</a>'
+                ctas += f'<a class="btn btn-outline-light" href="{WA}" target="_blank" rel="noopener"><svg class="i" viewBox="0 0 24 24" data-ic="wa"></svg> WhatsApp</a>'
         return (m.group(0) + f'<img src="img/{attrs["hero"]}.webp" alt="" fetchpriority="high"><div class="page-hero-shade"></div><div class="wrap">'
                 f'<nav class="crumbs" aria-label="Ruta"><a href="#inicio">Inicio</a><span>/</span><span class="cur">{attrs["crumb"]}</span></nav>'
                 f'<p class="ey">{attrs["ey"]}</p><h1>{attrs["h1"]}</h1><p class="lead">{attrs["lead"]}</p><div class="ctas">{ctas}</div></div>')
@@ -204,6 +208,7 @@ SERVICIOS = {
     'perdida-de-peso-valladolid': 'Consulta de nutrición para pérdida y ganancia de peso',
     'patologias-digestivas-valladolid': 'Nutrición en patologías digestivas',
     'alimentacion-vegetariana-vegana-valladolid': 'Asesoramiento en alimentación vegetariana y vegana',
+    'nutricion-infantil-valladolid': 'Nutrición infantil y alimentación complementaria (BLW)',
     'dietista-nutricionista-en-valladolid': 'Consulta de dietética y nutrición',
     'nutricionista-online': 'Consulta de nutrición online',
 }
@@ -309,6 +314,7 @@ Contacto: teléfono y WhatsApp 669 87 70 52 · nutricion.arguello@gmail.com · r
 - [Pérdida y ganancia de peso]({BASE}perdida-de-peso-valladolid.html)
 - [Patologías digestivas: SIBO, intolerancias, celiaquía]({BASE}patologias-digestivas-valladolid.html)
 - [Alimentación vegetariana y vegana]({BASE}alimentacion-vegetariana-vegana-valladolid.html)
+- [Nutrición infantil: alimentación complementaria, BLW, niños que comen poco]({BASE}nutricion-infantil-valladolid.html)
 - [Guía: dieta FODMAP, qué es, fases y alimentos]({BASE}dieta-fodmap.html)
 - [Consulta de nutrición online]({BASE}nutricionista-online.html)
 
