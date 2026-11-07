@@ -2,15 +2,78 @@
   "dominio": "nutriendohabitos.es",
   "nota": "Posición = puesto entre los resultados orgánicos (rank_group) de Google desde Valladolid. null = no aparece en los 50-100 primeros. IA = si nombra a Nutriendo Hábitos / Andrea Argüello al preguntar.",
   "palabras_clave": [
-    {"kw": "nutricionista valladolid", "volumen": 1000, "ubicacion": "Valladolid,Castile and Leon,Spain", "pagina_objetivo": "index.html"},
-    {"kw": "nutricionista deportivo valladolid", "volumen": 140, "ubicacion": "Valladolid,Castile and Leon,Spain", "pagina_objetivo": "nutricion-deportiva-valladolid.html"},
-    {"kw": "dietista valladolid", "volumen": 140, "ubicacion": "Valladolid,Castile and Leon,Spain", "pagina_objetivo": "dietista-nutricionista-en-valladolid.html"},
-    {"kw": "nutricionista oncológico", "volumen": 140, "ubicacion": "Spain", "pagina_objetivo": "nutricion-oncologica-valladolid.html"},
-    {"kw": "nutrición oncológica", "volumen": 210, "ubicacion": "Spain", "pagina_objetivo": "nutricion-oncologica-valladolid.html"},
-    {"kw": "nutricionista sibo", "volumen": 140, "ubicacion": "Spain", "pagina_objetivo": "patologias-digestivas-valladolid.html"},
-    {"kw": "nutricionista online", "volumen": 1600, "ubicacion": "Spain", "pagina_objetivo": "nutricionista-online.html"},
-    {"kw": "dieta fodmap", "volumen": 12100, "ubicacion": "Spain", "pagina_objetivo": "dieta-fodmap.html"},
-    {"kw": "nutricionista vegana", "volumen": 110, "ubicacion": "Spain", "pagina_objetivo": "alimentacion-vegetariana-vegana-valladolid.html"}
+    {
+      "kw": "nutricionista valladolid",
+      "volumen": 1000,
+      "ubicacion": "Valladolid,Castile and Leon,Spain",
+      "pagina_objetivo": "index.html"
+    },
+    {
+      "kw": "nutricionista deportivo valladolid",
+      "volumen": 140,
+      "ubicacion": "Valladolid,Castile and Leon,Spain",
+      "pagina_objetivo": "nutricion-deportiva-valladolid.html"
+    },
+    {
+      "kw": "dietista valladolid",
+      "volumen": 140,
+      "ubicacion": "Valladolid,Castile and Leon,Spain",
+      "pagina_objetivo": "dietista-nutricionista-en-valladolid.html"
+    },
+    {
+      "kw": "nutricionista oncológico",
+      "volumen": 140,
+      "ubicacion": "Spain",
+      "pagina_objetivo": "nutricion-oncologica-valladolid.html"
+    },
+    {
+      "kw": "nutrición oncológica",
+      "volumen": 210,
+      "ubicacion": "Spain",
+      "pagina_objetivo": "nutricion-oncologica-valladolid.html"
+    },
+    {
+      "kw": "nutricionista sibo",
+      "volumen": 140,
+      "ubicacion": "Spain",
+      "pagina_objetivo": "patologias-digestivas-valladolid.html"
+    },
+    {
+      "kw": "nutricionista online",
+      "volumen": 1600,
+      "ubicacion": "Spain",
+      "pagina_objetivo": "nutricionista-online.html"
+    },
+    {
+      "kw": "dieta fodmap",
+      "volumen": 12100,
+      "ubicacion": "Spain",
+      "pagina_objetivo": "dieta-fodmap.html"
+    },
+    {
+      "kw": "nutricionista vegana",
+      "volumen": 110,
+      "ubicacion": "Spain",
+      "pagina_objetivo": "alimentacion-vegetariana-vegana-valladolid.html"
+    },
+    {
+      "kw": "nutricionista infantil valladolid",
+      "volumen": null,
+      "ubicacion": "Valladolid,Castile and Leon,Spain",
+      "pagina_objetivo": "nutricion-infantil-valladolid.html"
+    },
+    {
+      "kw": "dietista online",
+      "volumen": null,
+      "ubicacion": "Spain",
+      "pagina_objetivo": "nutricionista-online.html"
+    },
+    {
+      "kw": "dieta personalizada valladolid",
+      "volumen": null,
+      "ubicacion": "Valladolid,Castile and Leon,Spain",
+      "pagina_objetivo": "dietista-nutricionista-en-valladolid.html"
+    }
   ],
   "preguntas_ia": [
     "¿Qué nutricionista me recomiendas en Valladolid?",
@@ -22,11 +85,28 @@
       "fecha": "2026-11-03",
       "web_publicada": "web antigua en la raíz (la nueva aún en /NUEVA/)",
       "google": {
-        "nutricionista valladolid": {"posicion": 2, "url": "dietista-nutricionista-en-valladolid.html"},
-        "nutricionista deportivo valladolid": {"posicion": 21, "url": "dietista-nutricionista-en-valladolid.html"},
-        "nutricionista online": {"posicion": 35, "url": "nutricionista-online.html"},
-        "dieta fodmap": {"posicion": null, "url": null, "nota": "guía nueva, aún no publicada en la raíz"},
-        "nutrición oncológica": {"posicion": null, "url": null, "nota": "página nueva, aún no publicada"}
+        "nutricionista valladolid": {
+          "posicion": 2,
+          "url": "dietista-nutricionista-en-valladolid.html"
+        },
+        "nutricionista deportivo valladolid": {
+          "posicion": 21,
+          "url": "dietista-nutricionista-en-valladolid.html"
+        },
+        "nutricionista online": {
+          "posicion": 35,
+          "url": "nutricionista-online.html"
+        },
+        "dieta fodmap": {
+          "posicion": null,
+          "url": null,
+          "nota": "guía nueva, aún no publicada en la raíz"
+        },
+        "nutrición oncológica": {
+          "posicion": null,
+          "url": null,
+          "nota": "página nueva, aún no publicada"
+        }
       },
       "dataforseo_labs_septiembre": {
         "nutricionista deportivo valladolid": 6,
@@ -42,6 +122,61 @@
         "claude": "no la nombra (oncológica: María de Haro; deportiva: Nutritiomem, García Oliveri)",
         "copilot": "sin medición fiable (los datos de Bing salieron erróneos)"
       }
+    },
+    {
+      "fecha": "2026-11-07",
+      "fuente": "Google Search Console (ago-nov 2026, 3 meses)",
+      "web_publicada": "web nueva en la raíz desde el 6-11-2026",
+      "resumen": {
+        "clics": 111,
+        "impresiones": 16900,
+        "ctr": "0,7 %",
+        "posicion_media": 20.6
+      },
+      "consultas": {
+        "nutricionista online": {
+          "impresiones": 2671,
+          "posicion": 25.5
+        },
+        "nutricionista valladolid": {
+          "impresiones": 1172,
+          "posicion": 12.9
+        },
+        "dietista online": {
+          "impresiones": 1052,
+          "posicion": 23.6
+        },
+        "nutricionista deportivo valladolid": {
+          "impresiones": 310,
+          "posicion": 9.0
+        },
+        "dietista valladolid": {
+          "impresiones": 249,
+          "posicion": 15.9
+        },
+        "dieta personalizada valladolid": {
+          "impresiones": 248,
+          "posicion": 13.6
+        },
+        "nutricion infantil valladolid": {
+          "impresiones": 193,
+          "posicion": 16.3
+        },
+        "nutricionista valladolid menopausia": {
+          "impresiones": 94,
+          "posicion": 21.8
+        },
+        "nutricionista valladolid precios": {
+          "impresiones": 54,
+          "posicion": 18.4
+        }
+      },
+      "acciones": [
+        "sitemap reenviado en Search Console",
+        "indexación solicitada: portada, oncológica, infantil, deportiva, pérdida de peso, digestivas, vegetariana, FODMAP",
+        "nueva página nutricion-infantil-valladolid.html"
+      ],
+      "nota": "DataForSEO sin saldo (40200) el 7-11-2026"
     }
   ]
 }
