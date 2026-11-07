@@ -38,3 +38,12 @@ jobs:
             **/.git*
             **/.git*/**
             reservas/datos/**
+      - name: Avisar a Bing y otros buscadores (IndexNow)
+        if: env.HAY_FTP == 'true'
+        continue-on-error: true
+        run: |
+          KEY=$(ls _fuente/build/definitiva/ | grep -E '^[0-9a-f]{32}\.txt$' | head -1 | sed 's/\.txt$//')
+          URLS=$(grep -o '<loc>[^<]*' _fuente/build/definitiva/sitemap.xml | sed 's/<loc>//' | python3 -c 'import sys,json;print(json.dumps([l.strip() for l in sys.stdin if l.strip()]))')
+          BODY="{\"host\":\"www.nutriendohabitos.es\",\"key\":\"$KEY\",\"keyLocation\":\"https://www.nutriendohabitos.es/$KEY.txt\",\"urlList\":$URLS}"
+          sleep 20
+          curl -s -o /dev/null -w 'IndexNow: %{http_code}\n' -X POST https://api.indexnow.org/indexnow -H 'Content-Type: application/json; charset=utf-8' -d "$BODY"

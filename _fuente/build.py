@@ -374,6 +374,9 @@ if MODO == 'definitiva':
     urls = ''.join(f'  <url><loc>{BASE if a == "index.html" else BASE + a}</loc><lastmod>{HOY}</lastmod><priority>{p}</priority></url>\n'
                    for s_, (a, t, d, p) in PAGINAS.items() if s_ not in ('proteccion-de-datos', 'reserva-seguimiento'))
     (OUT / 'sitemap.xml').write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + urls + '</urlset>\n', encoding='utf-8')
+    # IndexNow (Bing, Yandex, Seznam…): clave pública que demuestra que la web es nuestra
+    INDEXNOW = '335d0e6929713ffc09dfa5e41e70bafb'
+    (OUT / f'{INDEXNOW}.txt').write_text(INDEXNOW, encoding='utf-8')
     (OUT / 'robots.txt').write_text(f'User-agent: *\nAllow: /\nDisallow: /reservas/\nDisallow: /admin/\nDisallow: /nueva/\nDisallow: /NUEVA/\n\nSitemap: {BASE}sitemap.xml\n', encoding='utf-8')
 
 print(MODO, '->', OUT, '|', len(PAGINAS), 'páginas')

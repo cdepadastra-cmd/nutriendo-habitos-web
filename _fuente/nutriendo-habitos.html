@@ -465,6 +465,19 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
 
 [data-page]{animation:rise .7s cubic-bezier(.2,.7,.2,1) both}
 @keyframes rise{from{opacity:.001;transform:translateY(16px)}to{opacity:1;transform:none}}
+.opiniones{background:var(--background)}
+.op-head{display:flex;flex-wrap:wrap;gap:1.5rem;align-items:end;justify-content:space-between;margin-bottom:2rem}
+.op-nota{display:flex;gap:.8rem;align-items:center;text-decoration:none;color:var(--foreground);background:var(--card);border:1px solid var(--border);border-radius:var(--radius-xl);padding:.8rem 1.1rem;font-size:.85rem;line-height:1.35}
+.op-nota:hover{border-color:var(--primary)}
+.op-num{font-family:var(--font-display);font-size:2.2rem;color:var(--primary);line-height:1}
+.op-st{color:#e3a008;letter-spacing:.1em}
+.op-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.1rem}
+@media(max-width:900px){.op-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.op-grid{grid-template-columns:1fr}}
+.op{margin:0;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-xl);padding:1.3rem 1.4rem;display:flex;flex-direction:column;gap:.7rem}
+.op blockquote{margin:0;font-size:.95rem;line-height:1.6;color:var(--foreground)}
+.op figcaption{margin-top:auto;font-size:.82rem;color:var(--muted-fg)}
+.op figcaption b{color:var(--foreground)}
 </style>
 
 <header class="site" id="top">
@@ -579,6 +592,11 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
     </div>
   </div></section>
 
+  <section class="sec opiniones" aria-labelledby="h-opiniones"><div class="wrap">
+    <div class="op-head"><div><p class="ey">Opiniones reales de pacientes en Google</p><h2 class="h2" id="h-opiniones">Lo que dicen mis pacientes</h2></div>
+      <a class="op-nota" href="https://maps.google.com/?cid=4463089233659683043" target="_blank" rel="noopener"><span class="op-num">5,0</span><span><span class="op-st">★★★★★</span><br>Valoración media en Google · Ver todas las opiniones</span></a></div>
+    <div class="op-grid"><figure class="op"><div class="op-st" aria-label="5 de 5 estrellas">★★★★★</div><blockquote>“Conocí a Andrea después de varios intentos por bajar de peso con otros profesionales. Lo que comenzó siendo una más se convirtió en la mejor decisión que tomé a nivel de salud, marcando un antes y un después.”</blockquote><figcaption><b>Laura F.</b> · Pérdida de peso</figcaption></figure><figure class="op"><div class="op-st" aria-label="5 de 5 estrellas">★★★★★</div><blockquote>“Empecé por un problema intestinal (el cual solucionó) y he continuado con objetivos deportivos y de mejora constante.”</blockquote><figcaption><b>Ernesto G.</b> · Digestivo y deporte</figcaption></figure><figure class="op"><div class="op-st" aria-label="5 de 5 estrellas">★★★★★</div><blockquote>“Los menús son fáciles, adaptados a tus gustos y tu estilo de vida y sostenibles en el tiempo. Su objetivo es que aprendas a comer de una forma que puedas mantener.”</blockquote><figcaption><b>Soraya R.</b> · Paciente desde hace años</figcaption></figure><figure class="op"><div class="op-st" aria-label="5 de 5 estrellas">★★★★★</div><blockquote>“Te escucha y te explica todo de una forma que cualquiera puede entenderlo. Gracias a ella no solo consigues tus objetivos, también aprendes a comer y a cuidarte.”</blockquote><figcaption><b>Alexia A.</b> · Volvió a la consulta</figcaption></figure><figure class="op"><div class="op-st" aria-label="5 de 5 estrellas">★★★★★</div><blockquote>“En cuanto a nutrición deportiva su orientación ha sido fundamental para mejorar mi rendimiento y sentirme muy cómodo adaptando la alimentación a los entrenamientos y pruebas.”</blockquote><figcaption><b>Miguel T.</b> · Nutrición deportiva</figcaption></figure><figure class="op"><div class="op-st" aria-label="5 de 5 estrellas">★★★★★</div><blockquote>“El trabajo que estoy haciendo con Andrea me ayuda a pensar en mi alimentación como algo que forma parte de mi bienestar. Mi salud ha mejorado.”</blockquote><figcaption><b>Amaya D.</b> · Hábitos saludables</figcaption></figure></div>
+  </div></section>
   <section class="sec cta-home"><div class="wrap">
     <div class="ic"><svg class="i" viewBox="0 0 24 24" data-ic="leaf"></svg></div>
     <h2 class="h2">¿Empezamos a nutrir tus hábitos?</h2>
@@ -636,7 +654,7 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
     <section class="faq" aria-labelledby="faq-serv">
       <h2 class="bar-h2" id="faq-serv">Preguntas frecuentes sobre la consulta</h2>
       <div class="faq-list">
-        <details><summary>¿Dónde está la consulta de nutrición en Valladolid?</summary><div class="oc small"><p>En la Calle Gregorio Fernández, nº4, 47006 Valladolid. Si no puedes venir, la consulta también se puede hacer online por videollamada, con el mismo método y seguimiento.</p></div></details>
+        <details><summary>¿Dónde está la consulta de nutrición en Valladolid?</summary><div class="oc small"><p>En la Calle Gregorio Fernández, nº4, 47006 Valladolid, a un paso del Campo Grande y de la Plaza Zorrilla. Si no puedes venir, la consulta también se puede hacer online por videollamada, con el mismo método y seguimiento.</p></div></details>
         <details><summary>¿Cuánto dura la primera consulta?</summary><div class="oc small"><p>Alrededor de 1 hora y 15 minutos. Revisamos tu historia clínica y nutricional, hacemos la valoración antropométrica y por bioimpedancia y fijamos las primeras pautas. La primera pauta personalizada te llega después por correo electrónico.</p></div></details>
         <details><summary>¿Cada cuánto son las revisiones?</summary><div class="oc small"><p>Duran unos 45 minutos y la frecuencia es variable; normalmente, al principio, cada dos semanas. En cada revisión valoramos tu composición corporal, resolvemos dudas y adaptamos la pauta.</p></div></details>
         <details><summary>¿Necesito llevar análisis de sangre?</summary><div class="oc small"><p>Es recomendable tener unos análisis de sangre recientes y, si tienes algún problema de salud, la información médica que tengas. Así la pauta se adapta mejor a ti.</p></div></details>
