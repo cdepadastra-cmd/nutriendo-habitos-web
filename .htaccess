@@ -9,6 +9,7 @@ ErrorDocument 404 /404.html
 
 # Las reservas online ya no son públicas: la antigua página de reservas lleva al formulario de contacto
 RedirectMatch 301 ^/reservar\.html$ /contacto.html
+RedirectMatch 302 ^/alimentacion-cancer-quimioterapia\.html$ /nutricion-oncologica-valladolid.html
 # Página privada de citas de seguimiento: fuera de Google y sin pasar el enlace a otras webs
 <Files "reserva-seguimiento.html">
   <IfModule mod_headers.c>

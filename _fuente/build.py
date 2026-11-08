@@ -48,9 +48,6 @@ PAGINAS = {
     'dieta-sibo': ('dieta-sibo.html',
         'Dieta para el SIBO: qué comer, qué evitar y cómo hacerla | Nutriendo Hábitos',
         'Guía de la dieta para el SIBO: qué alimentos se toleran mejor, cuáles reducir, cómo organizar las comidas y cómo reintroducir. Nutricionista digestiva en Valladolid y online.', '0.7'),
-    'alimentacion-cancer-quimioterapia': ('alimentacion-cancer-quimioterapia.html',
-        'Alimentación durante la quimioterapia y el cáncer: guía práctica | Nutriendo Hábitos',
-        'Qué comer durante la quimioterapia: falta de apetito, náuseas, cambios de sabor, diarrea y mitos frecuentes. Guía de una nutricionista oncológica en Valladolid y online.', '0.7'),
     'dieta-fodmap': ('dieta-fodmap.html',
         'Dieta FODMAP: qué es, fases y lista de alimentos | Nutriendo Hábitos',
         'Guía de la dieta baja en FODMAP: qué son los FODMAP, para quién está indicada (colon irritable, SIBO), sus 3 fases, alimentos y alternativas y errores frecuentes.', '0.8'),
@@ -91,7 +88,7 @@ ALIAS = {'servicios': 'dietista-nutricionista-en-valladolid', 'online': 'nutrici
          'privacidad': 'proteccion-de-datos', 'reserva': 'contacto', 'cita': 'contacto', 'reservar': 'contacto',
          'oncologica': 'nutricion-oncologica-valladolid', 'nutricion-oncologica': 'nutricion-oncologica-valladolid',
          'perdida-de-peso': 'perdida-de-peso-valladolid', 'patologias-digestivas': 'patologias-digestivas-valladolid',
-         'vegana': 'alimentacion-vegetariana-vegana-valladolid', 'fodmap': 'dieta-fodmap', 'sibo': 'dieta-sibo', 'cancer': 'alimentacion-cancer-quimioterapia', 'quimioterapia': 'alimentacion-cancer-quimioterapia',
+         'vegana': 'alimentacion-vegetariana-vegana-valladolid', 'fodmap': 'dieta-fodmap', 'sibo': 'dieta-sibo',
          'infantil': 'nutricion-infantil-valladolid', 'nutricion-infantil': 'nutricion-infantil-valladolid'}
 FILES = {k: v[0] for k, v in PAGINAS.items()}
 FILES_JS = {k: ('./' if v == 'index.html' else v) for k, v in FILES.items()}
@@ -105,7 +102,7 @@ for m in re.finditer(r'<div data-page="([^"]+)"', SRC):
 NAV = [('inicio', 'Inicio'), ('dietista-nutricionista-en-valladolid', 'Servicios'), ('nutricionista-online', 'Online'),
        ('asesoria-externa', 'Asesoría externa'), ('publicaciones', 'Colaboraciones'), ('cursos-talleres', 'Cursos/Talleres'),
        ('blog-nutricion', 'Blog'), ('contacto', 'Contacto')]
-NAVMAP = {'dieta-fodmap': 'blog-nutricion', 'dieta-sibo': 'blog-nutricion', 'alimentacion-cancer-quimioterapia': 'blog-nutricion', 'perdida-de-peso-valladolid': 'dietista-nutricionista-en-valladolid', 'patologias-digestivas-valladolid': 'dietista-nutricionista-en-valladolid',
+NAVMAP = {'dieta-fodmap': 'blog-nutricion', 'dieta-sibo': 'blog-nutricion', 'perdida-de-peso-valladolid': 'dietista-nutricionista-en-valladolid', 'patologias-digestivas-valladolid': 'dietista-nutricionista-en-valladolid',
           'alimentacion-vegetariana-vegana-valladolid': 'dietista-nutricionista-en-valladolid', 'nutricion-infantil-valladolid': 'dietista-nutricionista-en-valladolid', 'nutricion-oncologica-valladolid': 'dietista-nutricionista-en-valladolid', 'nuestros-servicios': 'dietista-nutricionista-en-valladolid',
           'nutricion-deportiva-valladolid': 'dietista-nutricionista-en-valladolid', 'tips': 'blog-nutricion'}
 
@@ -219,7 +216,7 @@ SERVICIOS = {
     'nutricionista-online': 'Consulta de nutrición online',
 }
 
-GUIAS = {'dieta-fodmap': '2026-11-02', 'dieta-sibo': '2026-11-08', 'alimentacion-cancer-quimioterapia': '2026-11-08'}
+GUIAS = {'dieta-fodmap': '2026-11-02', 'dieta-sibo': '2026-11-08'}
 
 def jsonld(slug: str, url: str, titulo: str, desc: str, seg: str) -> str:
     graph = [NEGOCIO, ANDREA, WEB,
@@ -331,7 +328,6 @@ Contacto: teléfono y WhatsApp 669 87 70 52 · nutricion.arguello@gmail.com · r
 - [Nutrición infantil: alimentación complementaria, BLW, niños que comen poco]({BASE}nutricion-infantil-valladolid.html)
 - [Guía: dieta FODMAP, qué es, fases y alimentos]({BASE}dieta-fodmap.html)
 - [Guía: dieta para el SIBO, qué comer y qué evitar]({BASE}dieta-sibo.html)
-- [Guía: alimentación durante la quimioterapia y el cáncer]({BASE}alimentacion-cancer-quimioterapia.html)
 - [Consulta de nutrición online]({BASE}nutricionista-online.html)
 
 ## Reservar y contactar
@@ -352,6 +348,7 @@ ErrorDocument 404 {RAIZ}404.html
 
 # Las reservas online ya no son públicas: la antigua página de reservas lleva al formulario de contacto
 RedirectMatch 301 ^{RAIZ}reservar\\.html$ {RAIZ}contacto.html
+RedirectMatch 302 ^{RAIZ}alimentacion-cancer-quimioterapia\\.html$ {RAIZ}nutricion-oncologica-valladolid.html
 # Página privada de citas de seguimiento: fuera de Google y sin pasar el enlace a otras webs
 <Files "reserva-seguimiento.html">
   <IfModule mod_headers.c>
