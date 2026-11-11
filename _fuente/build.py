@@ -45,6 +45,15 @@ PAGINAS = {
     'nutricion-infantil-valladolid': ('nutricion-infantil-valladolid.html',
         'Nutricionista infantil en Valladolid · Alimentación infantil y BLW | Nutriendo Hábitos',
         'Nutricionista infantil en Valladolid y online: alimentación complementaria y Baby Led Weaning, niños que comen poco, peso en la infancia, alergias y menús familiares.', '0.8'),
+    'herramientas': ('herramientas.html',
+        'Herramientas de nutrición gratuitas | Nutriendo Hábitos',
+        'Herramientas gratuitas de nutrición: calorías y nutrientes de los alimentos y recetas saludables con los ingredientes que tienes en casa.', '0.6'),
+    'calorias-alimentos': ('calorias-alimentos.html',
+        'Calorías de los alimentos: tabla de calorías y nutrientes | Nutriendo Hábitos',
+        'Busca cuántas calorías, proteínas, hidratos, fibra y grasas tiene cada alimento, por 100 g y por ración. Carnes, pescados, verduras, frutas, legumbres y más, con datos oficiales.', '0.7'),
+    'recetas-con-lo-que-tengo': ('recetas-con-lo-que-tengo.html',
+        '¿Qué cocino con lo que tengo en casa? Recetas saludables | Nutriendo Hábitos',
+        'Marca los ingredientes que tienes en la nevera y encuentra recetas sencillas y saludables con el paso a paso: legumbres, verduras, pescado, huevos y más.', '0.7'),
     'dieta-sibo': ('dieta-sibo.html',
         'Dieta para el SIBO: qué comer, qué evitar y cómo hacerla | Nutriendo Hábitos',
         'Guía de la dieta para el SIBO: qué alimentos se toleran mejor, cuáles reducir, cómo organizar las comidas y cómo reintroducir. Nutricionista digestiva en Valladolid y online.', '0.7'),
@@ -88,7 +97,7 @@ ALIAS = {'servicios': 'dietista-nutricionista-en-valladolid', 'online': 'nutrici
          'privacidad': 'proteccion-de-datos', 'reserva': 'contacto', 'cita': 'contacto', 'reservar': 'contacto',
          'oncologica': 'nutricion-oncologica-valladolid', 'nutricion-oncologica': 'nutricion-oncologica-valladolid',
          'perdida-de-peso': 'perdida-de-peso-valladolid', 'patologias-digestivas': 'patologias-digestivas-valladolid',
-         'vegana': 'alimentacion-vegetariana-vegana-valladolid', 'fodmap': 'dieta-fodmap', 'sibo': 'dieta-sibo',
+         'vegana': 'alimentacion-vegetariana-vegana-valladolid', 'fodmap': 'dieta-fodmap', 'calorias': 'calorias-alimentos', 'recetas': 'recetas-con-lo-que-tengo', 'herramienta': 'herramientas', 'sibo': 'dieta-sibo',
          'infantil': 'nutricion-infantil-valladolid', 'nutricion-infantil': 'nutricion-infantil-valladolid'}
 FILES = {k: v[0] for k, v in PAGINAS.items()}
 FILES_JS = {k: ('./' if v == 'index.html' else v) for k, v in FILES.items()}
@@ -101,8 +110,8 @@ for m in re.finditer(r'<div data-page="([^"]+)"', SRC):
     pass
 NAV = [('inicio', 'Inicio'), ('dietista-nutricionista-en-valladolid', 'Servicios'), ('nutricionista-online', 'Online'),
        ('asesoria-externa', 'Asesoría externa'), ('publicaciones', 'Colaboraciones'), ('cursos-talleres', 'Cursos/Talleres'),
-       ('blog-nutricion', 'Blog'), ('contacto', 'Contacto')]
-NAVMAP = {'dieta-fodmap': 'blog-nutricion', 'dieta-sibo': 'blog-nutricion', 'perdida-de-peso-valladolid': 'dietista-nutricionista-en-valladolid', 'patologias-digestivas-valladolid': 'dietista-nutricionista-en-valladolid',
+       ('blog-nutricion', 'Blog'), ('herramientas', 'Herramientas'), ('contacto', 'Contacto')]
+NAVMAP = {'calorias-alimentos': 'herramientas', 'recetas-con-lo-que-tengo': 'herramientas', 'dieta-fodmap': 'blog-nutricion', 'dieta-sibo': 'blog-nutricion', 'perdida-de-peso-valladolid': 'dietista-nutricionista-en-valladolid', 'patologias-digestivas-valladolid': 'dietista-nutricionista-en-valladolid',
           'alimentacion-vegetariana-vegana-valladolid': 'dietista-nutricionista-en-valladolid', 'nutricion-infantil-valladolid': 'dietista-nutricionista-en-valladolid', 'nutricion-oncologica-valladolid': 'dietista-nutricionista-en-valladolid', 'nuestros-servicios': 'dietista-nutricionista-en-valladolid',
           'nutricion-deportiva-valladolid': 'dietista-nutricionista-en-valladolid', 'tips': 'blog-nutricion'}
 
@@ -328,6 +337,8 @@ Contacto: teléfono y WhatsApp 669 87 70 52 · nutricion.arguello@gmail.com · r
 - [Nutrición infantil: alimentación complementaria, BLW, niños que comen poco]({BASE}nutricion-infantil-valladolid.html)
 - [Guía: dieta FODMAP, qué es, fases y alimentos]({BASE}dieta-fodmap.html)
 - [Guía: dieta para el SIBO, qué comer y qué evitar]({BASE}dieta-sibo.html)
+- [Herramienta: calorías y nutrientes de los alimentos (datos USDA FoodData Central)]({BASE}calorias-alimentos.html)
+- [Herramienta: ¿qué cocino con lo que tengo? Recetas saludables por ingredientes]({BASE}recetas-con-lo-que-tengo.html)
 - [Consulta de nutrición online]({BASE}nutricionista-online.html)
 
 ## Reservar y contactar

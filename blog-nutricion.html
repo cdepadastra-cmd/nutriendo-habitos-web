@@ -500,19 +500,65 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
 .op blockquote{margin:0;font-size:.95rem;line-height:1.6;color:var(--foreground)}
 .op figcaption{margin-top:auto;font-size:.82rem;color:var(--muted-fg)}
 .op figcaption b{color:var(--foreground)}
+.tl-hub{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
+@media(max-width:760px){.tl-hub{grid-template-columns:1fr}}
+.tl-hubcard{display:flex;flex-direction:column;gap:.7rem;padding:1.6rem;border-radius:var(--radius-xl);border:1px solid var(--border);background:var(--card);color:var(--foreground);text-decoration:none;transition:border-color .2s,transform .2s}
+.tl-hubcard:hover{border-color:var(--primary);transform:translateY(-2px)}
+.tl-hubcard h2{font-size:1.5rem;color:var(--primary);line-height:1.2}
+.tl-hubcard p{font-size:.95rem;color:var(--muted-fg);line-height:1.6}
+.tl-go{margin-top:auto;display:inline-flex;align-items:center;gap:.4rem;font-weight:600;font-size:.9rem;color:var(--primary)}
+.tl-nota{margin-top:1.5rem;font-size:.85rem;color:var(--muted-fg)}
+.tl-box{border-radius:var(--radius-xl);border:1px solid var(--border);background:var(--card);padding:1.4rem;margin-bottom:2.5rem}
+.tl-search{max-width:none;display:block;margin-bottom:1rem}
+.tl-search input{height:2.9rem;font-size:1rem}
+.tl-chips{display:flex;flex-wrap:wrap;gap:.45rem;margin-bottom:.9rem}
+.tl-chip{border:1px solid var(--border);background:var(--background);color:var(--foreground);border-radius:999px;padding:.4rem .85rem;font:inherit;font-size:.82rem;cursor:pointer;line-height:1.2}
+.tl-chip:hover{border-color:var(--primary)}
+.tl-chip[aria-pressed="true"]{background:var(--primary);border-color:var(--primary);color:var(--primary-fg)}
+.tl-count{font-size:.82rem;color:var(--muted-fg);margin:.2rem 0 .7rem}
+.tl-list{display:grid;gap:.5rem}
+.tl-item{border:1px solid var(--border);border-radius:1rem;background:var(--background);overflow:hidden}
+.tl-item summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:1fr auto;gap:.2rem 1rem;align-items:center;padding:.8rem 1rem}
+.tl-item summary::-webkit-details-marker{display:none}
+.tl-item summary b{font-weight:600}
+.tl-item summary small{grid-column:1;color:var(--muted-fg);font-size:.78rem}
+.tl-kcal{grid-row:1/3;grid-column:2;text-align:right;font-family:var(--font-display);color:var(--primary);font-size:1.25rem;line-height:1.1;white-space:nowrap}
+.tl-kcal span{display:block;font-family:var(--font-sans);font-size:.7rem;color:var(--muted-fg)}
+.tl-det{padding:0 1rem 1rem}
+.tl-tab{width:100%;border-collapse:collapse;font-size:.88rem}
+.tl-tab th,.tl-tab td{padding:.45rem .5rem;border-bottom:1px solid var(--border);text-align:right}
+.tl-tab th:first-child,.tl-tab td:first-child{text-align:left}
+.tl-tab thead th{font-size:.75rem;color:var(--muted-fg);font-weight:600}
+.tl-tab .sub td:first-child{padding-left:1.3rem;color:var(--muted-fg)}
+.tl-src{margin-top:1rem;font-size:.75rem;color:var(--muted-fg);line-height:1.5}
+.tl-h{font-size:1.3rem;color:var(--primary);margin:.4rem 0 .3rem}
+.tl-help{font-size:.82rem;color:var(--muted-fg);margin-bottom:.8rem}
+.tl-grp{margin-bottom:.8rem}
+.tl-grp h3{font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted-fg);margin-bottom:.4rem;font-family:var(--font-sans)}
+.tl-row{display:flex;flex-wrap:wrap;align-items:center;gap:.8rem;margin:.4rem 0 1.4rem}
+.tl-sel{font-size:.85rem;color:var(--muted-fg)}
+.tl-match{font-size:.75rem;border-radius:999px;padding:.2rem .6rem;white-space:nowrap}
+.tl-match.ok{background:color-mix(in oklab,var(--primary) 15%,transparent);color:var(--primary)}
+.tl-match.casi{background:color-mix(in oklab,#e3a008 18%,transparent);color:#8a5a00}
+.tl-rec h4{font-size:.85rem;margin:.6rem 0 .3rem;color:var(--primary);font-family:var(--font-sans)}
+.tl-rec ul,.tl-rec ol{padding-left:1.2rem;font-size:.9rem;line-height:1.6}
+.tl-rec li.falta{color:#a0522d}
+.tl-rec li.falta::after{content:" · te falta";font-size:.75rem}
+.tl-tags{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.2rem}
+.tl-tags span{font-size:.7rem;border:1px solid var(--border);border-radius:999px;padding:.05rem .5rem;color:var(--muted-fg)}
 </style>
 </head>
 <body>
 <header class="site" id="top">
   <div class="bar">
     <a class="logo" href="./" aria-label="Nutriendo Hábitos"><img src="img/logo.webp" alt="Nutriendo Hábitos"></a>
-    <nav class="main" aria-label="Principal"><a href="./" data-nav="inicio">Inicio</a><a href="dietista-nutricionista-en-valladolid.html" data-nav="dietista-nutricionista-en-valladolid">Servicios</a><a href="nutricionista-online.html" data-nav="nutricionista-online">Online</a><a href="asesoria-externa.html" data-nav="asesoria-externa">Asesoría externa</a><a href="publicaciones.html" data-nav="publicaciones">Colaboraciones</a><a href="cursos-talleres.html" data-nav="cursos-talleres">Cursos/Talleres</a><a href="blog-nutricion.html" data-nav="blog-nutricion" aria-current="page">Blog</a><a href="contacto.html" data-nav="contacto">Contacto</a></nav>
+    <nav class="main" aria-label="Principal"><a href="./" data-nav="inicio">Inicio</a><a href="dietista-nutricionista-en-valladolid.html" data-nav="dietista-nutricionista-en-valladolid">Servicios</a><a href="nutricionista-online.html" data-nav="nutricionista-online">Online</a><a href="asesoria-externa.html" data-nav="asesoria-externa">Asesoría externa</a><a href="publicaciones.html" data-nav="publicaciones">Colaboraciones</a><a href="cursos-talleres.html" data-nav="cursos-talleres">Cursos/Talleres</a><a href="blog-nutricion.html" data-nav="blog-nutricion" aria-current="page">Blog</a><a href="herramientas.html" data-nav="herramientas">Herramientas</a><a href="contacto.html" data-nav="contacto">Contacto</a></nav>
     <div style="display:flex;gap:.5rem;align-items:center">
       <a class="btn btn-primary" href="contacto.html#formulario">Pide cita <svg class="i" viewBox="0 0 24 24"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg></a>
       <button class="menu-btn" id="menu-btn" aria-label="Abrir menú" aria-expanded="false"><svg class="i" viewBox="0 0 24 24"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></svg></button>
     </div>
   </div>
-  <nav class="mobile-nav" aria-label="Menú móvil"><a href="./" data-nav="inicio">Inicio</a><a href="dietista-nutricionista-en-valladolid.html" data-nav="dietista-nutricionista-en-valladolid">Servicios</a><a href="nutricionista-online.html" data-nav="nutricionista-online">Online</a><a href="asesoria-externa.html" data-nav="asesoria-externa">Asesoría externa</a><a href="publicaciones.html" data-nav="publicaciones">Colaboraciones</a><a href="cursos-talleres.html" data-nav="cursos-talleres">Cursos/Talleres</a><a href="blog-nutricion.html" data-nav="blog-nutricion" aria-current="page">Blog</a><a href="contacto.html" data-nav="contacto">Contacto</a></nav>
+  <nav class="mobile-nav" aria-label="Menú móvil"><a href="./" data-nav="inicio">Inicio</a><a href="dietista-nutricionista-en-valladolid.html" data-nav="dietista-nutricionista-en-valladolid">Servicios</a><a href="nutricionista-online.html" data-nav="nutricionista-online">Online</a><a href="asesoria-externa.html" data-nav="asesoria-externa">Asesoría externa</a><a href="publicaciones.html" data-nav="publicaciones">Colaboraciones</a><a href="cursos-talleres.html" data-nav="cursos-talleres">Cursos/Talleres</a><a href="blog-nutricion.html" data-nav="blog-nutricion" aria-current="page">Blog</a><a href="herramientas.html" data-nav="herramientas">Herramientas</a><a href="contacto.html" data-nav="contacto">Contacto</a></nav>
 </header>
 
 <main id="app">
@@ -556,7 +602,7 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
       <div class="flinks">
         <a href="dietista-nutricionista-en-valladolid.html">Servicios</a><a href="nutricionista-online.html">Online</a>
         <a href="asesoria-externa.html">Asesoría externa</a><a href="publicaciones.html">Colaboraciones</a>
-        <a href="cursos-talleres.html">Cursos/Talleres</a><a href="blog-nutricion.html">Blog</a>
+        <a href="cursos-talleres.html">Cursos/Talleres</a><a href="blog-nutricion.html">Blog</a><a href="herramientas.html">Herramientas</a>
         <a href="contacto.html">Contacto</a><a href="nuestros-servicios.html">Todos los servicios</a>
         <a href="nutricion-deportiva-valladolid.html">Nutrición deportiva</a><a href="nutricion-oncologica-valladolid.html">Nutrición oncológica</a>
         <a href="perdida-de-peso-valladolid.html">Pérdida de peso</a><a href="patologias-digestivas-valladolid.html">Patologías digestivas</a>
@@ -571,7 +617,7 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
 
 <a class="wa-float" href="https://wa.me/34669877052?text=Hola%20Andrea%2C%20me%20gustar%C3%ADa%20consultar%20sobre%20nutrici%C3%B3n." target="_blank" rel="noopener" aria-label="Escríbeme por WhatsApp"><svg class="i" viewBox="0 0 24 24" data-ic="wa"></svg><span>Escríbeme por WhatsApp</span></a>
 
-<script>window.__MPA={"page": "blog-nutricion", "files": {"inicio": "./", "dietista-nutricionista-en-valladolid": "dietista-nutricionista-en-valladolid.html", "nutricion-deportiva-valladolid": "nutricion-deportiva-valladolid.html", "nutricion-oncologica-valladolid": "nutricion-oncologica-valladolid.html", "perdida-de-peso-valladolid": "perdida-de-peso-valladolid.html", "patologias-digestivas-valladolid": "patologias-digestivas-valladolid.html", "alimentacion-vegetariana-vegana-valladolid": "alimentacion-vegetariana-vegana-valladolid.html", "nutricion-infantil-valladolid": "nutricion-infantil-valladolid.html", "dieta-sibo": "dieta-sibo.html", "dieta-fodmap": "dieta-fodmap.html", "nutricionista-online": "nutricionista-online.html", "nuestros-servicios": "nuestros-servicios.html", "reserva-seguimiento": "reserva-seguimiento.html", "asesoria-externa": "asesoria-externa.html", "publicaciones": "publicaciones.html", "cursos-talleres": "cursos-talleres.html", "blog-nutricion": "blog-nutricion.html", "tips": "tips.html", "contacto": "contacto.html", "proteccion-de-datos": "proteccion-de-datos.html", "servicios": "dietista-nutricionista-en-valladolid.html", "online": "nutricionista-online.html", "asesoria": "asesoria-externa.html", "colaboraciones": "publicaciones.html", "cursos": "cursos-talleres.html", "blog": "blog-nutricion.html", "todos-los-servicios": "nuestros-servicios.html", "nutricion-deportiva": "nutricion-deportiva-valladolid.html", "privacidad": "proteccion-de-datos.html", "reserva": "contacto.html", "cita": "contacto.html", "reservar": "contacto.html", "oncologica": "nutricion-oncologica-valladolid.html", "nutricion-oncologica": "nutricion-oncologica-valladolid.html", "perdida-de-peso": "perdida-de-peso-valladolid.html", "patologias-digestivas": "patologias-digestivas-valladolid.html", "vegana": "alimentacion-vegetariana-vegana-valladolid.html", "fodmap": "dieta-fodmap.html", "sibo": "dieta-sibo.html", "infantil": "nutricion-infantil-valladolid.html", "nutricion-infantil": "nutricion-infantil-valladolid.html"}, "anchors": {"especialidades": "./#especialidades", "acc": "./#acc", "ptabs": "./#ptabs", "pt-1": "./#pt-1", "pt-2": "./#pt-2", "pt-3": "./#pt-3", "ppanel": "./#ppanel", "pp-k": "./#pp-k", "pp-t": "./#pp-t", "pp-d": "./#pp-d", "h-opiniones": "./#h-opiniones", "sobrepeso": "dietista-nutricionista-en-valladolid.html#sobrepeso", "patologias": "dietista-nutricionista-en-valladolid.html#patologias", "vegetariana": "dietista-nutricionista-en-valladolid.html#vegetariana", "faq-serv": "dietista-nutricionista-en-valladolid.html#faq-serv", "ct-prox": "cursos-talleres.html#ct-prox", "ct-past": "cursos-talleres.html#ct-past", "cp-prox": "cursos-talleres.html#cp-prox", "cp-past": "cursos-talleres.html#cp-past", "blog-q": "blog-nutricion.html#blog-q", "blog-posts": "blog-nutricion.html#blog-posts", "blog-empty": "blog-nutricion.html#blog-empty", "tips-posts": "tips.html#tips-posts", "formulario": "contacto.html#formulario", "rform": "contacto.html#rform", "rf-nombre": "contacto.html#rf-nombre", "rf-apellidos": "contacto.html#rf-apellidos", "rf-tel": "contacto.html#rf-tel", "rf-email": "contacto.html#rf-email", "rf-modo": "contacto.html#rf-modo", "rf-tema": "contacto.html#rf-tema", "rf-priv": "contacto.html#rf-priv", "rf-web": "contacto.html#rf-web", "rf-err": "contacto.html#rf-err", "rf-send-mail": "contacto.html#rf-send-mail", "rf-send-wa": "contacto.html#rf-send-wa", "rf-wadone": "contacto.html#rf-wadone", "rf-wa-open": "contacto.html#rf-wa-open", "rf-done": "contacto.html#rf-done", "faq-dep": "nutricion-deportiva-valladolid.html#faq-dep", "faq-onco": "nutricion-oncologica-valladolid.html#faq-onco", "ganancia-de-peso": "perdida-de-peso-valladolid.html#ganancia-de-peso", "faq-peso": "perdida-de-peso-valladolid.html#faq-peso", "faq-dig": "patologias-digestivas-valladolid.html#faq-dig", "faq-veg": "alimentacion-vegetariana-vegana-valladolid.html#faq-veg", "faq-inf": "nutricion-infantil-valladolid.html#faq-inf", "faq-fodmap": "dieta-fodmap.html#faq-fodmap", "faq-sibo": "dieta-sibo.html#faq-sibo", "bk": "reserva-seguimiento.html#bk", "bk-vuelta": "reserva-seguimiento.html#bk-vuelta", "bk-sinclave": "reserva-seguimiento.html#bk-sinclave", "bk-demo": "reserva-seguimiento.html#bk-demo", "bk-step1": "reserva-seguimiento.html#bk-step1", "bk-prev": "reserva-seguimiento.html#bk-prev", "bk-mes": "reserva-seguimiento.html#bk-mes", "bk-next": "reserva-seguimiento.html#bk-next", "bk-days": "reserva-seguimiento.html#bk-days", "bk-slots": "reserva-seguimiento.html#bk-slots", "bk-form": "reserva-seguimiento.html#bk-form", "bk-sum": "reserva-seguimiento.html#bk-sum", "bk-nombre": "reserva-seguimiento.html#bk-nombre", "bk-apellidos": "reserva-seguimiento.html#bk-apellidos", "bk-tel": "reserva-seguimiento.html#bk-tel", "bk-email": "reserva-seguimiento.html#bk-email", "bk-motivo": "reserva-seguimiento.html#bk-motivo", "bk-pago": "reserva-seguimiento.html#bk-pago", "bk-precio": "reserva-seguimiento.html#bk-precio", "bk-priv": "reserva-seguimiento.html#bk-priv", "bk-web": "reserva-seguimiento.html#bk-web", "bk-err": "reserva-seguimiento.html#bk-err", "bk-send": "reserva-seguimiento.html#bk-send", "bk-ok": "reserva-seguimiento.html#bk-ok", "bk-oksum": "reserva-seguimiento.html#bk-oksum", "bk-okmsg": "reserva-seguimiento.html#bk-okmsg", "bk-otra": "reserva-seguimiento.html#bk-otra"}};</script>
+<script>window.__MPA={"page": "blog-nutricion", "files": {"inicio": "./", "dietista-nutricionista-en-valladolid": "dietista-nutricionista-en-valladolid.html", "nutricion-deportiva-valladolid": "nutricion-deportiva-valladolid.html", "nutricion-oncologica-valladolid": "nutricion-oncologica-valladolid.html", "perdida-de-peso-valladolid": "perdida-de-peso-valladolid.html", "patologias-digestivas-valladolid": "patologias-digestivas-valladolid.html", "alimentacion-vegetariana-vegana-valladolid": "alimentacion-vegetariana-vegana-valladolid.html", "nutricion-infantil-valladolid": "nutricion-infantil-valladolid.html", "herramientas": "herramientas.html", "calorias-alimentos": "calorias-alimentos.html", "recetas-con-lo-que-tengo": "recetas-con-lo-que-tengo.html", "dieta-sibo": "dieta-sibo.html", "dieta-fodmap": "dieta-fodmap.html", "nutricionista-online": "nutricionista-online.html", "nuestros-servicios": "nuestros-servicios.html", "reserva-seguimiento": "reserva-seguimiento.html", "asesoria-externa": "asesoria-externa.html", "publicaciones": "publicaciones.html", "cursos-talleres": "cursos-talleres.html", "blog-nutricion": "blog-nutricion.html", "tips": "tips.html", "contacto": "contacto.html", "proteccion-de-datos": "proteccion-de-datos.html", "servicios": "dietista-nutricionista-en-valladolid.html", "online": "nutricionista-online.html", "asesoria": "asesoria-externa.html", "colaboraciones": "publicaciones.html", "cursos": "cursos-talleres.html", "blog": "blog-nutricion.html", "todos-los-servicios": "nuestros-servicios.html", "nutricion-deportiva": "nutricion-deportiva-valladolid.html", "privacidad": "proteccion-de-datos.html", "reserva": "contacto.html", "cita": "contacto.html", "reservar": "contacto.html", "oncologica": "nutricion-oncologica-valladolid.html", "nutricion-oncologica": "nutricion-oncologica-valladolid.html", "perdida-de-peso": "perdida-de-peso-valladolid.html", "patologias-digestivas": "patologias-digestivas-valladolid.html", "vegana": "alimentacion-vegetariana-vegana-valladolid.html", "fodmap": "dieta-fodmap.html", "calorias": "calorias-alimentos.html", "recetas": "recetas-con-lo-que-tengo.html", "herramienta": "herramientas.html", "sibo": "dieta-sibo.html", "infantil": "nutricion-infantil-valladolid.html", "nutricion-infantil": "nutricion-infantil-valladolid.html"}, "anchors": {"especialidades": "./#especialidades", "acc": "./#acc", "ptabs": "./#ptabs", "pt-1": "./#pt-1", "pt-2": "./#pt-2", "pt-3": "./#pt-3", "ppanel": "./#ppanel", "pp-k": "./#pp-k", "pp-t": "./#pp-t", "pp-d": "./#pp-d", "h-opiniones": "./#h-opiniones", "sobrepeso": "dietista-nutricionista-en-valladolid.html#sobrepeso", "patologias": "dietista-nutricionista-en-valladolid.html#patologias", "vegetariana": "dietista-nutricionista-en-valladolid.html#vegetariana", "faq-serv": "dietista-nutricionista-en-valladolid.html#faq-serv", "ct-prox": "cursos-talleres.html#ct-prox", "ct-past": "cursos-talleres.html#ct-past", "cp-prox": "cursos-talleres.html#cp-prox", "cp-past": "cursos-talleres.html#cp-past", "blog-q": "blog-nutricion.html#blog-q", "blog-posts": "blog-nutricion.html#blog-posts", "blog-empty": "blog-nutricion.html#blog-empty", "tips-posts": "tips.html#tips-posts", "formulario": "contacto.html#formulario", "rform": "contacto.html#rform", "rf-nombre": "contacto.html#rf-nombre", "rf-apellidos": "contacto.html#rf-apellidos", "rf-tel": "contacto.html#rf-tel", "rf-email": "contacto.html#rf-email", "rf-modo": "contacto.html#rf-modo", "rf-tema": "contacto.html#rf-tema", "rf-priv": "contacto.html#rf-priv", "rf-web": "contacto.html#rf-web", "rf-err": "contacto.html#rf-err", "rf-send-mail": "contacto.html#rf-send-mail", "rf-send-wa": "contacto.html#rf-send-wa", "rf-wadone": "contacto.html#rf-wadone", "rf-wa-open": "contacto.html#rf-wa-open", "rf-done": "contacto.html#rf-done", "faq-dep": "nutricion-deportiva-valladolid.html#faq-dep", "faq-onco": "nutricion-oncologica-valladolid.html#faq-onco", "ganancia-de-peso": "perdida-de-peso-valladolid.html#ganancia-de-peso", "faq-peso": "perdida-de-peso-valladolid.html#faq-peso", "faq-dig": "patologias-digestivas-valladolid.html#faq-dig", "faq-veg": "alimentacion-vegetariana-vegana-valladolid.html#faq-veg", "faq-inf": "nutricion-infantil-valladolid.html#faq-inf", "faq-fodmap": "dieta-fodmap.html#faq-fodmap", "faq-sibo": "dieta-sibo.html#faq-sibo", "al-app": "calorias-alimentos.html#al-app", "al-q": "calorias-alimentos.html#al-q", "al-cats": "calorias-alimentos.html#al-cats", "al-count": "calorias-alimentos.html#al-count", "al-list": "calorias-alimentos.html#al-list", "faq-cal": "calorias-alimentos.html#faq-cal", "datos-alimentos": "calorias-alimentos.html#datos-alimentos", "re-app": "recetas-con-lo-que-tengo.html#re-app", "re-ing": "recetas-con-lo-que-tengo.html#re-ing", "re-clear": "recetas-con-lo-que-tengo.html#re-clear", "re-sel": "recetas-con-lo-que-tengo.html#re-sel", "re-tags": "recetas-con-lo-que-tengo.html#re-tags", "re-count": "recetas-con-lo-que-tengo.html#re-count", "re-list": "recetas-con-lo-que-tengo.html#re-list", "faq-rec": "recetas-con-lo-que-tengo.html#faq-rec", "datos-recetas": "recetas-con-lo-que-tengo.html#datos-recetas", "bk": "reserva-seguimiento.html#bk", "bk-vuelta": "reserva-seguimiento.html#bk-vuelta", "bk-sinclave": "reserva-seguimiento.html#bk-sinclave", "bk-demo": "reserva-seguimiento.html#bk-demo", "bk-step1": "reserva-seguimiento.html#bk-step1", "bk-prev": "reserva-seguimiento.html#bk-prev", "bk-mes": "reserva-seguimiento.html#bk-mes", "bk-next": "reserva-seguimiento.html#bk-next", "bk-days": "reserva-seguimiento.html#bk-days", "bk-slots": "reserva-seguimiento.html#bk-slots", "bk-form": "reserva-seguimiento.html#bk-form", "bk-sum": "reserva-seguimiento.html#bk-sum", "bk-nombre": "reserva-seguimiento.html#bk-nombre", "bk-apellidos": "reserva-seguimiento.html#bk-apellidos", "bk-tel": "reserva-seguimiento.html#bk-tel", "bk-email": "reserva-seguimiento.html#bk-email", "bk-motivo": "reserva-seguimiento.html#bk-motivo", "bk-pago": "reserva-seguimiento.html#bk-pago", "bk-precio": "reserva-seguimiento.html#bk-precio", "bk-priv": "reserva-seguimiento.html#bk-priv", "bk-web": "reserva-seguimiento.html#bk-web", "bk-err": "reserva-seguimiento.html#bk-err", "bk-send": "reserva-seguimiento.html#bk-send", "bk-ok": "reserva-seguimiento.html#bk-ok", "bk-oksum": "reserva-seguimiento.html#bk-oksum", "bk-okmsg": "reserva-seguimiento.html#bk-okmsg", "bk-otra": "reserva-seguimiento.html#bk-otra"}};</script>
 <script>
 (function(){
   // ---------- icons (lucide) ----------
@@ -615,8 +661,76 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
     root.querySelectorAll('[data-ic2]').forEach(function(s){ if(!s.innerHTML) s.innerHTML = svg(s.getAttribute('data-ic2')); });
   }
 
+
+  // ---------- herramientas ----------
+  window.__toolInit = {};
+  function leerJSON(id){ var el = document.getElementById(id); try { return el ? JSON.parse(el.textContent) : null; } catch(e){ return null; } }
+  function norm(t){ return (t||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,''); }
+  function escH(t){ return String(t).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  function n1(v){ return v === null || v === undefined ? '—' : String(Math.round(v*10)/10).replace('.', ','); }
+  window.__toolInit['calorias-alimentos'] = function(){
+    var app = document.getElementById('al-app'); if (!app || app.__ok) return; app.__ok = true;
+    var D = leerJSON('datos-alimentos'); if (!D) return;
+    var cat = '', q = '';
+    var cats = document.getElementById('al-cats');
+    cats.innerHTML = ['Todos'].concat(D.cats).map(function(c,i){ return '<button type="button" class="tl-chip" data-cat="'+(i?escH(c):'')+'" aria-pressed="'+(i?'false':'true')+'">'+escH(c)+'</button>'; }).join('');
+    cats.addEventListener('click', function(e){ var b = e.target.closest('[data-cat]'); if (!b) return; cat = b.getAttribute('data-cat'); cats.querySelectorAll('[data-cat]').forEach(function(x){ x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); pintar(); });
+    document.getElementById('al-q').addEventListener('input', function(){ q = norm(this.value.trim()); pintar(); });
+    function fila(nom, v100, g, fact, cls){ return '<tr'+(cls?' class="'+cls+'"':'')+'><td>'+nom+'</td><td>'+(v100===null?'—':n1(v100)+' '+g)+'</td><td>'+(v100===null?'—':n1(v100*fact)+' '+g)+'</td></tr>'; }
+    function pintar(){
+      var L = D.a.filter(function(a){ return (!cat || a[1] === cat) && (!q || norm(a[0]).indexOf(q) >= 0); });
+      document.getElementById('al-count').textContent = L.length ? L.length + (L.length === 1 ? ' alimento' : ' alimentos') + ' · pulsa en uno para ver todo lo que aporta' : 'No encuentro ese alimento. Prueba con otra palabra o elige un grupo.';
+      document.getElementById('al-list').innerHTML = L.map(function(a){
+        var f = a[10]/100, sal = a[9] === null ? null : a[9]*2.5/1000;
+        return '<details class="tl-item"><summary><b>'+escH(a[0])+'</b><small>'+escH(a[1])+' · 1 ración ≈ '+a[10]+' g ('+escH(a[11])+')</small><span class="tl-kcal">'+a[2]+' kcal<span>por 100 g · '+Math.round(a[2]*f)+' kcal/ración</span></span></summary>'
+          + '<div class="tl-det"><table class="tl-tab"><thead><tr><th>Nutriente</th><th>Por 100 g</th><th>Por ración ('+a[10]+' g)</th></tr></thead><tbody>'
+          + fila('Energía', a[2], 'kcal', f) + fila('Proteínas', a[3], 'g', f) + fila('Hidratos de carbono', a[4], 'g', f) + fila('de los cuales, azúcares', a[5], 'g', f, 'sub')
+          + fila('Fibra', a[6], 'g', f) + fila('Grasas', a[7], 'g', f) + fila('de las cuales, saturadas', a[8], 'g', f, 'sub') + fila('Sal', sal, 'g', f)
+          + '</tbody></table></div></details>';
+      }).join('');
+    }
+    pintar();
+  };
+  window.__toolInit['recetas-con-lo-que-tengo'] = function(){
+    var app = document.getElementById('re-app'); if (!app || app.__ok) return; app.__ok = true;
+    var D = leerJSON('datos-recetas'); if (!D) return;
+    var tengo = {}, tag = '';
+    try { (JSON.parse(localStorage.getItem('nh_tengo')||'[]')).forEach(function(i){ tengo[i] = 1; }); } catch(e){}
+    var ing = document.getElementById('re-ing');
+    ing.innerHTML = D.grupos.map(function(g){ return '<div class="tl-grp"><h3>'+escH(g[0])+'</h3><div class="tl-chips">'+g[1].map(function(i){ return '<button type="button" class="tl-chip" data-ing="'+escH(i)+'" aria-pressed="'+(tengo[i]?'true':'false')+'">'+escH(i)+'</button>'; }).join('')+'</div></div>'; }).join('');
+    ing.addEventListener('click', function(e){ var b = e.target.closest('[data-ing]'); if (!b) return; var i = b.getAttribute('data-ing'); if (tengo[i]) delete tengo[i]; else tengo[i] = 1; b.setAttribute('aria-pressed', tengo[i] ? 'true' : 'false'); guardar(); pintar(); });
+    document.getElementById('re-clear').addEventListener('click', function(){ tengo = {}; ing.querySelectorAll('[data-ing]').forEach(function(b){ b.setAttribute('aria-pressed','false'); }); guardar(); pintar(); });
+    var TAGS = [['','Todas'],['vegetariana','Vegetarianas'],['sin gluten','Sin gluten'],['sin lactosa','Sin lactosa'],['rápida','Rápidas']];
+    var tg = document.getElementById('re-tags');
+    tg.innerHTML = TAGS.map(function(t,i){ return '<button type="button" class="tl-chip" data-tag="'+t[0]+'" aria-pressed="'+(i?'false':'true')+'">'+t[1]+'</button>'; }).join('');
+    tg.addEventListener('click', function(e){ var b = e.target.closest('[data-tag]'); if (!b) return; tag = b.getAttribute('data-tag'); tg.querySelectorAll('[data-tag]').forEach(function(x){ x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); pintar(); });
+    function guardar(){ try { localStorage.setItem('nh_tengo', JSON.stringify(Object.keys(tengo))); } catch(e){} }
+    function esDespensa(n){ return D.despensa.indexOf(n) >= 0; }
+    function pintar(){
+      var sel = Object.keys(tengo), haySel = sel.length > 0;
+      document.getElementById('re-sel').textContent = haySel ? 'Has marcado ' + sel.length + (sel.length === 1 ? ' ingrediente' : ' ingredientes') : 'Aún no has marcado nada: te enseño todas las recetas.';
+      var L = D.r.map(function(r){
+        var princ = r[5].filter(function(x){ return !esDespensa(x[0]); });
+        var falta = princ.filter(function(x){ return !tengo[x[0]]; });
+        return { r: r, total: princ.length, falta: falta.length, tiene: princ.length - falta.length };
+      }).filter(function(o){
+        var t = o.r[4]; if (tag === 'vegetariana' && t.indexOf('vegetariana') < 0 && t.indexOf('vegana') < 0) return false;
+        if (tag && tag !== 'vegetariana' && t.indexOf(tag) < 0) return false;
+        return !haySel || o.tiene > 0;
+      });
+      L.sort(function(a,b){ return haySel ? (a.falta - b.falta) || (b.tiene - a.tiene) : a.r[1] - b.r[1]; });
+      document.getElementById('re-count').textContent = L.length ? L.length + (L.length === 1 ? ' receta' : ' recetas') + (haySel ? ', primero las que tienen menos ingredientes que te falten' : '') : 'Ninguna receta usa esos ingredientes todavía. Prueba a marcar alguno más.';
+      document.getElementById('re-list').innerHTML = L.map(function(o){
+        var r = o.r, m = !haySel ? '' : (o.falta === 0 ? '<span class="tl-match ok">¡Lo tienes todo!</span>' : '<span class="tl-match casi">Te falta' + (o.falta === 1 ? ' 1 ingrediente' : 'n ' + o.falta) + '</span>');
+        return '<details class="tl-item"><summary><b>'+escH(r[0])+'</b><small>'+escH(r[3])+' · '+r[1]+' min · '+r[2]+(r[2]===1?' ración':' raciones')+'</small><span class="tl-kcal" style="font-size:.9rem">'+m+'</span><span class="tl-tags">'+r[4].map(function(t){ return '<span>'+escH(t)+'</span>'; }).join('')+'</span></summary>'
+          + '<div class="tl-det tl-rec"><h4>Ingredientes</h4><ul>' + r[5].map(function(x){ var f = haySel && !esDespensa(x[0]) && !tengo[x[0]]; return '<li'+(f?' class="falta"':'')+'>'+escH(x[0].charAt(0).toUpperCase()+x[0].slice(1))+': '+escH(x[1])+'</li>'; }).join('') + '</ul>'
+          + '<h4>Paso a paso</h4><ol>' + r[6].map(function(p){ return '<li>'+escH(p)+'</li>'; }).join('') + '</ol></div></details>';
+      }).join('');
+    }
+    pintar();
+  };
   // ---------- nav ----------
-  var NAV = [['inicio','Inicio'],['dietista-nutricionista-en-valladolid','Servicios'],['nutricionista-online','Online'],['asesoria-externa','Asesoría externa'],['publicaciones','Colaboraciones'],['cursos-talleres','Cursos/Talleres'],['blog-nutricion','Blog'],['contacto','Contacto']];
+  var NAV = [['inicio','Inicio'],['dietista-nutricionista-en-valladolid','Servicios'],['nutricionista-online','Online'],['asesoria-externa','Asesoría externa'],['publicaciones','Colaboraciones'],['cursos-talleres','Cursos/Talleres'],['blog-nutricion','Blog'],['herramientas','Herramientas'],['contacto','Contacto']];
   var navHTML = NAV.map(function(n){ return '<a href="#'+n[0]+'" data-nav="'+n[0]+'">'+n[1]+'</a>'; }).join('');
   // En la versión publicada por páginas, el menú ya viene escrito en el HTML
   if (!document.querySelector('nav.main').children.length) {
@@ -658,7 +772,9 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
     vegetariana:['alimentacion-vegetariana-vegana-valladolid','hero','Vegetariana y vegana','Completa y bien planificada'],
     infantil:['nutricion-infantil-valladolid','hero','Nutrición infantil','BLW, niños que no comen, menús familiares'],
     fodmap:['dieta-fodmap','online','Guía: dieta FODMAP','Qué es, fases y alimentos'],
-    sibo:['dieta-sibo','tips','Guía: dieta para el SIBO','Qué comer y qué evitar']
+    sibo:['dieta-sibo','tips','Guía: dieta para el SIBO','Qué comer y qué evitar'],
+    calorias:['calorias-alimentos','hero','Qué aporta cada alimento','Calorías y nutrientes'],
+    recetas:['recetas-con-lo-que-tengo','online','¿Qué cocino con lo que tengo?','Recetas con tus ingredientes']
   };
   document.querySelectorAll('[data-cta]').forEach(function(el){
     var html = '';
@@ -976,8 +1092,8 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
   // ---------- routing ----------
   var pages = [].slice.call(document.querySelectorAll('[data-page]'));
   var names = pages.map(function(p){ return p.getAttribute('data-page'); });
-  var ALIAS = {'fodmap':'dieta-fodmap','sibo':'dieta-sibo','perdida-de-peso':'perdida-de-peso-valladolid','patologias-digestivas':'patologias-digestivas-valladolid','vegana':'alimentacion-vegetariana-vegana-valladolid','infantil':'nutricion-infantil-valladolid','nutricion-infantil':'nutricion-infantil-valladolid','oncologica':'nutricion-oncologica-valladolid','nutricion-oncologica':'nutricion-oncologica-valladolid','reserva':'contacto','cita':'contacto','reservar':'contacto','servicios':'dietista-nutricionista-en-valladolid','online':'nutricionista-online','asesoria':'asesoria-externa','colaboraciones':'publicaciones','cursos':'cursos-talleres','blog':'blog-nutricion','todos-los-servicios':'nuestros-servicios','nutricion-deportiva':'nutricion-deportiva-valladolid','privacidad':'proteccion-de-datos'};
-  var NAVMAP = {'dieta-fodmap':'blog-nutricion','dieta-sibo':'blog-nutricion','perdida-de-peso-valladolid':'dietista-nutricionista-en-valladolid','patologias-digestivas-valladolid':'dietista-nutricionista-en-valladolid','alimentacion-vegetariana-vegana-valladolid':'dietista-nutricionista-en-valladolid','nutricion-infantil-valladolid':'dietista-nutricionista-en-valladolid','nutricion-oncologica-valladolid':'dietista-nutricionista-en-valladolid','nuestros-servicios':'dietista-nutricionista-en-valladolid','nutricion-deportiva-valladolid':'dietista-nutricionista-en-valladolid','tips':'blog-nutricion'};
+  var ALIAS = {'calorias':'calorias-alimentos','recetas':'recetas-con-lo-que-tengo','herramienta':'herramientas','sibo':'dieta-sibo','perdida-de-peso':'perdida-de-peso-valladolid','patologias-digestivas':'patologias-digestivas-valladolid','vegana':'alimentacion-vegetariana-vegana-valladolid','infantil':'nutricion-infantil-valladolid','nutricion-infantil':'nutricion-infantil-valladolid','oncologica':'nutricion-oncologica-valladolid','nutricion-oncologica':'nutricion-oncologica-valladolid','reserva':'contacto','cita':'contacto','reservar':'contacto','servicios':'dietista-nutricionista-en-valladolid','online':'nutricionista-online','asesoria':'asesoria-externa','colaboraciones':'publicaciones','cursos':'cursos-talleres','blog':'blog-nutricion','todos-los-servicios':'nuestros-servicios','nutricion-deportiva':'nutricion-deportiva-valladolid','privacidad':'proteccion-de-datos'};
+  var NAVMAP = {'calorias-alimentos':'herramientas','recetas-con-lo-que-tengo':'herramientas','dieta-fodmap':'blog-nutricion','dieta-sibo':'blog-nutricion','perdida-de-peso-valladolid':'dietista-nutricionista-en-valladolid','patologias-digestivas-valladolid':'dietista-nutricionista-en-valladolid','alimentacion-vegetariana-vegana-valladolid':'dietista-nutricionista-en-valladolid','nutricion-infantil-valladolid':'dietista-nutricionista-en-valladolid','nutricion-oncologica-valladolid':'dietista-nutricionista-en-valladolid','nuestros-servicios':'dietista-nutricionista-en-valladolid','nutricion-deportiva-valladolid':'dietista-nutricionista-en-valladolid','tips':'blog-nutricion'};
   var current = null;
   var MPA = window.__MPA || null;
   // Versión publicada por páginas: los enlaces #seccion pasan a ser páginas reales (seccion.html)
@@ -997,6 +1113,7 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
     var navKeyM = NAVMAP[current] || current;
     document.querySelectorAll('[data-nav]').forEach(function(a){ if (a.getAttribute('data-nav') === navKeyM) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current'); });
     if (current === 'reserva-seguimiento' && window.__bkInit) window.__bkInit();
+    if (window.__toolInit[current]) window.__toolInit[current]();
     var irAncla = function(){
       var h = decodeURIComponent((location.hash||'').slice(1)), el = h ? document.getElementById(h) : null;
       header.classList.remove('open'); mb.setAttribute('aria-expanded','false');
@@ -1018,6 +1135,7 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
       pages.forEach(function(p){ var on = p.getAttribute('data-page') === target; p.hidden = !on; if(on){ p.style.animation='none'; void p.offsetWidth; p.style.animation=''; } });
       current = target;
       if (target === 'reserva-seguimiento' && window.__bkInit) window.__bkInit();
+      if (window.__toolInit[target]) window.__toolInit[target]();
     }
     var navKey = NAVMAP[target] || target;
     document.querySelectorAll('[data-nav]').forEach(function(a){ if (a.getAttribute('data-nav') === navKey) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current'); });
