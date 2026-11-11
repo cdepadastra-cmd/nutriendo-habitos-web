@@ -1,0 +1,46 @@
+# Descarga la base oficial USDA FoodData Central (SR Legacy, dominio público CC0) y guarda
+# un resumen de nutrientes en _fuente/datos-alimentos/usda_sr.json. Se lanza a mano.
+name: Datos de alimentos
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  datos:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Descargar SR Legacy
+        run: |
+          curl -sSL -o sr.zip https://fdc.nal.usda.gov/fdc-datasets/FoodData_Central_sr_legacy_food_csv_2018-04.zip
+          unzip -q -o sr.zip -d sr
+          ls -R sr | head -40
+      - name: Resumir nutrientes
+        run: |
+          python3 - <<'EOF'
+          import csv, json, glob, os
+          base = os.path.dirname(glob.glob('sr/**/food.csv', recursive=True)[0])
+          cats = {r['id']: r['description'] for r in csv.DictReader(open(f'{base}/food_category.csv', encoding='utf-8'))}
+          foods = {r['fdc_id']: {'d': r['description'], 'c': cats.get(r['food_category_id'], '')} for r in csv.DictReader(open(f'{base}/food.csv', encoding='utf-8'))}
+          want = {'1008': 'kcal', '1003': 'prot', '1004': 'grasa', '1005': 'hc', '1079': 'fibra', '2000': 'azuc', '1258': 'sat', '1093': 'sodio', '1087': 'calcio', '1089': 'hierro'}
+          for r in csv.DictReader(open(f'{base}/food_nutrient.csv', encoding='utf-8')):
+              k = want.get(r['nutrient_id'])
+              if k and r['fdc_id'] in foods:
+                  try: foods[r['fdc_id']][k] = round(float(r['amount']), 2)
+                  except ValueError: pass
+          ndb = {}
+          p = glob.glob(f'{base}/sr_legacy_food.csv')
+          if p:
+              for r in csv.DictReader(open(p[0], encoding='utf-8')): ndb[r['fdc_id']] = r['NDB_number']
+          out = [dict(id=k, ndb=ndb.get(k, ''), **v) for k, v in foods.items() if 'kcal' in v]
+          os.makedirs('_fuente/datos-alimentos', exist_ok=True)
+          json.dump(out, open('_fuente/datos-alimentos/usda_sr.json', 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
+          print(len(out), 'alimentos')
+          EOF
+      - name: Guardar en el repositorio
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add _fuente/datos-alimentos/usda_sr.json
+          git commit -m "Datos USDA FoodData Central SR Legacy (dominio público) para la herramienta de alimentos" || echo "sin cambios"
+          git push
