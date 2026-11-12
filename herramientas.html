@@ -753,8 +753,9 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
       }
       document.getElementById('re-sel').textContent = haySel ? 'Tienes: ' + sel.join(', ') : 'Aún no has marcado nada: te enseño todas las recetas.';
       var L = D.r.map(function(r){
-        var fams = []; r[5].forEach(function(x){ if (x[2] && fams.indexOf(x[2]) < 0) fams.push(x[2]); });
-        var tiene = fams.filter(function(f){ return tengo[f]; }), falta = fams.filter(function(f){ return !tengo[f]; });
+        var fams = [], opc = []; r[5].forEach(function(x){ if (!x[2]) return; if (x[3]) { if (opc.indexOf(x[2]) < 0) opc.push(x[2]); } else if (fams.indexOf(x[2]) < 0) fams.push(x[2]); });
+        opc = opc.filter(function(f){ return fams.indexOf(f) < 0; });
+        var tiene = fams.concat(opc).filter(function(f){ return tengo[f]; }), falta = fams.filter(function(f){ return !tengo[f]; });
         var princ = fams.filter(function(f){ return D.principal.indexOf(f) >= 0; }), princOk = princ.filter(function(f){ return tengo[f]; });
         return { r: r, tiene: tiene, falta: falta.length, grupo: (princ.length && !princOk.length) ? 1 : 0, princOk: princOk.length };
       }).filter(function(o){
@@ -762,12 +763,12 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
         if (tag && tag !== 'vegetariana' && t.indexOf(tag) < 0) return false;
         return !haySel || o.tiene.length > 0;
       });
-      L.sort(function(a,b){ return haySel ? (a.grupo - b.grupo) || ((b.princOk * 2 - b.falta) - (a.princOk * 2 - a.falta)) || (a.falta - b.falta) || (b.tiene.length - a.tiene.length) : a.r[1] - b.r[1]; });
-      document.getElementById('re-count').textContent = L.length ? L.length + (L.length === 1 ? ' receta' : ' recetas') + (haySel ? ': primero las que aprovechan lo principal que tienes y menos ingredientes te faltan' : '') : 'Ninguna receta usa esos ingredientes todavía. Prueba a añadir alguno más.';
+      L.sort(function(a,b){ return haySel ? (a.grupo - b.grupo) || (a.falta - b.falta) || (b.princOk - a.princOk) || (b.tiene.length - a.tiene.length) : a.r[1] - b.r[1]; });
+      document.getElementById('re-count').textContent = L.length ? L.length + (L.length === 1 ? ' receta' : ' recetas') + (haySel ? ': primero las que puedes hacer ya con lo que tienes' : '') : 'Ninguna receta usa esos ingredientes todavía. Prueba a añadir alguno más.';
       document.getElementById('re-list').innerHTML = L.map(function(o){
         var r = o.r, m = !haySel ? '' : (o.falta === 0 ? '<span class="tl-match ok">¡Lo tienes todo!</span>' : '<span class="tl-match casi">Te falta' + (o.falta === 1 ? ' 1 ingrediente' : 'n ' + o.falta) + '</span>');
         return '<details class="tl-item"><summary class="tl-rec-sum"><b>'+escH(r[0])+'</b><small>'+escH(r[3])+' · '+r[1]+' min · '+r[2]+(r[2]===1?' ración':' raciones')+'</small>'+(haySel ? '<span class="tl-usa">Usa: '+escH(o.tiene.join(', '))+'</span>' : '')+'<span class="tl-kcal" style="font-size:.9rem">'+m+'</span><span class="tl-tags">'+r[4].map(function(t){ return '<span>'+escH(t)+'</span>'; }).join('')+'</span></summary>'
-          + '<div class="tl-det tl-rec"><h4>Ingredientes</h4><ul>' + r[5].map(function(x){ var f = haySel && x[2] && !tengo[x[2]]; return '<li'+(f?' class="falta"':'')+'>'+escH(x[0].charAt(0).toUpperCase()+x[0].slice(1))+': '+escH(x[1])+'</li>'; }).join('') + '</ul>'
+          + '<div class="tl-det tl-rec"><h4>Ingredientes</h4><ul>' + r[5].map(function(x){ var f = haySel && x[2] && !x[3] && !tengo[x[2]]; return '<li'+(f?' class="falta"':'')+'>'+escH(x[0].charAt(0).toUpperCase()+x[0].slice(1))+': '+escH(x[1])+'</li>'; }).join('') + '</ul>'
           + '<h4>Paso a paso</h4><ol>' + r[6].map(function(p){ return '<li>'+escH(p)+'</li>'; }).join('') + '</ol></div></details>';
       }).join('');
     }
