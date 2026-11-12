@@ -519,6 +519,10 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
 .tl-more summary{cursor:pointer;font-size:.88rem;color:var(--primary);font-weight:600}
 .tl-more[open] summary{margin-bottom:.6rem}
 .tl-usa{grid-column:1;font-size:.78rem;color:var(--primary)}
+.tl-ext{margin-top:1.4rem;padding:1rem 1.1rem;border-radius:1rem;background:color-mix(in oklab,var(--primary) 6%,var(--card));border:1px solid color-mix(in oklab,var(--primary) 14%,transparent)}
+.tl-ext h3{font-size:1rem;color:var(--primary);margin-bottom:.3rem;font-family:var(--font-sans)}
+.tl-ext p{font-size:.82rem;color:var(--muted-fg);margin-bottom:.7rem}
+.tl-ext a.tl-chip{text-decoration:none}
 .tl-grp{margin-bottom:.8rem}
 .tl-grp h3{font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted-fg);margin-bottom:.4rem;font-family:var(--font-sans)}
 .tl-row{display:flex;flex-wrap:wrap;align-items:center;gap:.8rem;margin:.4rem 0 1.4rem}
@@ -1319,6 +1323,7 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
       <div class="tl-chips" id="re-tags" role="group" aria-label="Filtrar recetas"></div>
       <p class="tl-count" id="re-count" aria-live="polite"></p>
       <div class="tl-list" id="re-list"></div>
+      <div class="tl-ext" id="re-ext" hidden><h3>¿Quieres más ideas con lo que tienes?</h3><p>Busca recetas con tus ingredientes en otras webs de cocina (se abren aparte; no las he revisado yo, así que fíjate en la cantidad de aceite, azúcar y sal):</p><div class="tl-chips" id="re-ext-links"></div></div>
       <p class="tl-src">Recetas sencillas de Nutriendo Hábitos. Las cantidades son orientativas: adáptalas a tu apetito y a tus necesidades.</p>
     </div>
     <section class="faq" aria-labelledby="faq-rec">
@@ -1611,6 +1616,12 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
     function guardar(){ try { localStorage.setItem('nh_tengo2', JSON.stringify(Object.keys(tengo))); } catch(e){} }
     function pintar(){
       var sel = Object.keys(tengo), haySel = sel.length > 0;
+      var ext = document.getElementById('re-ext'); ext.hidden = !haySel;
+      if (haySel) {
+        var qq = 'receta saludable ' + sel.join(' ');
+        document.getElementById('re-ext-links').innerHTML = [['Directo al Paladar','directoalpaladar.com'],['Hogarmanía','hogarmania.com'],['A mi manera','amimaneracocinando.com'],['Toda la web','']].map(function(w){
+          return '<a class="tl-chip" target="_blank" rel="noopener nofollow" href="https://www.google.com/search?q=' + encodeURIComponent(qq + (w[1] ? ' site:' + w[1] : '')) + '">' + w[0] + ' ↗</a>'; }).join('');
+      }
       document.getElementById('re-sel').textContent = haySel ? 'Tienes: ' + sel.join(', ') : 'Aún no has marcado nada: te enseño todas las recetas.';
       var L = D.r.map(function(r){
         var fams = []; r[5].forEach(function(x){ if (x[2] && fams.indexOf(x[2]) < 0) fams.push(x[2]); });
