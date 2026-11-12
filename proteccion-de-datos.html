@@ -553,6 +553,8 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
 .tl-match.ok{background:color-mix(in oklab,var(--primary) 15%,transparent);color:var(--primary)}
 .tl-match.casi{background:color-mix(in oklab,#e3a008 18%,transparent);color:#8a5a00}
 .tl-rec h4{font-size:.85rem;margin:.6rem 0 .3rem;color:var(--primary);font-family:var(--font-sans)}
+.tl-tab-rec{max-width:26rem;margin-top:.2rem}
+.tl-nota{font-size:.75rem;color:var(--muted-fg);line-height:1.5;margin:.5rem 0 0;max-width:40rem}
 .tl-rec ul,.tl-rec ol{padding-left:1.2rem;font-size:.9rem;line-height:1.6}
 .tl-rec li.falta{color:#a0522d}
 .tl-rec li.falta::after{content:" · te falta";font-size:.75rem}
@@ -767,6 +769,14 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
     var tg = document.getElementById('re-tags');
     tg.innerHTML = TAGS.map(function(t,i){ return '<button type="button" class="tl-chip" data-tag="'+t[0]+'" aria-pressed="'+(i?'false':'true')+'">'+t[1]+'</button>'; }).join('');
     tg.addEventListener('click', function(e){ var b = e.target.closest('[data-tag]'); if (!b) return; tag = b.getAttribute('data-tag'); tg.querySelectorAll('[data-tag]').forEach(function(x){ x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); pintar(); });
+    function nutri(r){
+      var v = r[7]; if (!v) return '';
+      function f(nom, x, u, cls){ return '<tr'+(cls?' class="'+cls+'"':'')+'><td>'+nom+'</td><td>'+n1(x)+' '+u+'</td></tr>'; }
+      return '<h4>Valor nutricional por ración</h4><table class="tl-tab tl-tab-rec"><thead><tr><th>Nutriente</th><th>Por ración</th></tr></thead><tbody>'
+        + f('Energía', v[0], 'kcal') + f('Proteínas', v[1], 'g') + f('Hidratos de carbono', v[2], 'g') + f('de los cuales, azúcares', v[3], 'g', 'sub')
+        + f('Fibra', v[4], 'g') + f('Grasas', v[5], 'g') + f('de las cuales, saturadas', v[6], 'g', 'sub') + f('Sal', v[7], 'g')
+        + '</tbody></table><p class="tl-nota">Valores aproximados, calculados con la misma base de datos que la herramienta de alimentos (USDA FoodData Central). No incluyen los ingredientes opcionales ni la sal que añadas al cocinar.</p>';
+    }
     function guardar(){ try { localStorage.setItem('nh_tengo2', JSON.stringify(Object.keys(tengo))); } catch(e){} }
     function pintar(){
       var sel = Object.keys(tengo), haySel = sel.length > 0;
@@ -792,9 +802,9 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
       document.getElementById('re-count').textContent = L.length ? L.length + (L.length === 1 ? ' receta' : ' recetas') + (haySel ? ': primero las que puedes hacer ya con lo que tienes' : '') : 'Ninguna receta usa esos ingredientes todavía. Prueba a añadir alguno más.';
       document.getElementById('re-list').innerHTML = L.map(function(o){
         var r = o.r, m = !haySel ? '' : (o.falta === 0 ? '<span class="tl-match ok">¡Lo tienes todo!</span>' : '<span class="tl-match casi">Te falta' + (o.falta === 1 ? ' 1 ingrediente' : 'n ' + o.falta) + '</span>');
-        return '<details class="tl-item"><summary class="tl-rec-sum"><b>'+escH(r[0])+'</b><small>'+escH(r[3])+' · '+r[1]+' min · '+r[2]+(r[2]===1?' ración':' raciones')+'</small>'+(haySel ? '<span class="tl-usa">Usa: '+escH(o.tiene.join(', '))+'</span>' : '')+'<span class="tl-kcal" style="font-size:.9rem">'+m+'</span><span class="tl-tags">'+r[4].map(function(t){ return '<span>'+escH(t)+'</span>'; }).join('')+'</span></summary>'
+        return '<details class="tl-item"><summary class="tl-rec-sum"><b>'+escH(r[0])+'</b><small>'+escH(r[3])+' · '+r[1]+' min · '+r[2]+(r[2]===1?' ración':' raciones')+(r[7]?' · ≈ '+r[7][0]+' kcal por ración':'')+'</small>'+(haySel ? '<span class="tl-usa">Usa: '+escH(o.tiene.join(', '))+'</span>' : '')+'<span class="tl-kcal" style="font-size:.9rem">'+m+'</span><span class="tl-tags">'+r[4].map(function(t){ return '<span>'+escH(t)+'</span>'; }).join('')+'</span></summary>'
           + '<div class="tl-det tl-rec"><h4>Ingredientes</h4><ul>' + r[5].map(function(x){ var f = haySel && x[2] && !x[3] && !tengo[x[2]]; return '<li'+(f?' class="falta"':'')+'>'+escH(x[0].charAt(0).toUpperCase()+x[0].slice(1))+': '+escH(x[1])+'</li>'; }).join('') + '</ul>'
-          + '<h4>Paso a paso</h4><ol>' + r[6].map(function(p){ return '<li>'+escH(p)+'</li>'; }).join('') + '</ol></div></details>';
+          + '<h4>Paso a paso</h4><ol>' + r[6].map(function(p){ return '<li>'+escH(p)+'</li>'; }).join('') + '</ol>' + nutri(r) + '</div></details>';
       }).join('');
     }
     pintar();
