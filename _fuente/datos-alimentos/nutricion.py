@@ -50,7 +50,7 @@ def alimento(n, q):
         'salmón': 'Salmón (crudo)', 'salsa de soja': 'usda:174277', 'sardinas en lata': 'Sardinas en aceite (lata)',
         'semillas': 'Sésamo', 'tofu': 'Tofu firme', 'tomate': 'Tomate', 'tomate triturado': 'Tomate triturado (lata)',
         'tortillas de trigo': 'usda:173242', 'vinagre': 'usda:173469', 'vino blanco': 'usda:173195', 'yogur natural': 'Yogur natural',
-        'zanahoria': 'Zanahoria',
+        'zanahoria': 'Zanahoria', 'bebida vegetal': 'Bebida de soja', 'soja texturizada': 'Soja texturizada (en seco)',
     }
     return M.get(n)
 
