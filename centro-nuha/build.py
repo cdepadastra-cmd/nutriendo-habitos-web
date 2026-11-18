@@ -26,7 +26,7 @@ MAPS = 'https://www.google.com/maps/search/?api=1&query=Calle+Gregorio+Fern%C3%A
 NH = 'https://www.nutriendohabitos.es/'
 
 MENU = [('index.html', 'Inicio'), ('fisioterapia.html', 'Fisioterapia'), ('acupuntura.html', 'Acupuntura'),
-        ('nutricion.html', 'Nutrición'), ('quienes-somos.html', 'Quiénes somos'),
+        ('nutricion.html', 'Nutrición'), ('psicologia.html', 'Psicología'), ('quienes-somos.html', 'Quiénes somos'),
         ('instalaciones.html', 'Instalaciones'), ('contacto.html', 'Contacto')]
 
 CSS = r"""
@@ -64,7 +64,9 @@ header.top{position:sticky;top:0;z-index:20;background:rgba(245,240,232,.94);bac
 section.blk{padding:72px 0}section.alt{background:var(--white)}
 .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:36px;align-items:center}
-@media(max-width:860px){.grid3,.grid2{grid-template-columns:1fr}}
+.grid3.g4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:1100px){.grid3.g4{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:860px){.grid3,.grid3.g4,.grid2{grid-template-columns:1fr}}
 .card{background:var(--white);border:1px solid var(--line);border-radius:18px;overflow:hidden;display:flex;flex-direction:column}
 section.alt .card{background:var(--sand)}
 .card img{aspect-ratio:3/2;object-fit:cover;width:100%}
@@ -132,7 +134,8 @@ NEGOCIO = {
     'availableService': [
         {'@type': 'MedicalTherapy', 'name': 'Fisioterapia y osteopatía', 'url': BASE + 'fisioterapia.html'},
         {'@type': 'MedicalTherapy', 'name': 'Acupuntura', 'url': BASE + 'acupuntura.html'},
-        {'@type': 'MedicalTherapy', 'name': 'Nutrición y dietética', 'url': BASE + 'nutricion.html'}],
+        {'@type': 'MedicalTherapy', 'name': 'Nutrición y dietética', 'url': BASE + 'nutricion.html'},
+        {'@type': 'MedicalTherapy', 'name': 'Psicología', 'url': BASE + 'psicologia.html'}],
     'subOrganization': {'@type': 'MedicalBusiness', 'name': 'Nutriendo Hábitos', 'url': NH},
 }
 
@@ -174,9 +177,9 @@ def pagina(archivo, titulo, desc, cuerpo, extra_ld=None, robots='index,follow'):
 </main>
 <footer class="foot"><div class="wrap">
 <div class="cols">
-<div><h4>Centro Nuha</h4><p>Fisioterapia y osteopatía, acupuntura y nutrición en el centro de Valladolid, a pocos minutos del Campo Grande.</p>
+<div><h4>Centro Nuha</h4><p>Fisioterapia y osteopatía, acupuntura, nutrición y psicología en el centro de Valladolid, a pocos minutos del Campo Grande.</p>
 <p>{DIR}<br>{CP} Valladolid</p></div>
-<div><h4>Especialidades</h4><ul><li><a href="fisioterapia.html">Fisioterapia y osteopatía</a></li><li><a href="acupuntura.html">Acupuntura</a></li><li><a href="nutricion.html">Nutrición</a></li><li><a href="cursos-talleres.html">Talleres</a></li></ul></div>
+<div><h4>Especialidades</h4><ul><li><a href="fisioterapia.html">Fisioterapia y osteopatía</a></li><li><a href="acupuntura.html">Acupuntura</a></li><li><a href="nutricion.html">Nutrición</a></li><li><a href="psicologia.html">Psicología</a></li><li><a href="cursos-talleres.html">Talleres</a></li></ul></div>
 <div><h4>Contacto</h4><ul><li><a href="tel:{TEL_LINK}">{TEL}</a></li><li><a href="mailto:{EMAIL}">{EMAIL}</a></li><li><a href="{MAPS}" target="_blank" rel="noopener">Cómo llegar</a></li><li><a href="{NH}" target="_blank" rel="noopener">Nutriendo Hábitos</a></li></ul></div>
 </div>
 <div class="legal"><span>© {datetime.date.today().year} Centro Nuha · Valladolid</span><span><a href="quienes-somos.html">Quiénes somos</a> · <a href="instalaciones.html">Instalaciones</a> · <a href="proteccion-de-datos.html">Protección de datos</a></span></div>
@@ -212,24 +215,25 @@ PAGS = {}
 # ------------------------------------------------------------------ inicio
 f_html, f_ld = faq([
     ('¿Dónde está Centro Nuha?', f'En {DIR}, en el centro de Valladolid, a pocos minutos andando del Campo Grande.'),
-    ('¿Qué especialidades hay en el centro?', 'Fisioterapia y osteopatía con Amaya Arnaiz, acupuntura con el médico acupuntor Adolfo Argüello Fernández y nutrición con dietista-nutricionista colegiada (Nutriendo Hábitos).'),
+    ('¿Qué especialidades hay en el centro?', 'Fisioterapia y osteopatía con Amaya Arnaiz, acupuntura con el médico acupuntor Adolfo Argüello Fernández, nutrición con dietista-nutricionista colegiada (Nutriendo Hábitos) y psicología.'),
     ('¿Cómo pido cita?', f'Cada profesional gestiona su agenda: fisioterapia con Amaya Arnaiz en el 606 926 228 (teléfono y WhatsApp); nutrición con Andrea Argüello en el 669 87 70 52 o con el formulario de nutriendohabitos.es; acupuntura y dudas generales en el {TEL}.'),
     ('¿Se pueden combinar tratamientos?', 'Sí. Al estar en el mismo centro, los profesionales pueden coordinarse cuando un mismo problema se beneficia de varios enfoques, por ejemplo dolor de espalda con fisioterapia y acupuntura, o digestiones pesadas con nutrición y osteopatía visceral.'),
 ])
-PAGS['index.html'] = ('Centro Nuha · Fisioterapia, acupuntura y nutrición en Valladolid',
-    'Centro de salud en el centro de Valladolid: fisioterapia y osteopatía, acupuntura con médico acupuntor y nutricionista. Calle Gregorio Fernández 4. Pide cita en el 983 35 47 63.',
-    hero('mbr-1626x1080.jpg', 'Centro Nuha · Valladolid', 'Fisioterapia, acupuntura y nutrición en el centro de Valladolid',
+PAGS['index.html'] = ('Centro Nuha · Fisioterapia, acupuntura, nutrición y psicología en Valladolid',
+    'Centro de salud en el centro de Valladolid: fisioterapia y osteopatía, acupuntura con médico acupuntor, nutricionista y psicología. Calle Gregorio Fernández 4. Pide cita en el 983 35 47 63.',
+    hero('mbr-1626x1080.jpg', 'Centro Nuha · Valladolid', 'Fisioterapia, acupuntura, nutrición y psicología en el centro de Valladolid',
          'Un lugar para la salud. Profesionales sanitarios con muchos años de experiencia, en un mismo centro y a pocos minutos del Campo Grande.', small=False) +
     f'''<section class="blk"><div class="wrap">
-<div class="eyebrow">Especialidades</div><h2>Tres formas de cuidarte, un mismo centro</h2>
-<div class="grid3">
+<div class="eyebrow">Especialidades</div><h2>Cuatro formas de cuidarte, un mismo centro</h2>
+<div class="grid3 g4">
 <article class="card"><img src="{IMG}mbr-1-600x400.jpg" alt="Sesión de fisioterapia en Centro Nuha, Valladolid" loading="lazy"><div class="in"><h3>Fisioterapia y osteopatía</h3><p>Con Amaya Arnaiz, fisioterapeuta y osteópata: dolor de espalda, dolor persistente, reeducación postural, mandíbula y cefaleas, osteopatía visceral y fisioterapia para músicos.</p><a class="more" href="fisioterapia.html">Fisioterapia en Valladolid →</a></div></article>
 <article class="card"><img src="{IMG}mbr-600x495.jpg" alt="Acupuntura en Centro Nuha, Valladolid" loading="lazy"><div class="in"><h3>Acupuntura</h3><p>Con Adolfo Argüello, médico acupuntor licenciado en Medicina y Cirugía y diplomado en Medicina Tradicional China. Lumbociáticas, migrañas, ansiedad y acompañamiento en el embarazo.</p><a class="more" href="acupuntura.html">Acupuntura en Valladolid →</a></div></article>
 <article class="card"><img src="{IMG}mbr-600x337.jpg" alt="Consulta de nutrición en Centro Nuha, Valladolid" loading="lazy"><div class="in"><h3>Nutrición</h3><p>Con Andrea Argüello, dietista-nutricionista (Nutriendo Hábitos): aprender a comer sin dietas estrictas, nutrición deportiva, oncológica y digestiva. Presencial y online.</p><a class="more" href="nutricion.html">Nutricionista en Valladolid →</a></div></article>
+<article class="card"><img src="{IMG}mbr-2000x1333.jpg" alt="Psicología en Centro Nuha, Valladolid" loading="lazy"><div class="in"><h3>Psicología</h3><p>Un espacio para cuidar también la mente: ansiedad y estrés, estado de ánimo, autoestima y momentos de cambio, en coordinación con el resto del equipo.</p><a class="more" href="psicologia.html">Psicología en Valladolid →</a></div></article>
 </div></div></section>
 <section class="blk alt"><div class="wrap grid2">
 <div><div class="eyebrow">Por qué Centro Nuha</div><h2>Profesionales que se coordinan entre sí</h2>
-<p>Centro Nuha reúne en un mismo espacio fisioterapia, acupuntura y nutrición. Cada profesional trabaja en su especialidad y, cuando tiene sentido, se coordina con los demás para atender el problema desde su origen y no solo el síntoma.</p>
+<p>Centro Nuha reúne en un mismo espacio fisioterapia, acupuntura, nutrición y psicología. Cada profesional trabaja en su especialidad y, cuando tiene sentido, se coordina con los demás para atender el problema desde su origen y no solo el síntoma.</p>
 <ul class="list"><li><b>Atención individual.</b> Valoramos a cada persona y sus circunstancias para adaptar el tratamiento.</li><li><b>Experiencia.</b> Más de 10 años atendiendo pacientes en Valladolid.</li><li><b>En el centro.</b> {DIR}, a pocos minutos del Campo Grande.</li></ul></div>
 <div class="pic"><img src="{IMG}mbr-1920x1440.jpg" alt="Tratamiento en Centro Nuha, Valladolid" loading="lazy"></div>
 </div></section>
@@ -353,6 +357,38 @@ PAGS['nutricion.html'] = ('Nutricionista en Valladolid · Consulta de nutrición
 <section class="blk"><div class="wrap"><div class="eyebrow">Dudas</div><h2>Preguntas sobre nutrición</h2>{f_html}</div></section>
 ''', [f_ld, migas(('Inicio', ''), ('Nutrición', 'nutricion.html'))])
 
+# ------------------------------------------------------------------ psicologia
+# Profesional aún sin confirmar: cuando lo haya, añadir nombre, titulación y n.º de colegiado/a (no inventar).
+f_html, f_ld = faq([
+    ('¿Qué se trata en la consulta de psicología?', 'Ansiedad y estrés, estado de ánimo bajo, autoestima, duelo, momentos de cambio o crisis, dificultades en las relaciones y malestar emocional que se refleja en el cuerpo, como el dolor persistente o la relación con la comida.'),
+    ('¿Cómo es la primera consulta?', 'Es una conversación para conocer qué te trae, cómo te afecta en tu día a día y qué te gustaría cambiar. A partir de ahí se plantea un plan de trabajo adaptado a ti, con objetivos realistas.'),
+    ('¿Se coordina con el resto de profesionales del centro?', 'Sí. Cuando lo necesitas y con tu permiso, la psicología se coordina con fisioterapia, acupuntura o nutrición, por ejemplo en dolor crónico, ansiedad con síntomas físicos o problemas con la alimentación.'),
+    ('¿Cómo pido cita de psicología en Valladolid?', f'Llama al {TEL} o escribe a {EMAIL} y te informamos de la disponibilidad.'),
+])
+PAGS['psicologia.html'] = ('Psicología en Valladolid · Consulta de psicología en Centro Nuha',
+    f'Consulta de psicología en Centro Nuha, en el centro de Valladolid ({DIR}): ansiedad y estrés, estado de ánimo, autoestima, duelo y momentos de cambio. Pide información en el {TEL}.',
+    hero('mbr-2000x1052.jpg', 'Psicología · Bienestar emocional', 'Psicología en Valladolid, en Centro Nuha',
+         'Cuidar la mente también es cuidar la salud. Un espacio cercano y confidencial para entender lo que te pasa y encontrar tus propios recursos.', 'Psicología') +
+    f'''<section class="blk"><div class="wrap grid2">
+<div class="prose"><div class="eyebrow">Nueva especialidad</div><h2>La consulta de psicología del centro</h2>
+<p>Centro Nuha incorpora la <strong>psicología</strong> a su equipo para atender a la persona de forma completa: muchas veces el cuerpo y la mente van de la mano, y un mismo problema mejora antes cuando se aborda desde varios enfoques.</p>
+<p>La terapia es un trabajo conjunto entre paciente y profesional. Partimos de una buena relación de confianza, escuchamos sin juzgar y avanzamos paso a paso hacia objetivos realistas.</p>
+<p class="note">Muy pronto presentaremos aquí al profesional de psicología del centro. Mientras tanto, puedes llamarnos y te informamos.</p>
+<a class="btn" href="tel:{TEL_LINK}">Llamar al {TEL}</a></div>
+<div class="pic"><img src="{IMG}mbr-2000x1333.jpg" alt="Acompañamiento psicológico en Centro Nuha, Valladolid" loading="lazy"></div>
+</div></section>
+<section class="blk alt"><div class="wrap"><div class="eyebrow">En qué te podemos ayudar</div><h2>Motivos frecuentes de consulta</h2>
+<div class="tiles">
+<div class="tile"><h3>Ansiedad y estrés</h3><p>Nervios, preocupación constante, insomnio o sensación de no llegar a todo.</p></div>
+<div class="tile"><h3>Estado de ánimo</h3><p>Tristeza, desánimo, falta de ilusión o de energía.</p></div>
+<div class="tile"><h3>Autoestima y relaciones</h3><p>Inseguridad, dificultades con la pareja, la familia o el trabajo.</p></div>
+<div class="tile"><h3>Momentos de cambio</h3><p>Duelos, separaciones, cambios vitales o situaciones que te desbordan.</p></div>
+</div>
+<p class="note" style="margin-top:22px"><strong>Cuerpo y mente:</strong> si además tienes <a href="fisioterapia.html">dolor persistente</a>, síntomas físicos de ansiedad o una relación difícil con la comida (<a href="nutricion.html">nutrición</a>), en Centro Nuha los profesionales pueden coordinarse contigo.</p>
+</div></section>
+<section class="blk"><div class="wrap"><div class="eyebrow">Dudas</div><h2>Preguntas sobre psicología</h2>{f_html}</div></section>
+''' + BANDA, [f_ld, migas(('Inicio', ''), ('Psicología', 'psicologia.html'))])
+
 # ------------------------------------------------------------------ quienes somos
 PAGS['quienes-somos.html'] = ('Quiénes somos · Profesionales de Centro Nuha, Valladolid',
     'Conoce al equipo de Centro Nuha en Valladolid: Adolfo Argüello (médico acupuntor), Amaya Arnaiz (fisioterapeuta y osteópata) y Andrea Argüello (dietista-nutricionista). Más de 10 años cuidando la salud en el centro de la ciudad.',
@@ -362,6 +398,7 @@ PAGS['quienes-somos.html'] = ('Quiénes somos · Profesionales de Centro Nuha, V
 <article class="pro"><div class="role">Médico acupuntor</div><h3>Adolfo Argüello Fernández</h3><ul><li>Licenciado en Medicina y Cirugía por la Universidad de Valladolid.</li><li>Colegiado nº 474706370 · Colegio de Médicos de Valladolid.</li><li>Diplomado en Medicina Tradicional China por la escuela Tian y la escuela de Alfredo Embid.</li></ul><p><a href="acupuntura.html">Acupuntura en Valladolid →</a></p></article>
 <article class="pro"><div class="role">Fisioterapeuta y osteópata</div><h3>Amaya Arnaiz Carro</h3><ul><li>Diplomada en Fisioterapia por la Universidad de Salamanca (2010).</li><li>C.O. en Osteopatía por la Escuela de Osteopatía de Madrid.</li><li>Experta en Terapia Fascial.</li><li>Certificado de profesionalidad en Yoga.</li><li>Especialista en dolor persistente y fisioterapia para músicos · <a href="https://amayaarnaiz.es/" target="_blank" rel="noopener">amayaarnaiz.es</a></li></ul><p><a href="fisioterapia.html">Fisioterapia en Valladolid →</a></p></article>
 <article class="pro"><div class="role">Dietista-nutricionista</div><h3>Andrea Argüello Arbe</h3><ul><li>Diplomada en Nutrición y Dietética por la Universidad de Valladolid.</li><li>Máster en Metabolismo por la Universidad de Barcelona.</li><li>Máster en Nutrición Oncológica (2026).</li><li>Colegiada nº CYL00060.</li></ul><p><a href="nutricion.html">Nutrición en Valladolid →</a></p></article>
+<article class="pro"><div class="role">Psicología</div><h3>Próximamente</h3><ul><li>Muy pronto presentaremos al profesional de psicología del centro.</li><li>Mientras tanto, te informamos en el {TEL}.</li></ul><p><a href="psicologia.html">Psicología en Valladolid →</a></p></article>
 </div></div></section>
 ''' + BANDA, [migas(('Inicio', ''), ('Quiénes somos', 'quienes-somos.html'))])
 
@@ -386,6 +423,7 @@ PAGS['contacto.html'] = ('Contacto y cita · Centro Nuha, Valladolid',
 <div class="contact">
 <a class="c" href="https://wa.me/34606926228" target="_blank" rel="noopener"><b>Fisioterapia · Amaya Arnaiz</b><span>606 926 228</span><br><small>Teléfono y WhatsApp · contacto@amayaarnaiz.es</small></a>
 <a class="c" href="{NH}contacto.html#formulario"><b>Nutrición · Andrea Argüello</b><span>669 87 70 52</span><br><small>Teléfono, WhatsApp y formulario</small></a>
+<a class="c" href="tel:{TEL_LINK}"><b>Psicología</b><span>{TEL}</span><br><small>Te informamos de la disponibilidad</small></a>
 <a class="c" href="tel:{TEL_LINK}"><b>Acupuntura y centro</b><span>{TEL}</span><br><small>{EMAIL}</small></a>
 </div>
 <h2 style="margin-top:40px">Dónde estamos</h2>
@@ -472,13 +510,14 @@ indexables = [a for a in PAGS if a != 'proteccion-de-datos.html']
 (OUT / 'sitemap.xml').write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + ''.join(
     f'  <url><loc>{BASE}{"" if a == "index.html" else a}</loc><lastmod>{HOY}</lastmod></url>\n' for a in indexables) + '</urlset>\n', encoding='utf-8')
 (OUT / 'robots.txt').write_text(f'User-agent: *\nAllow: /\n\nSitemap: {BASE}sitemap.xml\n', encoding='utf-8')
-(OUT / 'llms.txt').write_text(f"""# Centro Nuha (NUHA – Salud Integrativa) · Fisioterapia, acupuntura y nutrición en Valladolid
+(OUT / 'llms.txt').write_text(f"""# Centro Nuha (NUHA – Salud Integrativa) · Fisioterapia, acupuntura, nutrición y psicología en Valladolid
 
 > Centro de salud en {DIR} ({CP} Valladolid), a pocos minutos del Campo Grande. Teléfono {TEL} · {EMAIL}. Antes se llamaba Centro Los Arces.
 
 - [Fisioterapia y osteopatía en Valladolid]({BASE}fisioterapia.html): Amaya Arnaiz Carro, fisioterapeuta (Universidad de Salamanca, 2010) y osteópata (Escuela de Osteopatía de Madrid), experta en terapia fascial. Dolor persistente, reeducación postural, fisioterapia para músicos, espalda, ATM, osteopatía visceral. 606 926 228 · https://amayaarnaiz.es/
 - [Acupuntura en Valladolid]({BASE}acupuntura.html): Adolfo Argüello Fernández, médico acupuntor colegiado nº 474706370 en Valladolid (Medicina y Cirugía, Universidad de Valladolid; Medicina Tradicional China). Lumbociáticas, migrañas, ansiedad, fertilidad y embarazo.
 - [Nutrición en Valladolid]({BASE}nutricion.html): Andrea Argüello Arbe, dietista-nutricionista colegiada CYL00060 (Nutriendo Hábitos, {NH}). Presencial y online.
+- [Psicología en Valladolid]({BASE}psicologia.html): consulta de psicología (ansiedad, estrés, estado de ánimo, autoestima, duelo), coordinada con el resto del equipo. Información en el {TEL}.
 - [Quiénes somos]({BASE}quienes-somos.html) · [Contacto]({BASE}contacto.html)
 """, encoding='utf-8')
 if MODO == 'web':
@@ -492,10 +531,9 @@ ErrorDocument 404 /404.html
   RewriteCond %{{HTTP_HOST}} ^centronuha\\.es$ [NC]
   RewriteRule ^ https://www.centronuha.es%{{REQUEST_URI}} [L,R=301]
   # páginas antiguas
-  RewriteRule ^psicologia\\.html$ /index.html [L,R=301]
   RewriteRule ^nuestras\\.instalaciones\\.html$ /instalaciones.html [L,R=301]
   # direcciones cortas: /acupuntura -> /acupuntura.html (sirve para acupunturavalladolid.com)
-  RewriteRule ^(acupuntura|fisioterapia|nutricion|quienes-somos|instalaciones|contacto|cursos-talleres)/?$ /$1.html [L,R=301,NC]
+  RewriteRule ^(acupuntura|fisioterapia|nutricion|psicologia|quienes-somos|instalaciones|contacto|cursos-talleres)/?$ /$1.html [L,R=301,NC]
 </IfModule>
 
 <IfModule mod_deflate.c>
