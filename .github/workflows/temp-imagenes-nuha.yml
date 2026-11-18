@@ -1,0 +1,23 @@
+# Temporal: recupera del archivo de Internet (Wayback Machine) las fotos de centronuha.es. Se borra después.
+name: Temp imagenes Nuha
+on: workflow_dispatch
+jobs:
+  bajar:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          mkdir img; ok=0; fallo=""
+          for f in 27628767-1790940321207912-5785969058236033741-o-1-794x1123.jpg 28516062-353583385141636-3635879251579606501-o-2-1000x666.jpg 48418577-1970798716555404-7240199208941125632-n-960x960.jpg 51251581-1995473034087972-8937401444860952576-n-800x800.jpg logo-138x128.png logo-265x244.png mbr-1-2000x1125.jpg mbr-1-600x400.jpg mbr-1626x1080.jpg mbr-1920x1280.jpg mbr-1920x1440.jpg mbr-2000x1125.jpg mbr-2000x1651.jpg mbr-6-2000x1333.jpg mbr-600x337.jpg mbr-600x495.jpg; do
+            got=""
+            for host in www.centronuha.es centronuha.es; do
+              for u in "https://$host/assets/images/$f" "https://web.archive.org/web/2024id_/https://$host/assets/images/$f" "https://web.archive.org/web/2020id_/http://$host/assets/images/$f"; do
+                curl -sSL -m 60 -A "Mozilla/5.0" -o "img/$f" "$u" || continue
+                if file "img/$f" | grep -qiE 'image|JPEG|PNG'; then got="$u"; break 2; fi
+              done
+            done
+            if [ -n "$got" ]; then ok=$((ok+1)); echo "OK $f <- $got"; else rm -f "img/$f"; fallo="$fallo $f"; echo "FALTA $f"; fi
+            sleep 2
+          done
+          echo "recuperadas: $ok"; echo "faltan:$fallo"
+      - uses: actions/upload-artifact@v4
+        with: { name: imagenes-nuha, path: img/, retention-days: 3 }
