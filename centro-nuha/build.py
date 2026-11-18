@@ -45,15 +45,15 @@ h3{font-size:1.15rem;margin:0 0 .4em;font-weight:700}
 .eyebrow{text-transform:uppercase;letter-spacing:.16em;font-size:.75rem;font-weight:700;color:var(--terra)}
 header.top{position:sticky;top:0;z-index:20;background:rgba(245,240,232,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
 .top .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:68px}
-.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);font:700 1.15rem 'Montserrat',sans-serif;letter-spacing:.04em}
+.brand{flex-shrink:0;white-space:nowrap;display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);font:700 1.15rem 'Montserrat',sans-serif;letter-spacing:.04em}
 .brand img{width:40px;height:auto}
-.brand small{display:block;font:500 .66rem 'Montserrat',sans-serif;letter-spacing:.14em;color:var(--ink2);text-transform:uppercase}
+.brand small{display:block;white-space:nowrap;font:500 .66rem 'Montserrat',sans-serif;letter-spacing:.14em;color:var(--ink2);text-transform:uppercase}
 .nav{display:flex;gap:4px;align-items:center;font-size:.85rem;font-weight:600}
-.nav a{color:var(--ink);text-decoration:none;padding:8px 10px;border-radius:8px}
+.nav a{color:var(--ink);text-decoration:none;padding:8px 10px;border-radius:8px;white-space:nowrap}
 .nav a:hover,.nav a[aria-current]{background:var(--sand2)}
 .nav a.cta{background:var(--sage);color:#fff}.nav a.cta:hover{background:var(--sage-d)}
 .burger{display:none;background:none;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:600 .85rem 'Montserrat',sans-serif;color:var(--ink)}
-@media(max-width:900px){.burger{display:block}.nav{display:none;position:absolute;left:0;right:0;top:68px;background:var(--sand);flex-direction:column;align-items:stretch;padding:10px 20px 18px;border-bottom:1px solid var(--line)}.nav.open{display:flex}.nav a{padding:12px}}
+@media(max-width:1280px){.burger{display:block}.nav{display:none;position:absolute;left:0;right:0;top:68px;background:var(--sand);flex-direction:column;align-items:stretch;padding:10px 20px 18px;border-bottom:1px solid var(--line)}.nav.open{display:flex}.nav a{padding:12px}}
 .hero{position:relative;color:#fff;background:#24302d center/cover no-repeat;min-height:min(78vh,640px);display:flex;align-items:flex-end}
 .hero::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,28,26,.25),rgba(20,28,26,.78))}
 .hero .wrap{position:relative;padding-top:120px;padding-bottom:64px}
