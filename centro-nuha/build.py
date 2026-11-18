@@ -132,11 +132,11 @@ f.addEventListener('submit',function(e){e.preventDefault();m.className='fmsg';
 if(f.web.value){return;}
 if(!f.nombre.value.trim()||!f.telefono.value.trim()||!f.mensaje.value.trim()){m.className='fmsg err';m.textContent='Rellena nombre, teléfono y mensaje.';return;}
 if(!f.acepto.checked){m.className='fmsg err';m.textContent='Marca la casilla de protección de datos para poder enviarlo.';return;}
-if(!U){m.className='fmsg err';m.textContent='El formulario aún no está activo. Llámanos al __TEL__ y te atendemos.';return;}
+if(!U){var t='Nombre: '+f.nombre.value+'\nTeléfono: '+f.telefono.value+'\nCorreo: '+f.email.value+'\nEspecialidad: '+f.especialidad.value+'\n\n'+f.mensaje.value;location.href='mailto:__MAIL__?subject='+encodeURIComponent('Web Centro Nuha · '+f.especialidad.value)+'&body='+encodeURIComponent(t);m.className='fmsg ok';m.textContent='Se abrirá tu programa de correo con el mensaje preparado: solo tienes que enviarlo.';return;}
 var b=f.querySelector('button');b.disabled=true;m.textContent='Enviando…';
 var d=new URLSearchParams();['nombre','telefono','email','especialidad','mensaje'].forEach(function(k){d.append(k,f[k].value.trim())});d.append('pagina',location.href);
 fetch(U,{method:'POST',mode:'no-cors',body:d}).then(function(){f.reset();m.className='fmsg ok';m.textContent='¡Mensaje enviado! Te responderemos lo antes posible.';})
-.catch(function(){m.className='fmsg err';m.textContent='No se ha podido enviar. Llámanos al __TEL__.';}).then(function(){b.disabled=false;});});})();""".replace('__TEL__', TEL)
+.catch(function(){m.className='fmsg err';m.textContent='No se ha podido enviar. Llámanos al __TEL__.';}).then(function(){b.disabled=false;});});})();""".replace('__TEL__', TEL).replace('__MAIL__', EMAIL)
 JS = "document.querySelector('.burger').addEventListener('click',function(){var n=document.querySelector('.nav');var o=n.classList.toggle('open');this.setAttribute('aria-expanded',o)});"
 
 NEGOCIO = {
