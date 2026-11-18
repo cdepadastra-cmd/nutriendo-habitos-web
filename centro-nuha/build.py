@@ -330,7 +330,7 @@ f_html, f_ld = faq([
     ('¿Quién realiza la acupuntura?', 'Adolfo Argüello Fernández, médico acupuntor colegiado en Valladolid (nº 474706370): licenciado en Medicina y Cirugía por la Universidad de Valladolid y diplomado en Medicina Tradicional China por la escuela Tian y la escuela de Alfredo Embid.'),
     ('¿Para qué se usa la acupuntura?', 'En la consulta los motivos más frecuentes son lumbociáticas y dolor de espalda, migrañas y cefaleas, ansiedad y estrés, y el acompañamiento en el embarazo (fertilidad, malposiciones fetales y náuseas).'),
     ('¿La acupuntura duele?', 'Las agujas son muy finas. Lo habitual es notar un pinchazo leve o una sensación de pesadez u hormigueo en la zona, que desaparece en poco tiempo.'),
-    ('¿Cómo pido cita de acupuntura en Valladolid?', f'Llama al {TEL} o escribe a {EMAIL}. Estamos en {DIR}, en el centro de Valladolid.'),
+    ('¿Cómo pido cita de acupuntura en Valladolid?', f'Llama al {TEL} o escríbenos con el formulario de contacto. Estamos en {DIR}, en el centro de Valladolid.'),
 ])
 PAGS['acupuntura.html'] = ('Acupuntura en Valladolid · Médico acupuntor Adolfo Argüello · Centro Nuha',
     'Acupuntura en el centro de Valladolid con el médico acupuntor Adolfo Argüello Fernández: dolor de espalda y lumbociática, migrañas, ansiedad y estrés, fertilidad y embarazo. Centro Nuha, C/ Gregorio Fernández 4.',
@@ -388,7 +388,7 @@ f_html, f_ld = faq([
     ('¿Qué se trata en la consulta de psicología?', 'Ansiedad y estrés, estado de ánimo bajo, autoestima, duelo, momentos de cambio o crisis, dificultades en las relaciones y malestar emocional que se refleja en el cuerpo, como el dolor persistente o la relación con la comida.'),
     ('¿Cómo es la primera consulta?', 'Es una conversación para conocer qué te trae, cómo te afecta en tu día a día y qué te gustaría cambiar. A partir de ahí se plantea un plan de trabajo adaptado a ti, con objetivos realistas.'),
     ('¿Se coordina con el resto de profesionales del centro?', 'Sí. Cuando lo necesitas y con tu permiso, la psicología se coordina con fisioterapia, acupuntura o nutrición, por ejemplo en dolor crónico, ansiedad con síntomas físicos o problemas con la alimentación.'),
-    ('¿Cómo pido cita de psicología en Valladolid?', f'Llama al {TEL} o escribe a {EMAIL} y te informamos de la disponibilidad.'),
+    ('¿Cómo pido cita de psicología en Valladolid?', f'Llama al {TEL} o escríbenos con el formulario de contacto y te informamos de la disponibilidad.'),
 ])
 PAGS['psicologia.html'] = ('Psicología en Valladolid · Consulta de psicología en Centro Nuha',
     f'Consulta de psicología en Centro Nuha, en el centro de Valladolid ({DIR}): ansiedad y estrés, estado de ánimo, autoestima, duelo y momentos de cambio. Pide información en el {TEL}.',
