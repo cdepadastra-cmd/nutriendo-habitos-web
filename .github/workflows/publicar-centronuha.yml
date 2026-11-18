@@ -1,0 +1,38 @@
+# Publica centronuha.es por FTP cuando cambia centro-nuha/ en main (o a mano en Actions).
+# Datos de acceso como secrets del repositorio (los pone Jairo, nunca en el código):
+#   NUHA_FTP_SERVIDOR, NUHA_FTP_USUARIO, NUHA_FTP_CONTRASENA y, opcional, NUHA_FTP_CARPETA (por defecto ./)
+# Sin esos secrets no sube nada: solo genera la web y la deja descargable en la ejecución.
+name: Publicar Centro Nuha
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['centro-nuha/**']
+concurrency: publicar-centronuha
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    env:
+      HAY_FTP: ${{ secrets.NUHA_FTP_SERVIDOR != '' && secrets.NUHA_FTP_USUARIO != '' && secrets.NUHA_FTP_CONTRASENA != '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generar la web
+        run: cd centro-nuha && python3 build.py
+      - uses: actions/upload-artifact@v4
+        with: { name: centronuha-web, path: centro-nuha/web/, retention-days: 14 }
+      - name: Sin datos FTP
+        if: env.HAY_FTP != 'true'
+        run: echo "::notice::Faltan los secrets NUHA_FTP_*. La web está generada (descárgala en Artifacts) pero no se sube."
+      - name: Subir por FTP
+        if: env.HAY_FTP == 'true'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.NUHA_FTP_SERVIDOR }}
+          username: ${{ secrets.NUHA_FTP_USUARIO }}
+          password: ${{ secrets.NUHA_FTP_CONTRASENA }}
+          local-dir: centro-nuha/web/
+          server-dir: ${{ secrets.NUHA_FTP_CARPETA || './' }}
+          dangerous-clean-slate: false
+          exclude: |
+            **/.git*
+            **/.git*/**
