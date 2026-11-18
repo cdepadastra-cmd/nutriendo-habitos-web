@@ -24,6 +24,9 @@ DIR = 'Calle Gregorio Fernández, 4'
 CP = '47006'
 MAPS = 'https://www.google.com/maps/search/?api=1&query=Calle+Gregorio+Fern%C3%A1ndez+4+Valladolid'
 NH = 'https://www.nutriendohabitos.es/'
+# Dirección del Apps Script que envía el formulario al correo del centro (ver centro-nuha/LEEME.md)
+_FU = Path(__file__).parent / 'formulario_url.txt'
+FORM_URL = _FU.read_text(encoding='utf-8').strip() if _FU.exists() else ''
 
 MENU = [('index.html', 'Inicio'), ('fisioterapia.html', 'Fisioterapia'), ('acupuntura.html', 'Acupuntura'),
         ('nutricion.html', 'Nutrición'), ('psicologia.html', 'Psicología'), ('quienes-somos.html', 'Quiénes somos'),
@@ -102,6 +105,18 @@ section.alt .faq details{background:var(--sand)}
 .contact a.c b{display:block;font:700 .78rem 'Montserrat',sans-serif;text-transform:uppercase;letter-spacing:.12em;color:var(--terra);margin-bottom:4px}
 .contact a.c span{font-size:1.1rem}
 .note{font-size:.92rem;color:var(--ink2)}
+.form{max-width:760px;margin-top:14px;display:grid;gap:14px}
+.form .fr{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:640px){.form .fr{grid-template-columns:1fr}}
+.form label{display:grid;gap:6px;font-size:.88rem;font-weight:600;color:var(--ink)}
+.form input,.form select,.form textarea{font:inherit;font-weight:400;font-size:1rem;padding:11px 13px;border:1px solid #cfc6b8;border-radius:10px;background:#fff;color:var(--ink);width:100%;box-sizing:border-box}
+.form input:focus,.form select:focus,.form textarea:focus{outline:2px solid var(--sage-d);outline-offset:1px}
+.form .chk{display:flex;gap:10px;align-items:flex-start;font-weight:400}
+.form .chk input{width:auto;margin-top:3px}
+.form .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.form .btn{justify-self:start;border:0;cursor:pointer}
+.form .btn[disabled]{opacity:.6;cursor:wait}
+.fmsg{margin:0;font-size:.95rem}.fmsg.ok{color:var(--sage-d);font-weight:600}.fmsg.err{color:#a33}
 footer.foot{background:var(--ink);color:#d9d3c8;padding:54px 0 30px;font-size:.95rem}
 .foot .cols{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:30px}
 @media(max-width:760px){.foot .cols{grid-template-columns:1fr}}
@@ -112,6 +127,16 @@ footer.foot{background:var(--ink);color:#d9d3c8;padding:54px 0 30px;font-size:.9
 .prose{max-width:46rem}.prose h2{margin-top:1.4em}
 """
 
+JS_FORM = r"""(function(){var f=document.getElementById('f-contacto');if(!f)return;var m=document.getElementById('f-msg'),U=f.getAttribute('data-url');
+f.addEventListener('submit',function(e){e.preventDefault();m.className='fmsg';
+if(f.web.value){return;}
+if(!f.nombre.value.trim()||!f.telefono.value.trim()||!f.mensaje.value.trim()){m.className='fmsg err';m.textContent='Rellena nombre, teléfono y mensaje.';return;}
+if(!f.acepto.checked){m.className='fmsg err';m.textContent='Marca la casilla de protección de datos para poder enviarlo.';return;}
+if(!U){m.className='fmsg err';m.textContent='El formulario aún no está activo. Llámanos al __TEL__ y te atendemos.';return;}
+var b=f.querySelector('button');b.disabled=true;m.textContent='Enviando…';
+var d=new URLSearchParams();['nombre','telefono','email','especialidad','mensaje'].forEach(function(k){d.append(k,f[k].value.trim())});d.append('pagina',location.href);
+fetch(U,{method:'POST',mode:'no-cors',body:d}).then(function(){f.reset();m.className='fmsg ok';m.textContent='¡Mensaje enviado! Te responderemos lo antes posible.';})
+.catch(function(){m.className='fmsg err';m.textContent='No se ha podido enviar. Llámanos al __TEL__.';}).then(function(){b.disabled=false;});});})();""".replace('__TEL__', TEL)
 JS = "document.querySelector('.burger').addEventListener('click',function(){var n=document.querySelector('.nav');var o=n.classList.toggle('open');this.setAttribute('aria-expanded',o)});"
 
 NEGOCIO = {
@@ -180,11 +205,11 @@ def pagina(archivo, titulo, desc, cuerpo, extra_ld=None, robots='index,follow'):
 <div><h4>Centro Nuha</h4><p>Fisioterapia y osteopatía, acupuntura, nutrición y psicología en el centro de Valladolid, a pocos minutos del Campo Grande.</p>
 <p>{DIR}<br>{CP} Valladolid</p></div>
 <div><h4>Especialidades</h4><ul><li><a href="fisioterapia.html">Fisioterapia y osteopatía</a></li><li><a href="acupuntura.html">Acupuntura</a></li><li><a href="nutricion.html">Nutrición</a></li><li><a href="psicologia.html">Psicología</a></li><li><a href="cursos-talleres.html">Talleres</a></li></ul></div>
-<div><h4>Contacto</h4><ul><li><a href="tel:{TEL_LINK}">{TEL}</a></li><li><a href="mailto:{EMAIL}">{EMAIL}</a></li><li><a href="{MAPS}" target="_blank" rel="noopener">Cómo llegar</a></li><li><a href="{NH}" target="_blank" rel="noopener">Nutriendo Hábitos</a></li></ul></div>
+<div><h4>Contacto</h4><ul><li><a href="tel:{TEL_LINK}">{TEL}</a></li><li><a href="contacto.html#formulario">Escríbenos</a></li><li><a href="{MAPS}" target="_blank" rel="noopener">Cómo llegar</a></li><li><a href="{NH}" target="_blank" rel="noopener">Nutriendo Hábitos</a></li></ul></div>
 </div>
 <div class="legal"><span>© {datetime.date.today().year} Centro Nuha · Valladolid</span><span><a href="quienes-somos.html">Quiénes somos</a> · <a href="instalaciones.html">Instalaciones</a> · <a href="proteccion-de-datos.html">Protección de datos</a></span></div>
 </div></footer>
-<script>{JS}</script>
+<script>{JS}{JS_FORM if 'f-contacto' in cuerpo else ''}</script>
 </body>
 </html>
 """
@@ -208,7 +233,7 @@ def migas(*pares):
         {'@type': 'ListItem', 'position': i + 1, 'name': n, 'item': BASE + u} for i, (n, u) in enumerate(pares)]}
 
 
-BANDA = f'<section class="blk"><div class="wrap"><div class="band"><div><h2>¿Pedimos cita?</h2><p>Llámanos y te orientamos sobre la especialidad que mejor encaja contigo.</p></div><div><a class="btn" href="tel:{TEL_LINK}">{TEL}</a><a class="btn ghost" href="mailto:{EMAIL}">Escribir un correo</a></div></div></div></section>'
+BANDA = f'<section class="blk"><div class="wrap"><div class="band"><div><h2>¿Pedimos cita?</h2><p>Llámanos y te orientamos sobre la especialidad que mejor encaja contigo.</p></div><div><a class="btn" href="tel:{TEL_LINK}">{TEL}</a><a class="btn ghost" href="contacto.html#formulario">Escribir un mensaje</a></div></div></div></section>'
 
 PAGS = {}
 
@@ -424,8 +449,19 @@ PAGS['contacto.html'] = ('Contacto y cita · Centro Nuha, Valladolid',
 <a class="c" href="https://wa.me/34606926228" target="_blank" rel="noopener"><b>Fisioterapia · Amaya Arnaiz</b><span>606 926 228</span><br><small>Teléfono y WhatsApp · contacto@amayaarnaiz.es</small></a>
 <a class="c" href="{NH}contacto.html#formulario"><b>Nutrición · Andrea Argüello</b><span>669 87 70 52</span><br><small>Teléfono, WhatsApp y formulario</small></a>
 <a class="c" href="tel:{TEL_LINK}"><b>Psicología</b><span>{TEL}</span><br><small>Te informamos de la disponibilidad</small></a>
-<a class="c" href="tel:{TEL_LINK}"><b>Acupuntura y centro</b><span>{TEL}</span><br><small>{EMAIL}</small></a>
+<a class="c" href="tel:{TEL_LINK}"><b>Acupuntura y centro</b><span>{TEL}</span><br><small>Teléfono o formulario</small></a>
 </div>
+<h2 id="formulario" style="margin-top:44px">Escríbenos</h2>
+<p class="note">Déjanos tu mensaje y te respondemos lo antes posible, normalmente en uno o dos días laborables.</p>
+<form class="form" id="f-contacto" data-url="{html.escape(FORM_URL)}" novalidate>
+<div class="fr"><label>Nombre *<input name="nombre" required autocomplete="name" maxlength="80"></label><label>Teléfono *<input name="telefono" type="tel" required autocomplete="tel" maxlength="20"></label></div>
+<div class="fr"><label>Correo electrónico<input name="email" type="email" autocomplete="email" maxlength="120"></label><label>Especialidad<select name="especialidad"><option>Fisioterapia y osteopatía</option><option>Acupuntura</option><option>Nutrición</option><option>Psicología</option><option>Talleres</option><option selected>Otra consulta</option></select></label></div>
+<label>Mensaje *<textarea name="mensaje" rows="5" required maxlength="2000" placeholder="Cuéntanos brevemente en qué te podemos ayudar y cuándo te viene bien que te llamemos."></textarea></label>
+<label class="hp" aria-hidden="true">No rellenar<input name="web" tabindex="-1" autocomplete="off"></label>
+<label class="chk"><input type="checkbox" name="acepto" required><span>He leído la <a href="proteccion-de-datos.html">política de protección de datos</a> y acepto que usen mis datos para responder a mi consulta.</span></label>
+<button class="btn" type="submit">Enviar mensaje</button>
+<p class="fmsg" id="f-msg" role="status" aria-live="polite"></p>
+</form>
 <h2 style="margin-top:40px">Dónde estamos</h2>
 <div class="contact">
 <a class="c" href="{MAPS}" target="_blank" rel="noopener"><b>Dirección</b><span>{DIR} (local)</span><br><small>{CP} Valladolid · a pocos minutos del Campo Grande</small></a>
@@ -447,7 +483,7 @@ PAGS['cursos-talleres.html'] = ('Talleres y clases de salud · Centro Nuha, Vall
 <h2 style="margin-top:48px">Clases de movimiento con Amaya Arnaiz</h2>
 <div class="tiles"><div class="tile"><h3>Salud a través del movimiento</h3><p>Clases de yoga y movimiento consciente con fisioterapeuta.</p></div><div class="tile"><h3>Salud y música</h3><p>Terapia y educación corporal para músicos y cantantes.</div><div class="tile"><h3>Educación cuerpo-mente</h3><p>Aprender a escuchar el cuerpo para cuidar tu salud.</p></div></div>
 <p class="note">Horarios e inscripción en <a href="https://amayaarnaiz.es/clases-y-talleres/" target="_blank" rel="noopener">amayaarnaiz.es</a> o en el 606 926 228.</p>
-<p class="note" style="margin-top:22px">¿Te interesa un taller? Escríbenos a <a href="mailto:{EMAIL}">{EMAIL}</a> y te avisamos.</p>
+<p class="note" style="margin-top:22px">¿Te interesa un taller? <a href="contacto.html#formulario">Escríbenos</a> y te avisamos.</p>
 </div></section>''', [migas(('Inicio', ''), ('Talleres', 'cursos-talleres.html'))])
 
 # ------------------------------------------------------------------ protección de datos
@@ -455,9 +491,9 @@ PAGS['proteccion-de-datos.html'] = ('Protección de datos · Centro Nuha',
     'Información sobre el tratamiento de datos personales en la web de Centro Nuha (Valladolid).',
     f'''<section class="blk"><div class="wrap prose"><h1>Protección de datos</h1>
 <h2>1. Responsable</h2><p>Identidad: Adolfo Argüello Fernández (Centro Nuha).<br>Dirección postal: {DIR}, {CP} Valladolid.<br>Teléfono: {TEL}. Correo electrónico: {EMAIL}.</p>
-<h2>2. Finalidad</h2><p>Los datos que nos facilites por teléfono o correo se usan para atender tus consultas, gestionar las citas y prestarte el servicio sanitario solicitado. Se conservan mientras sean necesarios para ello y, después, durante los plazos que exige la ley (en el caso de la historia clínica, los que marca la normativa sanitaria).</p>
+<h2>2. Finalidad</h2><p>Los datos que nos facilites por teléfono, correo o el formulario de contacto (nombre, teléfono, correo y mensaje) se usan para atender tus consultas, gestionar las citas y prestarte el servicio sanitario solicitado. Se conservan mientras sean necesarios para ello y, después, durante los plazos que exige la ley (en el caso de la historia clínica, los que marca la normativa sanitaria).</p>
 <h2>3. Legitimación</h2><p>Tu consentimiento al contactar con nosotros y la relación asistencial cuando pides cita.</p>
-<h2>4. Destinatarios</h2><p>No cedemos tus datos a terceros salvo obligación legal. La consulta de nutrición la gestiona Nutriendo Hábitos, que tiene su propia <a href="{NH}proteccion-de-datos.html">política de privacidad</a>.</p>
+<h2>4. Destinatarios</h2><p>No cedemos tus datos a terceros salvo obligación legal. Los mensajes del formulario llegan al correo del centro a través de Google (Gmail), que actúa como proveedor del servicio. La consulta de nutrición la gestiona Nutriendo Hábitos, que tiene su propia <a href="{NH}proteccion-de-datos.html">política de privacidad</a>.</p>
 <h2>5. Derechos</h2><p>Puedes acceder, rectificar o suprimir tus datos, oponerte o limitar su tratamiento y pedir su portabilidad escribiendo a {EMAIL}. Si crees que no se han respetado, puedes reclamar ante la Agencia Española de Protección de Datos (aepd.es).</p>
 <h2>6. Esta web</h2><p>Esta web no usa cookies de publicidad ni de analítica. Solo carga las fuentes tipográficas de Google Fonts.</p>
 </div></section>''')
