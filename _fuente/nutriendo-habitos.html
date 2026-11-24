@@ -524,8 +524,8 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
 .nt-mas{display:block;margin:1rem auto 0;border:1px solid var(--primary);background:transparent;color:var(--primary);border-radius:999px;padding:.55rem 1.3rem;font:inherit;font-size:.9rem;cursor:pointer}
 .nt-mas:hover{background:var(--primary);color:var(--primary-fg)}
 #nt-app{margin-top:1.5rem}
-.cv-grid{display:grid;grid-template-columns:2fr auto 1fr 1fr;gap:1rem;align-items:end}
-@media(max-width:860px){.cv-grid{grid-template-columns:1fr 1fr}.cv-ali{grid-column:1/-1}}
+.cv-grid{display:grid;grid-template-columns:2fr 1fr;gap:1rem;align-items:end}
+@media(max-width:640px){.cv-grid:not(.cv-grid2){grid-template-columns:1fr}}
 @media(max-width:480px){.cv-grid{grid-template-columns:1fr}}
 .cv-f{display:grid;gap:.35rem;font-size:.78rem;font-weight:600;color:var(--muted-fg)}
 .cv-f select,.cv-f input{height:2.8rem;border-radius:999px;border:1px solid var(--border);background:var(--background);padding:0 1rem;font:inherit;font-size:1rem;color:var(--foreground);font-weight:500;width:100%;box-sizing:border-box}
@@ -535,6 +535,22 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
 .cv-res .big{font-family:var(--font-display);font-size:clamp(1.5rem,4vw,2.1rem);line-height:1.2;color:var(--primary)}
 .cv-res .big b{font-weight:600}
 .cv-res p{margin:.5rem 0 0;font-size:.92rem;line-height:1.55}
+.cv-help{font-size:.85rem;color:var(--muted-fg);margin:1.1rem 0 .5rem}
+.cv-pesos{display:grid;grid-template-columns:1fr auto 1fr;gap:.8rem;align-items:end}
+.cv-peso{display:grid;gap:.35rem;font-size:.85rem;font-weight:600;color:var(--foreground)}
+.cv-in{display:flex;align-items:center;border:2px solid var(--primary);border-radius:var(--radius);background:var(--background);padding:0 1rem}
+.cv-in input{border:0;background:transparent;font:inherit;font-family:var(--font-display);font-size:clamp(1.8rem,5vw,2.4rem);color:var(--primary);width:100%;padding:.4rem 0;font-variant-numeric:tabular-nums;outline:0}
+.cv-in:focus-within{box-shadow:0 0 0 3px var(--leaf)}
+.cv-in input{-moz-appearance:textfield;appearance:textfield}.cv-in input::-webkit-inner-spin-button,.cv-in input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.cv-in b{font-size:1.1rem;color:var(--muted-fg);font-weight:500}
+.cv-eq{font-size:1.6rem;color:var(--muted-fg);padding-bottom:.9rem}
+@media(max-width:480px){.cv-pesos{grid-template-columns:1fr}.cv-eq{display:none}}
+.cv-mio{margin-top:1rem;border-top:1px solid var(--border);padding-top:.8rem;font-size:.92rem}
+.cv-mio summary{cursor:pointer;font-weight:600;color:var(--primary)}
+.cv-grid2{grid-template-columns:1fr 1fr auto;margin-top:.6rem}
+@media(max-width:640px){.cv-grid2{grid-template-columns:1fr 1fr}.cv-usar{grid-column:1/-1}}
+.cv-usar{margin:0;height:2.8rem}
+.cv-mio-res{margin:.6rem 0 0;color:var(--secondary-fg)}
 .cv-tab td:not(:first-child),.cv-tab th:not(:first-child){text-align:right;white-space:nowrap}
 @media(max-width:640px){.nt-app .tl-chips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:.3rem;margin-right:-1.4rem;padding-right:1.4rem}.nt-app .tl-chip{flex:0 0 auto}.nt-ctrl{gap:.6rem}.nt-sel{flex:1 1 100%}.nt-sel select{width:100%}.nt-tab{font-size:.8rem}}
 .tl-list{display:grid;gap:.5rem}
@@ -1408,21 +1424,30 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
 
 <!-- ================= HERRAMIENTA: CONVERSOR CRUDO / COCIDO ================= -->
 <div data-page="conversor-crudo-cocido" hidden>
-  <section class="page-hero" data-hero="online" data-crumb="Conversor de crudo a cocido" data-ey="Herramienta gratuita" data-h1="Conversor de crudo a cocido: arroz, pasta, legumbres, carne y pescado" data-lead="¿Tu pauta dice 150 g de arroz cocido y no sabes cuánto pesar en seco? Elige el alimento, escribe los gramos y te digo el equivalente al momento."></section>
+  <section class="page-hero" data-hero="online" data-crumb="Conversor de crudo a cocido" data-ey="Herramienta gratuita" data-h1="Conversor de crudo a cocido: arroz, pasta, cuscús, legumbres, carne y pescado" data-lead="¿Tu pauta dice 150 g de arroz cocido y no sabes cuánto pesar en seco? Elige el alimento y escribe el peso en crudo o en cocinado: la otra cifra se calcula sola."></section>
   <div class="wrap editorial">
     <div class="tl-box cv-app" id="cv-app">
       <div class="cv-grid">
         <label class="cv-f cv-ali">Alimento<select id="cv-ali" aria-label="Alimento"></select></label>
-        <div class="cv-f"><span>Tengo el peso en</span><div class="nt-modo" role="group" aria-label="Estado del alimento"><button type="button" data-dir="crudo" aria-pressed="false">Crudo / seco</button><button type="button" data-dir="cocido" aria-pressed="true">Cocido</button></div></div>
-        <label class="cv-f">Gramos<input id="cv-g" type="number" inputmode="decimal" min="0" max="5000" step="5" value="150" aria-label="Gramos"></label>
         <label class="cv-f">Personas o raciones<input id="cv-n" type="number" inputmode="numeric" min="1" max="30" step="1" value="1" aria-label="Personas o raciones"></label>
       </div>
+      <p class="cv-help">Escribe el peso en la casilla que conozcas; la otra se calcula sola.</p>
+      <div class="cv-pesos">
+        <label class="cv-peso"><span id="cv-l-crudo">En crudo / seco</span><span class="cv-in"><input id="cv-crudo" type="number" inputmode="decimal" min="0" max="5000" step="any" aria-describedby="cv-l-crudo"><b>g</b></span></label>
+        <span class="cv-eq" aria-hidden="true">⇄</span>
+        <label class="cv-peso"><span id="cv-l-coc">Cocinado</span><span class="cv-in"><input id="cv-cocido" type="number" inputmode="decimal" min="0" max="5000" step="any" value="150" aria-describedby="cv-l-coc"><b>g</b></span></label>
+      </div>
       <div class="cv-res" id="cv-res" aria-live="polite"></div>
+      <details class="cv-mio"><summary>Calcula tu propio factor (si lo cocinas a tu manera)</summary>
+        <p>Pesa una vez el alimento en crudo, cocínalo como siempre y pésalo cocinado. Escribe los dos pesos y el conversor usará tu factor.</p>
+        <div class="cv-grid cv-grid2"><label class="cv-f">Pesé en crudo (g)<input id="cv-m1" type="number" inputmode="decimal" min="0" step="any"></label><label class="cv-f">Y cocinado pesó (g)<input id="cv-m2" type="number" inputmode="decimal" min="0" step="any"></label><button type="button" class="nt-mas cv-usar" id="cv-usar">Usar mi factor</button></div>
+        <p class="cv-mio-res" id="cv-mio-res" aria-live="polite"></p>
+      </details>
       <p class="tl-src">Factores aproximados calculados a partir de la base pública <a href="https://fdc.nal.usda.gov/" target="_blank" rel="noopener">USDA FoodData Central</a> (SR Legacy), comparando cada alimento crudo con el mismo alimento cocinado. El peso final depende del tiempo de cocción, del agua y del punto: tómalos como una guía práctica, no como una cifra exacta.</p>
     </div>
     <div class="band"><h2>Tabla rápida de equivalencias</h2>
       <div class="oc" style="max-width:46rem"><p>Cuánto pesa una vez cocinado lo que pesas en crudo, y cuánto tienes que pesar en crudo para tener 100 g cocinados.</p>
-        <div class="nt-wrap" style="margin-top:1rem"><table class="tl-tab cv-tab"><thead><tr><th>Alimento</th><th>100 g en crudo dan…</th><th>Para 100 g cocinados, pesa en crudo…</th></tr></thead><tbody><tr><td>Arroz blanco</td><td>270 g</td><td>37 g</td></tr><tr><td>Arroz integral</td><td>290 g</td><td>34 g</td></tr><tr><td>Pasta (macarrones, espaguetis…)</td><td>230 g</td><td>43 g</td></tr><tr><td>Pasta integral</td><td>230 g</td><td>43 g</td></tr><tr><td>Quinoa</td><td>310 g</td><td>32 g</td></tr><tr><td>Lentejas</td><td>290 g</td><td>34 g</td></tr><tr><td>Garbanzos</td><td>230 g</td><td>43 g</td></tr><tr><td>Alubias blancas</td><td>240 g</td><td>42 g</td></tr><tr><td>Alubias rojas o pintas</td><td>270 g</td><td>37 g</td></tr><tr><td>Pechuga de pollo</td><td>75 g</td><td>133 g</td></tr><tr><td>Pechuga de pavo</td><td>80 g</td><td>125 g</td></tr><tr><td>Carne picada de ternera</td><td>75 g</td><td>133 g</td></tr><tr><td>Solomillo de cerdo</td><td>80 g</td><td>125 g</td></tr><tr><td>Lomo de cerdo</td><td>75 g</td><td>133 g</td></tr><tr><td>Merluza, pescadilla o bacalao fresco</td><td>80 g</td><td>125 g</td></tr><tr><td>Salmón</td><td>90 g</td><td>111 g</td></tr><tr><td>Gambas y langostinos</td><td>85 g</td><td>118 g</td></tr></tbody></table></div>
+        <div class="nt-wrap" style="margin-top:1rem"><table class="tl-tab cv-tab"><thead><tr><th>Alimento</th><th>100 g en crudo dan…</th><th>Para 100 g cocinados, pesa en crudo…</th></tr></thead><tbody><tr><td>Arroz blanco</td><td>270 g</td><td>37 g</td></tr><tr><td>Arroz integral</td><td>290 g</td><td>34 g</td></tr><tr><td>Pasta (macarrones, espaguetis…)</td><td>230 g</td><td>43 g</td></tr><tr><td>Pasta integral</td><td>230 g</td><td>43 g</td></tr><tr><td>Quinoa</td><td>310 g</td><td>32 g</td></tr><tr><td>Cuscús</td><td>240 g</td><td>42 g</td></tr><tr><td>Lentejas</td><td>290 g</td><td>34 g</td></tr><tr><td>Garbanzos</td><td>230 g</td><td>43 g</td></tr><tr><td>Alubias blancas</td><td>240 g</td><td>42 g</td></tr><tr><td>Alubias rojas o pintas</td><td>270 g</td><td>37 g</td></tr><tr><td>Pechuga de pollo</td><td>75 g</td><td>133 g</td></tr><tr><td>Pechuga de pavo</td><td>80 g</td><td>125 g</td></tr><tr><td>Carne picada de ternera</td><td>75 g</td><td>133 g</td></tr><tr><td>Solomillo de cerdo</td><td>80 g</td><td>125 g</td></tr><tr><td>Lomo de cerdo</td><td>75 g</td><td>133 g</td></tr><tr><td>Merluza, pescadilla o bacalao fresco</td><td>80 g</td><td>125 g</td></tr><tr><td>Salmón</td><td>90 g</td><td>111 g</td></tr><tr><td>Gambas y langostinos</td><td>85 g</td><td>118 g</td></tr></tbody></table></div>
       </div></div>
     <div class="lead-rule"></div>
     <div>
@@ -1437,6 +1462,7 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
       <h2 class="bar-h2" id="faq-cv">Preguntas frecuentes</h2>
       <div class="faq-list">
         <details><summary>¿Cuánto pesa el arroz cocido?</summary><div class="oc small"><p>Unas 2,7 veces su peso en seco: 100 g de arroz blanco crudo dan unos 270 g cocido. Para 100 g de arroz cocido necesitas unos 37 g en crudo.</p></div></details>
+        <details><summary>¿Cuánto pesa el cuscús cocido?</summary><div class="oc small"><p>Preparado como indican la mayoría de paquetes, con el mismo volumen de agua o caldo que de cuscús, pesa unas 2,4 veces más: 60 g en seco dan unos 145 g. Si le pones más agua quedará más pesado y más blando; con «Calcula tu propio factor» puedes ajustarlo a tu manera.</p></div></details>
         <details><summary>¿Cuánto pesa la pasta cocida?</summary><div class="oc small"><p>Alrededor de 2,3 veces su peso en seco: 80 g de pasta seca dan unos 185 g cocida. Si la dejas muy al dente pesará un poco menos, y si la pasas un poco más.</p></div></details>
         <details><summary>¿Cuánto pesan las legumbres cocidas?</summary><div class="oc small"><p>Entre 2,3 y 2,9 veces su peso en seco según la legumbre: los garbanzos unas 2,3 veces, las alubias blancas 2,4 y las lentejas casi 3. 60-70 g en seco son una ración habitual de plato principal.</p></div></details>
         <details><summary>¿Cuánto pierde el pollo al cocinarlo?</summary><div class="oc small"><p>Una pechuga a la plancha o al horno pierde en torno a un 25 % de su peso: 150 g en crudo quedan en unos 110 g cocinados. Para tener 100 g de pollo cocinado, pesa unos 135 g en crudo.</p></div></details>
@@ -1444,7 +1470,7 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
       </div>
     </section>
   </div>
-  <script type="application/json" id="datos-conversor">[["Arroz blanco", "Cereales y pasta", 2.7, "hervido y escurrido"], ["Arroz integral", "Cereales y pasta", 2.9, "hervido"], ["Pasta (macarrones, espaguetis…)", "Cereales y pasta", 2.3, "hervida y escurrida"], ["Pasta integral", "Cereales y pasta", 2.3, "hervida y escurrida"], ["Quinoa", "Cereales y pasta", 3.1, "hervida"], ["Lentejas", "Legumbres", 2.9, "cocidas"], ["Garbanzos", "Legumbres", 2.3, "cocidos"], ["Alubias blancas", "Legumbres", 2.4, "cocidas"], ["Alubias rojas o pintas", "Legumbres", 2.7, "cocidas"], ["Pechuga de pollo", "Carnes y pescados", 0.75, "a la plancha o al horno"], ["Pechuga de pavo", "Carnes y pescados", 0.8, "a la plancha o al horno"], ["Carne picada de ternera", "Carnes y pescados", 0.75, "a la sartén"], ["Solomillo de cerdo", "Carnes y pescados", 0.8, "a la plancha o al horno"], ["Lomo de cerdo", "Carnes y pescados", 0.75, "a la plancha o al horno"], ["Merluza, pescadilla o bacalao fresco", "Carnes y pescados", 0.8, "a la plancha o al horno"], ["Salmón", "Carnes y pescados", 0.9, "a la plancha o al horno"], ["Gambas y langostinos", "Carnes y pescados", 0.85, "cocidos o a la plancha"]]</script>
+  <script type="application/json" id="datos-conversor">[["Arroz blanco", "Cereales y pasta", 2.7, "hervido y escurrido"], ["Arroz integral", "Cereales y pasta", 2.9, "hervido"], ["Pasta (macarrones, espaguetis…)", "Cereales y pasta", 2.3, "hervida y escurrida"], ["Pasta integral", "Cereales y pasta", 2.3, "hervida y escurrida"], ["Quinoa", "Cereales y pasta", 3.1, "hervida"], ["Cuscús", "Cereales y pasta", 2.4, "con el mismo volumen de agua que de cuscús"], ["Lentejas", "Legumbres", 2.9, "cocidas"], ["Garbanzos", "Legumbres", 2.3, "cocidos"], ["Alubias blancas", "Legumbres", 2.4, "cocidas"], ["Alubias rojas o pintas", "Legumbres", 2.7, "cocidas"], ["Pechuga de pollo", "Carnes y pescados", 0.75, "a la plancha o al horno"], ["Pechuga de pavo", "Carnes y pescados", 0.8, "a la plancha o al horno"], ["Carne picada de ternera", "Carnes y pescados", 0.75, "a la sartén"], ["Solomillo de cerdo", "Carnes y pescados", 0.8, "a la plancha o al horno"], ["Lomo de cerdo", "Carnes y pescados", 0.75, "a la plancha o al horno"], ["Merluza, pescadilla o bacalao fresco", "Carnes y pescados", 0.8, "a la plancha o al horno"], ["Salmón", "Carnes y pescados", 0.9, "a la plancha o al horno"], ["Gambas y langostinos", "Carnes y pescados", 0.85, "cocidos o a la plancha"]]</script>
   <div data-cta data-next="calorias,nutrientes,recetas"></div>
 </div>
 
@@ -1771,31 +1797,40 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
   window.__toolInit['conversor-crudo-cocido'] = function(){
     var app = document.getElementById('cv-app'); if (!app || app.__ok) return; app.__ok = true;
     var D = leerJSON('datos-conversor'); if (!D) return;
-    var dir = 'cocido', sel = document.getElementById('cv-ali'), g = document.getElementById('cv-g'), n = document.getElementById('cv-n');
+    var sel = document.getElementById('cv-ali'), ic = document.getElementById('cv-crudo'), io = document.getElementById('cv-cocido'), n = document.getElementById('cv-n');
+    var ultimo = 'cocido', mio = null;   // qué casilla escribió la persona; factor propio
     var grupos = []; D.forEach(function(a){ if (grupos.indexOf(a[1]) < 0) grupos.push(a[1]); });
     sel.innerHTML = grupos.map(function(gr){ return '<optgroup label="'+escH(gr)+'">' + D.map(function(a, i){ return a[1] === gr ? '<option value="'+i+'">'+escH(a[0])+'</option>' : ''; }).join('') + '</optgroup>'; }).join('');
-    try { var h = (location.hash||'').match(/alimento=(\d+)/); if (h && D[+h[1]]) sel.value = h[1]; } catch(e){}
-    app.querySelector('.nt-modo').addEventListener('click', function(e){ var b = e.target.closest('[data-dir]'); if (!b) return; dir = b.getAttribute('data-dir'); app.querySelectorAll('[data-dir]').forEach(function(x){ x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); pintar(); });
-    [sel, g, n].forEach(function(el){ el.addEventListener('input', pintar); el.addEventListener('change', pintar); });
+    function num(el){ var v = parseFloat(String(el.value).replace(',', '.')); return v > 0 ? v : 0; }
+    function red(v){ return Math.round(v); }
     function fmt(v){ return (v >= 100 ? Math.round(v/5)*5 : Math.round(v)).toLocaleString('es-ES'); }
+    function factor(){ return mio || D[+sel.value][2]; }
+    function etiquetas(){ var crece = D[+sel.value][2] > 1; document.getElementById('cv-l-crudo').textContent = crece ? 'En seco (crudo)' : 'En crudo'; document.getElementById('cv-l-coc').textContent = 'Cocinado'; }
+    function calcular(){
+      var f = factor();
+      if (ultimo === 'crudo') { var c = num(ic); io.value = c ? red(c * f) : ''; } else { var o = num(io); ic.value = o ? red(o / f) : ''; }
+      pintar();
+    }
     function pintar(){
-      var a = D[+sel.value], f = a[2], gr = parseFloat(String(g.value).replace(',', '.')), p = Math.max(1, parseInt(n.value, 10) || 1);
-      var res = document.getElementById('cv-res');
-      if (!(gr > 0)) { res.innerHTML = '<div class="big">Escribe los gramos</div>'; return; }
-      var crece = f > 1, nom = a[0].toLowerCase();
-      var otro = dir === 'cocido' ? gr / f : gr * f;
-      var de = dir === 'cocido' ? 'cocinado ('+a[3]+')' : (crece ? 'en seco' : 'en crudo');
-      var a2 = dir === 'cocido' ? (crece ? 'en seco' : 'en crudo') : 'cocinado';
-      var html = '<div class="big"><b>'+fmt(gr)+' g</b> '+de+' = <b>'+fmt(otro)+' g</b> '+a2+'</div>';
-      html += '<p>'+escH(a[0])+': '+(crece ? 'al cocinarse multiplica su peso por unas <b>'+String(f).replace('.', ',')+'</b> veces' : 'al cocinarse pierde alrededor de un <b>'+Math.round(100*(1-f))+' %</b> de su peso')+'.</p>';
-      if (p > 1) {
-        var crudoTot = (dir === 'cocido' ? otro : gr) * p, cocTot = (dir === 'cocido' ? gr : otro) * p;
-        html += '<p>Para <b>'+p+' personas</b>: pesa <b>'+fmt(crudoTot)+' g '+(crece ? 'en seco' : 'en crudo')+'</b>, que darán unos <b>'+fmt(cocTot)+' g cocinados</b>. Al servir, reparte '+fmt(cocTot/p)+' g por plato.</p>';
-      }
+      var a = D[+sel.value], f = factor(), crece = f > 1, c = num(ic), o = num(io), p = Math.max(1, parseInt(n.value, 10) || 1), res = document.getElementById('cv-res');
+      if (!c || !o) { res.innerHTML = '<div class="big">Escribe un peso</div>'; return; }
+      var html = '<div class="big"><b>'+fmt(c)+' g</b> '+(crece ? 'en seco' : 'en crudo')+' = <b>'+fmt(o)+' g</b> cocinado</div>';
+      html += '<p>'+escH(a[0])+(mio ? ' (con tu factor)' : ' ('+escH(a[3])+')')+': '+(crece ? 'al cocinarse multiplica su peso por unas <b>'+(Math.round(f*100)/100).toLocaleString('es-ES')+'</b> veces' : 'al cocinarse pierde alrededor de un <b>'+Math.round(100*(1-f))+' %</b> de su peso')+'.</p>';
+      if (p > 1) html += '<p>Para <b>'+p+' personas</b>: pesa <b>'+fmt(c*p)+' g '+(crece ? 'en seco' : 'en crudo')+'</b>, que darán unos <b>'+fmt(o*p)+' g cocinados</b>. Al servir, reparte unos '+fmt(o)+' g por plato.</p>';
       if (a[1] === 'Legumbres') html += '<p>Si usas legumbre de bote, el peso escurrido cuenta como cocido.</p>';
       res.innerHTML = html;
     }
-    pintar();
+    ic.addEventListener('input', function(){ ultimo = 'crudo'; calcular(); });
+    io.addEventListener('input', function(){ ultimo = 'cocido'; calcular(); });
+    n.addEventListener('input', pintar);
+    sel.addEventListener('change', function(){ mio = null; document.getElementById('cv-mio-res').textContent = ''; etiquetas(); calcular(); });
+    document.getElementById('cv-usar').addEventListener('click', function(){
+      var m1 = num(document.getElementById('cv-m1')), m2 = num(document.getElementById('cv-m2')), out = document.getElementById('cv-mio-res');
+      if (!m1 || !m2) { out.textContent = 'Escribe los dos pesos.'; return; }
+      mio = m2 / m1; out.innerHTML = 'Tu factor es <b>'+(Math.round(mio*100)/100).toLocaleString('es-ES')+'</b> (el de la tabla es '+String(D[+sel.value][2]).replace('.', ',')+'). Ya lo estoy usando en el conversor de arriba.';
+      calcular();
+    });
+    etiquetas(); calcular();
   };
   window.__toolInit['recetas-con-lo-que-tengo'] = function(){
     var app = document.getElementById('re-app'); if (!app || app.__ok) return; app.__ok = true;
