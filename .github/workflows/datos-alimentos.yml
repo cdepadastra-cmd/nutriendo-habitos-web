@@ -22,7 +22,7 @@ jobs:
           base = os.path.dirname(glob.glob('sr/**/food.csv', recursive=True)[0])
           cats = {r['id']: r['description'] for r in csv.DictReader(open(f'{base}/food_category.csv', encoding='utf-8'))}
           foods = {r['fdc_id']: {'d': r['description'], 'c': cats.get(r['food_category_id'], '')} for r in csv.DictReader(open(f'{base}/food.csv', encoding='utf-8'))}
-          want = {'1008': 'kcal', '1003': 'prot', '1004': 'grasa', '1005': 'hc', '1079': 'fibra', '2000': 'azuc', '1258': 'sat', '1093': 'sodio', '1087': 'calcio', '1089': 'hierro'}
+          want = {'1008': 'kcal', '1003': 'prot', '1004': 'grasa', '1005': 'hc', '1079': 'fibra', '2000': 'azuc', '1258': 'sat', '1093': 'sodio', '1087': 'calcio', '1089': 'hierro', '1178': 'b12', '1175': 'b6', '1162': 'vitc', '1114': 'vitd', '1106': 'vita', '1177': 'folato', '1190': 'folato_dfe', '1090': 'magnesio', '1095': 'zinc', '1092': 'potasio', '1404': 'ala', '1270': 'ala_tot', '1278': 'epa', '1272': 'dha', '1280': 'dpa'}
           for r in csv.DictReader(open(f'{base}/food_nutrient.csv', encoding='utf-8')):
               k = want.get(r['nutrient_id'])
               if k and r['fdc_id'] in foods:
