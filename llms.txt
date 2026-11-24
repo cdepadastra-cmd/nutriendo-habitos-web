@@ -18,6 +18,7 @@ Contacto: teléfono y WhatsApp 669 87 70 52 · nutricion.arguello@gmail.com · r
 - [Guía: dieta para el SIBO, qué comer y qué evitar](https://www.nutriendohabitos.es/dieta-sibo.html)
 - [Tabla: alimentos ricos en proteínas, vitamina B12, B6, C, D y omega 3, ordenable por nutriente](https://www.nutriendohabitos.es/alimentos-ricos-en-proteinas-vitaminas.html)
 - [Herramienta: calorías y nutrientes de los alimentos (datos USDA FoodData Central)](https://www.nutriendohabitos.es/calorias-alimentos.html)
+- [Herramienta: conversor de crudo a cocido (arroz, pasta, legumbres, carne y pescado)](https://www.nutriendohabitos.es/conversor-crudo-cocido.html)
 - [Herramienta: ¿qué cocino con lo que tengo? Recetas saludables por ingredientes](https://www.nutriendohabitos.es/recetas-con-lo-que-tengo.html)
 - [Consulta de nutrición online](https://www.nutriendohabitos.es/nutricionista-online.html)
 
