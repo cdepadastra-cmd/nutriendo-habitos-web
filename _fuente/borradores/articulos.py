@@ -152,23 +152,6 @@ art('alimentacion-menopausia', 'Alimentación en la menopausia: qué comer y nut
     ('¿Hay nutricionista para la menopausia en Valladolid?', 'Sí. Andrea Argüello, dietista-nutricionista colegiada, atiende en la calle Gregorio Fernández, 4, junto al Campo Grande, y también online.'),
     ], 'faq-meno'), 'servicios,prot,online')
 
-# ------------------------------------------------------------ precios
-art('precio-nutricionista-valladolid', 'Precio de un nutricionista en Valladolid: cuánto cuesta la consulta | Nutriendo Hábitos',
-    'Cuánto cuesta la consulta de nutrición con Andrea Argüello en Valladolid y online: primera consulta, revisiones, qué incluye cada una y cómo pedir cita.',
-    'contacto', 'Precios', 'Tarifas', 'Precio de la consulta de nutricionista en Valladolid',
-    'Qué incluye cada consulta, cuánto dura y cuánto cuesta, presencial en Valladolid u online.',
-    '<p class="tk-aviso tl-src" style="margin:0 0 1.5rem"><strong>PENDIENTE DE ANDREA:</strong> rellenar los precios marcados con [PRECIO] y confirmar duraciones y formas de pago antes de publicar.</p>'
-    + banda('Tarifas', '<div class="nt-wrap"><table class="tl-tab cv-tab"><thead><tr><th>Consulta</th><th>Duración</th><th>Precio</th></tr></thead><tbody><tr><td>Primera consulta (presencial u online)</td><td>unos 75 min</td><td>[PRECIO]</td></tr><tr><td>Revisión</td><td>unos 45 min</td><td>[PRECIO]</td></tr><tr><td>[Bono de revisiones, si lo hay]</td><td>—</td><td>[PRECIO]</td></tr></tbody></table></div><p class="tl-src">[Formas de pago: efectivo, tarjeta, Bizum…]</p>')
-    + stmts([
-    ('clip', 'Qué incluye la primera consulta', '<ul><li>Historia clínica y de hábitos: qué comes, cómo duermes, actividad, analíticas, medicación.</li><li><strong>Composición corporal con bioimpedancia</strong> (grasa, músculo, agua) y medidas.</li><li>Objetivos realistas y una <strong>pauta personalizada</strong>, sin dietas cerradas imposibles de seguir.</li><li>Material de apoyo: menús, recetas, lista de la compra.</li></ul>'),
-    ('cal', 'Revisiones', '<p>En cada revisión volvemos a medir la composición corporal, vemos cómo te has encontrado y ajustamos la pauta. La frecuencia habitual es cada 2-4 semanas al principio y más espaciadas después.</p>'),
-    ('video', 'Consulta online', '<p>Por videollamada, con la misma duración y seguimiento. Ideal si no vives en Valladolid o te cuesta desplazarte. <a href="#nutricionista-online">Cómo funciona</a>.</p>'),
-    ]) + faq([
-    ('¿Cuánto cuesta un nutricionista en Valladolid?', 'En la consulta de Andrea Argüello, la primera consulta cuesta [PRECIO] y las revisiones [PRECIO]. Incluyen medición de composición corporal y pauta personalizada.'),
-    ('¿La consulta de nutrición la cubre la Seguridad Social?', 'En la sanidad pública no suele haber dietistas-nutricionistas en atención primaria, por lo que la consulta es privada. [Confirmar si se emite factura para seguros o desgravaciones.]'),
-    ('¿Cómo pido cita?', 'Por el formulario de contacto, por WhatsApp o llamando al 669 87 70 52.'),
-    ], 'faq-precio'), 'servicios,online,blog')
-
 # ------------------------------------------------------------ digestivo
 DIG = 'digestiva,fodmap,sibo'
 art('dieta-gastritis', 'Dieta para la gastritis: qué comer y qué evitar | Nutriendo Hábitos',

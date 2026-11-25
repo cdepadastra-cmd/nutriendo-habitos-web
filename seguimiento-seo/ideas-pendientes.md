@@ -11,7 +11,7 @@ Ideas propuestas que aún no se han hecho. Cuando Jairo pregunte por más ideas,
 - Tabla de nutrientes: páginas propias por nutriente (ya hechas como borradores «alimentos ricos en…», pendientes de revisión).
 
 ## Contenido que necesita datos de Andrea
-- Precios de la consulta (borrador «precio-nutricionista-valladolid» con [PRECIO] por rellenar).
+- Precios de la consulta: el borrador se eliminó a petición de Jairo (25-11-2026); retomar solo si lo pide.
 - Confirmar si trata menopausia (borrador «alimentacion-menopausia»).
 - Revisión de la guía de quimioterapia (borrador «alimentacion-cancer-quimioterapia»).
 
