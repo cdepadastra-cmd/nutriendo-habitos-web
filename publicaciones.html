@@ -1039,7 +1039,14 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
       t = t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[|]/g, ' ');
       t = t.replace(/(^|[\s<(])o([.,]\d)/g, '$10$2').replace(/(\d)\s*[.,]\s*(\d)/g, '$1.$2');
       var L = t.split(/\n+/), r = {};
-      function num(linea, clave){ var i = linea.search(clave); if (i < 0) return null; var resto = linea.slice(i).replace(clave, ''); var m = resto.match(/<?\s*(\d+(?:\.\d+)?)/); return m ? parseFloat(m[1]) : null; }
+      function num(linea, clave, max){
+        var i = linea.search(clave); if (i < 0) return null;
+        var resto = linea.slice(i).replace(clave, ''), m = resto.match(/<?\s*(\d+(?:\.\d+)?)(\s*(mg|g|kcal|kj)\b)?/); if (!m) return null;
+        var txt = m[1];
+        // el lector suele confundir la «g» pegada al número con un 9 («22g» -> «229»): si no hay unidad y acaba en 9, quitamos ese 9
+        if (!m[2] && txt.length > 1 && /9$/.test(txt) && !/\.$/.test(txt.slice(0, -1))) txt = txt.slice(0, -1);
+        var v = parseFloat(txt); return isFinite(v) && v <= (max || 100) ? v : null;
+      }
       var kc = t.match(/(\d+(?:\.\d+)?)\s*kcal/); if (kc) r.kcal = parseFloat(kc[1]);
       L.forEach(function(l){
         if (/saturad/.test(l)) { if (r.sat == null) r.sat = num(l, /saturad\w*/); return; }
@@ -1049,7 +1056,7 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
         if (/fibra/.test(l)) { if (r.fibra == null) r.fibra = num(l, /fibra( alimentaria)?/); return; }
         if (/prote/.test(l)) { if (r.prot == null) r.prot = num(l, /prote\w*/); return; }
         if (/\bsal\b/.test(l)) { if (r.sal == null) r.sal = num(l, /\bsal\b/); return; }
-        if (/sodio/.test(l)) { var so = num(l, /sodio/); if (so != null) r.sodio = so; }
+        if (/sodio/.test(l)) { var so = num(l, /sodio/, 5000); if (so != null) r.sodio = so; }
       });
       if (r.sal == null && r.sodio != null) r.sal = Math.round(r.sodio * (r.sodio > 20 ? 0.0025 : 2.5) * 100) / 100;   // mg o g de sodio -> g de sal
       return r;
