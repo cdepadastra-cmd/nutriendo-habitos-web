@@ -333,7 +333,7 @@ for slug, (archivo, titulo, desc, _prio) in PAGINAS.items():
 # ---------------------------------------------------------------- borradores (ocultos)
 # Artículos pendientes de revisión: se generan en una carpeta con nombre difícil de adivinar, con noindex,
 # fuera del sitemap y del llms.txt y sin ningún enlace desde la web. Fuente: borradores/articulos.py -> borradores.html
-CARPETA_BORRADORES = 'revision-17a274cbc2'
+CARPETA_BORRADORES = 'revision'
 if MODO == 'definitiva' and (AQUI / 'borradores.html').exists():
     bsrc = (AQUI / 'borradores.html').read_text(encoding='utf-8')
     bstarts = [m.start() for m in re.finditer(r'<div data-page="', bsrc)]
