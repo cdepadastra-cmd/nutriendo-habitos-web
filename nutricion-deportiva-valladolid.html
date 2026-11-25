@@ -546,6 +546,50 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
 .nt-mas{display:block;margin:1rem auto 0;border:1px solid var(--primary);background:transparent;color:var(--primary);border-radius:999px;padding:.55rem 1.3rem;font:inherit;font-size:.9rem;cursor:pointer}
 .nt-mas:hover{background:var(--primary);color:var(--primary-fg)}
 #nt-app{margin-top:1.5rem}
+.tk-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;align-items:end}
+.tk-grid .tk-ancho{grid-column:span 2}
+.tk-grid1{grid-template-columns:1fr}
+.et-grid{margin-top:.4rem}
+@media(max-width:860px){.tk-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.tk-grid{grid-template-columns:1fr}.tk-grid .tk-ancho{grid-column:auto}}
+.tk-grid .nt-modo{display:flex;height:2.8rem}.tk-grid .nt-modo button{flex:1 1 auto;white-space:nowrap}
+.tk-app .cv-f select{padding-right:2.2rem;text-overflow:ellipsis}
+.tk-macs{display:grid;gap:.55rem;margin:.9rem 0 .3rem}
+.tk-mac{display:grid;grid-template-columns:10.5rem 4.5rem 3rem 1fr;gap:.6rem;align-items:center;font-size:.92rem}
+.tk-mac b{text-align:right;font-variant-numeric:tabular-nums}.tk-mac small{color:var(--muted-fg);font-variant-numeric:tabular-nums}
+.tk-mac i{display:block;height:8px;border-radius:4px;background:rgba(0,0,0,.08);overflow:hidden}.tk-mac em{display:block;height:100%;border-radius:4px}
+@media(max-width:480px){.tk-mac{grid-template-columns:1fr auto auto;}.tk-mac i{grid-column:1/-1}}
+.tk-nota{font-size:.85rem!important;opacity:.85}
+.tk-ej{margin:.3rem 0 0;padding-left:1.1rem;font-size:.9rem;columns:2;column-gap:2rem}
+@media(max-width:640px){.tk-ej{columns:1}}
+.tk-aviso{border-left:3px solid var(--primary);padding-left:.8rem}
+.tp-meses{display:grid;grid-template-columns:repeat(12,1fr);gap:.35rem}
+.tp-meses .tl-chip{justify-content:center;padding-left:.3rem;padding-right:.3rem}
+.tp-largo{display:none}
+@media(max-width:760px){.tp-meses{grid-template-columns:repeat(6,1fr)}}
+.tp-titulo{font-family:var(--font-display);font-size:1.5rem;margin:1.3rem 0 .4rem;color:var(--primary)}
+.tp-sub{font-size:1rem;margin:1rem 0 .5rem}.tp-sub small{color:var(--muted-fg);font-weight:400}
+.tp-lista{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:.4rem}
+.tp-lista li{background:var(--secondary);color:var(--secondary-fg);border-radius:999px;padding:.3rem .8rem;font-size:.88rem}
+.tp-lista li.nuevo{box-shadow:inset 0 0 0 2px var(--primary)}
+.tp-dot{display:inline-block;width:.9rem;height:.9rem;border-radius:50%;box-shadow:inset 0 0 0 2px var(--primary);vertical-align:-2px}
+.tp-q{margin-top:1.5rem}
+.tp-fila{display:grid;grid-template-columns:9rem 1fr;gap:.8rem;align-items:center;margin:.6rem 0}
+.tp-barra{display:grid;grid-template-columns:repeat(12,1fr);gap:2px}
+.tp-barra span{text-align:center;font-size:.72rem;padding:.3rem 0;border-radius:4px;background:var(--muted);color:var(--muted-fg)}
+.tp-barra span.si{background:var(--primary);color:var(--primary-fg)}
+@media(max-width:480px){.tp-fila{grid-template-columns:1fr}}
+.et-sem{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;margin-top:1.2rem}
+@media(max-width:640px){.et-sem{grid-template-columns:1fr 1fr}}
+.et-c{border-radius:var(--radius);padding:.8rem .9rem;display:grid;gap:.15rem;background:var(--muted);color:var(--foreground)}
+.et-c span{font-size:.8rem}.et-c b{font-size:1.3rem;font-variant-numeric:tabular-nums}.et-c em{font-style:normal;font-weight:600;font-size:.85rem}
+.et-c.bajo{background:#dcefd6;color:#24531c}.et-c.medio{background:#fbecc4;color:#6b4b00}.et-c.alto{background:#f8d3cd;color:#8a1f12}
+.hb-lista{margin:0;padding-left:1.3rem;display:grid;gap:.7rem}
+.hb-lista li{display:flex;justify-content:space-between;gap:1rem;align-items:center;font-size:.95rem;line-height:1.45}
+.hb-lista .nt-modo{flex:0 0 auto;height:2.4rem}.hb-lista .nt-modo button{min-width:3.6rem}
+@media(max-width:560px){.hb-lista li{flex-direction:column;align-items:flex-start;gap:.4rem}}
+.ag-vasos{display:inline-flex;flex-wrap:wrap;gap:3px;vertical-align:middle;margin-left:.4rem}
+.ag-vasos i{display:inline-block;width:10px;height:16px;border-radius:0 0 3px 3px;background:var(--primary);opacity:.75}
 .cv-grid{display:grid;grid-template-columns:2fr 1fr;gap:1rem;align-items:end}
 @media(max-width:640px){.cv-grid:not(.cv-grid2){grid-template-columns:1fr}}
 @media(max-width:480px){.cv-grid{grid-template-columns:1fr}}
@@ -722,7 +766,7 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
 
 <a class="wa-float" href="https://wa.me/34669877052?text=Hola%20Andrea%2C%20me%20gustar%C3%ADa%20consultar%20sobre%20nutrici%C3%B3n." target="_blank" rel="noopener" aria-label="Escríbeme por WhatsApp"><svg class="i" viewBox="0 0 24 24" data-ic="wa"></svg><span>Escríbeme por WhatsApp</span></a>
 
-<script>window.__MPA={"page": "nutricion-deportiva-valladolid", "files": {"inicio": "./", "dietista-nutricionista-en-valladolid": "dietista-nutricionista-en-valladolid.html", "nutricion-deportiva-valladolid": "nutricion-deportiva-valladolid.html", "nutricion-oncologica-valladolid": "nutricion-oncologica-valladolid.html", "perdida-de-peso-valladolid": "perdida-de-peso-valladolid.html", "patologias-digestivas-valladolid": "patologias-digestivas-valladolid.html", "alimentacion-vegetariana-vegana-valladolid": "alimentacion-vegetariana-vegana-valladolid.html", "nutricion-infantil-valladolid": "nutricion-infantil-valladolid.html", "herramientas": "herramientas.html", "calorias-alimentos": "calorias-alimentos.html", "recetas-con-lo-que-tengo": "recetas-con-lo-que-tengo.html", "conversor-crudo-cocido": "conversor-crudo-cocido.html", "alimentos-ricos-en-proteinas-vitaminas": "alimentos-ricos-en-proteinas-vitaminas.html", "dieta-sibo": "dieta-sibo.html", "dieta-fodmap": "dieta-fodmap.html", "nutricionista-online": "nutricionista-online.html", "nuestros-servicios": "nuestros-servicios.html", "reserva-seguimiento": "reserva-seguimiento.html", "asesoria-externa": "asesoria-externa.html", "publicaciones": "publicaciones.html", "cursos-talleres": "cursos-talleres.html", "blog-nutricion": "blog-nutricion.html", "tips": "tips.html", "contacto": "contacto.html", "proteccion-de-datos": "proteccion-de-datos.html", "servicios": "dietista-nutricionista-en-valladolid.html", "online": "nutricionista-online.html", "asesoria": "asesoria-externa.html", "colaboraciones": "publicaciones.html", "cursos": "cursos-talleres.html", "blog": "blog-nutricion.html", "todos-los-servicios": "nuestros-servicios.html", "nutricion-deportiva": "nutricion-deportiva-valladolid.html", "privacidad": "proteccion-de-datos.html", "reserva": "contacto.html", "cita": "contacto.html", "reservar": "contacto.html", "oncologica": "nutricion-oncologica-valladolid.html", "nutricion-oncologica": "nutricion-oncologica-valladolid.html", "perdida-de-peso": "perdida-de-peso-valladolid.html", "patologias-digestivas": "patologias-digestivas-valladolid.html", "vegana": "alimentacion-vegetariana-vegana-valladolid.html", "fodmap": "dieta-fodmap.html", "calorias": "calorias-alimentos.html", "recetas": "recetas-con-lo-que-tengo.html", "herramienta": "herramientas.html", "sibo": "dieta-sibo.html", "conversor": "conversor-crudo-cocido.html", "crudo-cocido": "conversor-crudo-cocido.html", "proteinas": "alimentos-ricos-en-proteinas-vitaminas.html", "vitaminas": "alimentos-ricos-en-proteinas-vitaminas.html", "tabla-nutrientes": "alimentos-ricos-en-proteinas-vitaminas.html", "infantil": "nutricion-infantil-valladolid.html", "nutricion-infantil": "nutricion-infantil-valladolid.html"}, "anchors": {"especialidades": "./#especialidades", "acc": "./#acc", "ptabs": "./#ptabs", "pt-1": "./#pt-1", "pt-2": "./#pt-2", "pt-3": "./#pt-3", "ppanel": "./#ppanel", "pp-k": "./#pp-k", "pp-t": "./#pp-t", "pp-d": "./#pp-d", "h-opiniones": "./#h-opiniones", "sobrepeso": "dietista-nutricionista-en-valladolid.html#sobrepeso", "patologias": "dietista-nutricionista-en-valladolid.html#patologias", "vegetariana": "dietista-nutricionista-en-valladolid.html#vegetariana", "faq-serv": "dietista-nutricionista-en-valladolid.html#faq-serv", "ct-prox": "cursos-talleres.html#ct-prox", "ct-past": "cursos-talleres.html#ct-past", "cp-prox": "cursos-talleres.html#cp-prox", "cp-past": "cursos-talleres.html#cp-past", "blog-q": "blog-nutricion.html#blog-q", "blog-posts": "blog-nutricion.html#blog-posts", "blog-empty": "blog-nutricion.html#blog-empty", "tips-posts": "tips.html#tips-posts", "formulario": "contacto.html#formulario", "rform": "contacto.html#rform", "rf-nombre": "contacto.html#rf-nombre", "rf-apellidos": "contacto.html#rf-apellidos", "rf-tel": "contacto.html#rf-tel", "rf-email": "contacto.html#rf-email", "rf-modo": "contacto.html#rf-modo", "rf-tema": "contacto.html#rf-tema", "rf-priv": "contacto.html#rf-priv", "rf-web": "contacto.html#rf-web", "rf-err": "contacto.html#rf-err", "rf-send-mail": "contacto.html#rf-send-mail", "rf-send-wa": "contacto.html#rf-send-wa", "rf-wadone": "contacto.html#rf-wadone", "rf-wa-open": "contacto.html#rf-wa-open", "rf-done": "contacto.html#rf-done", "faq-dep": "nutricion-deportiva-valladolid.html#faq-dep", "faq-onco": "nutricion-oncologica-valladolid.html#faq-onco", "ganancia-de-peso": "perdida-de-peso-valladolid.html#ganancia-de-peso", "faq-peso": "perdida-de-peso-valladolid.html#faq-peso", "faq-dig": "patologias-digestivas-valladolid.html#faq-dig", "faq-veg": "alimentacion-vegetariana-vegana-valladolid.html#faq-veg", "faq-inf": "nutricion-infantil-valladolid.html#faq-inf", "faq-fodmap": "dieta-fodmap.html#faq-fodmap", "faq-sibo": "dieta-sibo.html#faq-sibo", "al-app": "calorias-alimentos.html#al-app", "al-q": "calorias-alimentos.html#al-q", "al-cats": "calorias-alimentos.html#al-cats", "al-count": "calorias-alimentos.html#al-count", "al-list": "calorias-alimentos.html#al-list", "faq-cal": "calorias-alimentos.html#faq-cal", "datos-alimentos": "calorias-alimentos.html#datos-alimentos", "nt-app": "alimentos-ricos-en-proteinas-vitaminas.html#nt-app", "nt-orden": "alimentos-ricos-en-proteinas-vitaminas.html#nt-orden", "nt-q": "alimentos-ricos-en-proteinas-vitaminas.html#nt-q", "nt-cats": "alimentos-ricos-en-proteinas-vitaminas.html#nt-cats", "nt-count": "alimentos-ricos-en-proteinas-vitaminas.html#nt-count", "nt-tab": "alimentos-ricos-en-proteinas-vitaminas.html#nt-tab", "nt-mas": "alimentos-ricos-en-proteinas-vitaminas.html#nt-mas", "faq-nt": "alimentos-ricos-en-proteinas-vitaminas.html#faq-nt", "datos-nutrientes": "alimentos-ricos-en-proteinas-vitaminas.html#datos-nutrientes", "cv-app": "conversor-crudo-cocido.html#cv-app", "cv-ali": "conversor-crudo-cocido.html#cv-ali", "cv-n": "conversor-crudo-cocido.html#cv-n", "cv-l-crudo": "conversor-crudo-cocido.html#cv-l-crudo", "cv-crudo": "conversor-crudo-cocido.html#cv-crudo", "cv-l-coc": "conversor-crudo-cocido.html#cv-l-coc", "cv-cocido": "conversor-crudo-cocido.html#cv-cocido", "cv-res": "conversor-crudo-cocido.html#cv-res", "cv-m1": "conversor-crudo-cocido.html#cv-m1", "cv-m2": "conversor-crudo-cocido.html#cv-m2", "cv-usar": "conversor-crudo-cocido.html#cv-usar", "cv-mio-res": "conversor-crudo-cocido.html#cv-mio-res", "faq-cv": "conversor-crudo-cocido.html#faq-cv", "datos-conversor": "conversor-crudo-cocido.html#datos-conversor", "re-app": "recetas-con-lo-que-tengo.html#re-app", "re-form": "recetas-con-lo-que-tengo.html#re-form", "re-txt": "recetas-con-lo-que-tengo.html#re-txt", "re-msg": "recetas-con-lo-que-tengo.html#re-msg", "re-ing": "recetas-con-lo-que-tengo.html#re-ing", "re-clear": "recetas-con-lo-que-tengo.html#re-clear", "re-sel": "recetas-con-lo-que-tengo.html#re-sel", "re-tags": "recetas-con-lo-que-tengo.html#re-tags", "re-b12": "recetas-con-lo-que-tengo.html#re-b12", "re-count": "recetas-con-lo-que-tengo.html#re-count", "re-list": "recetas-con-lo-que-tengo.html#re-list", "re-ext": "recetas-con-lo-que-tengo.html#re-ext", "re-ext-links": "recetas-con-lo-que-tengo.html#re-ext-links", "faq-rec": "recetas-con-lo-que-tengo.html#faq-rec", "datos-recetas": "recetas-con-lo-que-tengo.html#datos-recetas", "bk": "reserva-seguimiento.html#bk", "bk-vuelta": "reserva-seguimiento.html#bk-vuelta", "bk-sinclave": "reserva-seguimiento.html#bk-sinclave", "bk-demo": "reserva-seguimiento.html#bk-demo", "bk-step1": "reserva-seguimiento.html#bk-step1", "bk-prev": "reserva-seguimiento.html#bk-prev", "bk-mes": "reserva-seguimiento.html#bk-mes", "bk-next": "reserva-seguimiento.html#bk-next", "bk-days": "reserva-seguimiento.html#bk-days", "bk-slots": "reserva-seguimiento.html#bk-slots", "bk-form": "reserva-seguimiento.html#bk-form", "bk-sum": "reserva-seguimiento.html#bk-sum", "bk-nombre": "reserva-seguimiento.html#bk-nombre", "bk-apellidos": "reserva-seguimiento.html#bk-apellidos", "bk-tel": "reserva-seguimiento.html#bk-tel", "bk-email": "reserva-seguimiento.html#bk-email", "bk-motivo": "reserva-seguimiento.html#bk-motivo", "bk-pago": "reserva-seguimiento.html#bk-pago", "bk-precio": "reserva-seguimiento.html#bk-precio", "bk-priv": "reserva-seguimiento.html#bk-priv", "bk-web": "reserva-seguimiento.html#bk-web", "bk-err": "reserva-seguimiento.html#bk-err", "bk-send": "reserva-seguimiento.html#bk-send", "bk-ok": "reserva-seguimiento.html#bk-ok", "bk-oksum": "reserva-seguimiento.html#bk-oksum", "bk-okmsg": "reserva-seguimiento.html#bk-okmsg", "bk-otra": "reserva-seguimiento.html#bk-otra"}};</script>
+<script>window.__MPA={"page": "nutricion-deportiva-valladolid", "files": {"inicio": "./", "dietista-nutricionista-en-valladolid": "dietista-nutricionista-en-valladolid.html", "nutricion-deportiva-valladolid": "nutricion-deportiva-valladolid.html", "nutricion-oncologica-valladolid": "nutricion-oncologica-valladolid.html", "perdida-de-peso-valladolid": "perdida-de-peso-valladolid.html", "patologias-digestivas-valladolid": "patologias-digestivas-valladolid.html", "alimentacion-vegetariana-vegana-valladolid": "alimentacion-vegetariana-vegana-valladolid.html", "nutricion-infantil-valladolid": "nutricion-infantil-valladolid.html", "herramientas": "herramientas.html", "calorias-alimentos": "calorias-alimentos.html", "recetas-con-lo-que-tengo": "recetas-con-lo-que-tengo.html", "calculadora-calorias": "calculadora-calorias.html", "calculadora-proteinas": "calculadora-proteinas.html", "creatina": "creatina.html", "frutas-verduras-temporada": "frutas-verduras-temporada.html", "lector-de-etiquetas": "lector-de-etiquetas.html", "test-hambre-emocional": "test-hambre-emocional.html", "calculadora-agua": "calculadora-agua.html", "conversor-crudo-cocido": "conversor-crudo-cocido.html", "alimentos-ricos-en-proteinas-vitaminas": "alimentos-ricos-en-proteinas-vitaminas.html", "dieta-sibo": "dieta-sibo.html", "dieta-fodmap": "dieta-fodmap.html", "nutricionista-online": "nutricionista-online.html", "nuestros-servicios": "nuestros-servicios.html", "reserva-seguimiento": "reserva-seguimiento.html", "asesoria-externa": "asesoria-externa.html", "publicaciones": "publicaciones.html", "cursos-talleres": "cursos-talleres.html", "blog-nutricion": "blog-nutricion.html", "tips": "tips.html", "contacto": "contacto.html", "proteccion-de-datos": "proteccion-de-datos.html", "servicios": "dietista-nutricionista-en-valladolid.html", "online": "nutricionista-online.html", "asesoria": "asesoria-externa.html", "colaboraciones": "publicaciones.html", "cursos": "cursos-talleres.html", "blog": "blog-nutricion.html", "todos-los-servicios": "nuestros-servicios.html", "nutricion-deportiva": "nutricion-deportiva-valladolid.html", "privacidad": "proteccion-de-datos.html", "reserva": "contacto.html", "cita": "contacto.html", "reservar": "contacto.html", "oncologica": "nutricion-oncologica-valladolid.html", "nutricion-oncologica": "nutricion-oncologica-valladolid.html", "perdida-de-peso": "perdida-de-peso-valladolid.html", "patologias-digestivas": "patologias-digestivas-valladolid.html", "vegana": "alimentacion-vegetariana-vegana-valladolid.html", "fodmap": "dieta-fodmap.html", "calorias": "calorias-alimentos.html", "recetas": "recetas-con-lo-que-tengo.html", "herramienta": "herramientas.html", "sibo": "dieta-sibo.html", "calorias-diarias": "calculadora-calorias.html", "macros": "calculadora-calorias.html", "proteina": "calculadora-proteinas.html", "temporada": "frutas-verduras-temporada.html", "etiquetas": "lector-de-etiquetas.html", "hambre-emocional": "test-hambre-emocional.html", "agua": "calculadora-agua.html", "conversor": "conversor-crudo-cocido.html", "crudo-cocido": "conversor-crudo-cocido.html", "proteinas": "alimentos-ricos-en-proteinas-vitaminas.html", "vitaminas": "alimentos-ricos-en-proteinas-vitaminas.html", "tabla-nutrientes": "alimentos-ricos-en-proteinas-vitaminas.html", "infantil": "nutricion-infantil-valladolid.html", "nutricion-infantil": "nutricion-infantil-valladolid.html"}, "anchors": {"especialidades": "./#especialidades", "acc": "./#acc", "ptabs": "./#ptabs", "pt-1": "./#pt-1", "pt-2": "./#pt-2", "pt-3": "./#pt-3", "ppanel": "./#ppanel", "pp-k": "./#pp-k", "pp-t": "./#pp-t", "pp-d": "./#pp-d", "h-opiniones": "./#h-opiniones", "sobrepeso": "dietista-nutricionista-en-valladolid.html#sobrepeso", "patologias": "dietista-nutricionista-en-valladolid.html#patologias", "vegetariana": "dietista-nutricionista-en-valladolid.html#vegetariana", "faq-serv": "dietista-nutricionista-en-valladolid.html#faq-serv", "ct-prox": "cursos-talleres.html#ct-prox", "ct-past": "cursos-talleres.html#ct-past", "cp-prox": "cursos-talleres.html#cp-prox", "cp-past": "cursos-talleres.html#cp-past", "blog-q": "blog-nutricion.html#blog-q", "blog-posts": "blog-nutricion.html#blog-posts", "blog-empty": "blog-nutricion.html#blog-empty", "tips-posts": "tips.html#tips-posts", "formulario": "contacto.html#formulario", "rform": "contacto.html#rform", "rf-nombre": "contacto.html#rf-nombre", "rf-apellidos": "contacto.html#rf-apellidos", "rf-tel": "contacto.html#rf-tel", "rf-email": "contacto.html#rf-email", "rf-modo": "contacto.html#rf-modo", "rf-tema": "contacto.html#rf-tema", "rf-priv": "contacto.html#rf-priv", "rf-web": "contacto.html#rf-web", "rf-err": "contacto.html#rf-err", "rf-send-mail": "contacto.html#rf-send-mail", "rf-send-wa": "contacto.html#rf-send-wa", "rf-wadone": "contacto.html#rf-wadone", "rf-wa-open": "contacto.html#rf-wa-open", "rf-done": "contacto.html#rf-done", "faq-dep": "nutricion-deportiva-valladolid.html#faq-dep", "faq-onco": "nutricion-oncologica-valladolid.html#faq-onco", "ganancia-de-peso": "perdida-de-peso-valladolid.html#ganancia-de-peso", "faq-peso": "perdida-de-peso-valladolid.html#faq-peso", "faq-dig": "patologias-digestivas-valladolid.html#faq-dig", "faq-veg": "alimentacion-vegetariana-vegana-valladolid.html#faq-veg", "faq-inf": "nutricion-infantil-valladolid.html#faq-inf", "faq-fodmap": "dieta-fodmap.html#faq-fodmap", "faq-sibo": "dieta-sibo.html#faq-sibo", "al-app": "calorias-alimentos.html#al-app", "al-q": "calorias-alimentos.html#al-q", "al-cats": "calorias-alimentos.html#al-cats", "al-count": "calorias-alimentos.html#al-count", "al-list": "calorias-alimentos.html#al-list", "faq-cal": "calorias-alimentos.html#faq-cal", "datos-alimentos": "calorias-alimentos.html#datos-alimentos", "nt-app": "alimentos-ricos-en-proteinas-vitaminas.html#nt-app", "nt-orden": "alimentos-ricos-en-proteinas-vitaminas.html#nt-orden", "nt-q": "alimentos-ricos-en-proteinas-vitaminas.html#nt-q", "nt-cats": "alimentos-ricos-en-proteinas-vitaminas.html#nt-cats", "nt-count": "alimentos-ricos-en-proteinas-vitaminas.html#nt-count", "nt-tab": "alimentos-ricos-en-proteinas-vitaminas.html#nt-tab", "nt-mas": "alimentos-ricos-en-proteinas-vitaminas.html#nt-mas", "faq-nt": "alimentos-ricos-en-proteinas-vitaminas.html#faq-nt", "datos-nutrientes": "alimentos-ricos-en-proteinas-vitaminas.html#datos-nutrientes", "cv-app": "conversor-crudo-cocido.html#cv-app", "cv-ali": "conversor-crudo-cocido.html#cv-ali", "cv-n": "conversor-crudo-cocido.html#cv-n", "cv-l-crudo": "conversor-crudo-cocido.html#cv-l-crudo", "cv-crudo": "conversor-crudo-cocido.html#cv-crudo", "cv-l-coc": "conversor-crudo-cocido.html#cv-l-coc", "cv-cocido": "conversor-crudo-cocido.html#cv-cocido", "cv-res": "conversor-crudo-cocido.html#cv-res", "cv-m1": "conversor-crudo-cocido.html#cv-m1", "cv-m2": "conversor-crudo-cocido.html#cv-m2", "cv-usar": "conversor-crudo-cocido.html#cv-usar", "cv-mio-res": "conversor-crudo-cocido.html#cv-mio-res", "faq-cv": "conversor-crudo-cocido.html#faq-cv", "datos-conversor": "conversor-crudo-cocido.html#datos-conversor", "kc-app": "calculadora-calorias.html#kc-app", "kc-edad": "calculadora-calorias.html#kc-edad", "kc-peso": "calculadora-calorias.html#kc-peso", "kc-alt": "calculadora-calorias.html#kc-alt", "kc-act": "calculadora-calorias.html#kc-act", "kc-obj": "calculadora-calorias.html#kc-obj", "kc-res": "calculadora-calorias.html#kc-res", "faq-kc": "calculadora-calorias.html#faq-kc", "pr-app": "calculadora-proteinas.html#pr-app", "pr-peso": "calculadora-proteinas.html#pr-peso", "pr-edad": "calculadora-proteinas.html#pr-edad", "pr-com": "calculadora-proteinas.html#pr-com", "pr-perfil": "calculadora-proteinas.html#pr-perfil", "pr-res": "calculadora-proteinas.html#pr-res", "faq-pr": "calculadora-proteinas.html#faq-pr", "cr-app": "creatina.html#cr-app", "cr-peso": "creatina.html#cr-peso", "cr-res": "creatina.html#cr-res", "faq-cr": "creatina.html#faq-cr", "tp-app": "frutas-verduras-temporada.html#tp-app", "tp-meses": "frutas-verduras-temporada.html#tp-meses", "tp-mes": "frutas-verduras-temporada.html#tp-mes", "tp-q": "frutas-verduras-temporada.html#tp-q", "tp-busca": "frutas-verduras-temporada.html#tp-busca", "datos-temporada": "frutas-verduras-temporada.html#datos-temporada", "faq-tp": "frutas-verduras-temporada.html#faq-tp", "et-app": "lector-de-etiquetas.html#et-app", "et-kcal": "lector-de-etiquetas.html#et-kcal", "et-grasa": "lector-de-etiquetas.html#et-grasa", "et-sat": "lector-de-etiquetas.html#et-sat", "et-hc": "lector-de-etiquetas.html#et-hc", "et-azuc": "lector-de-etiquetas.html#et-azuc", "et-fibra": "lector-de-etiquetas.html#et-fibra", "et-prot": "lector-de-etiquetas.html#et-prot", "et-sal": "lector-de-etiquetas.html#et-sal", "et-res": "lector-de-etiquetas.html#et-res", "faq-et": "lector-de-etiquetas.html#faq-et", "hb-app": "test-hambre-emocional.html#hb-app", "hb-lista": "test-hambre-emocional.html#hb-lista", "hb-res": "test-hambre-emocional.html#hb-res", "faq-hb": "test-hambre-emocional.html#faq-hb", "ag-app": "calculadora-agua.html#ag-app", "ag-min": "calculadora-agua.html#ag-min", "ag-calor": "calculadora-agua.html#ag-calor", "ag-emb-l": "calculadora-agua.html#ag-emb-l", "ag-emb": "calculadora-agua.html#ag-emb", "ag-res": "calculadora-agua.html#ag-res", "faq-ag": "calculadora-agua.html#faq-ag", "re-app": "recetas-con-lo-que-tengo.html#re-app", "re-form": "recetas-con-lo-que-tengo.html#re-form", "re-txt": "recetas-con-lo-que-tengo.html#re-txt", "re-msg": "recetas-con-lo-que-tengo.html#re-msg", "re-ing": "recetas-con-lo-que-tengo.html#re-ing", "re-clear": "recetas-con-lo-que-tengo.html#re-clear", "re-sel": "recetas-con-lo-que-tengo.html#re-sel", "re-tags": "recetas-con-lo-que-tengo.html#re-tags", "re-b12": "recetas-con-lo-que-tengo.html#re-b12", "re-count": "recetas-con-lo-que-tengo.html#re-count", "re-list": "recetas-con-lo-que-tengo.html#re-list", "re-ext": "recetas-con-lo-que-tengo.html#re-ext", "re-ext-links": "recetas-con-lo-que-tengo.html#re-ext-links", "faq-rec": "recetas-con-lo-que-tengo.html#faq-rec", "datos-recetas": "recetas-con-lo-que-tengo.html#datos-recetas", "bk": "reserva-seguimiento.html#bk", "bk-vuelta": "reserva-seguimiento.html#bk-vuelta", "bk-sinclave": "reserva-seguimiento.html#bk-sinclave", "bk-demo": "reserva-seguimiento.html#bk-demo", "bk-step1": "reserva-seguimiento.html#bk-step1", "bk-prev": "reserva-seguimiento.html#bk-prev", "bk-mes": "reserva-seguimiento.html#bk-mes", "bk-next": "reserva-seguimiento.html#bk-next", "bk-days": "reserva-seguimiento.html#bk-days", "bk-slots": "reserva-seguimiento.html#bk-slots", "bk-form": "reserva-seguimiento.html#bk-form", "bk-sum": "reserva-seguimiento.html#bk-sum", "bk-nombre": "reserva-seguimiento.html#bk-nombre", "bk-apellidos": "reserva-seguimiento.html#bk-apellidos", "bk-tel": "reserva-seguimiento.html#bk-tel", "bk-email": "reserva-seguimiento.html#bk-email", "bk-motivo": "reserva-seguimiento.html#bk-motivo", "bk-pago": "reserva-seguimiento.html#bk-pago", "bk-precio": "reserva-seguimiento.html#bk-precio", "bk-priv": "reserva-seguimiento.html#bk-priv", "bk-web": "reserva-seguimiento.html#bk-web", "bk-err": "reserva-seguimiento.html#bk-err", "bk-send": "reserva-seguimiento.html#bk-send", "bk-ok": "reserva-seguimiento.html#bk-ok", "bk-oksum": "reserva-seguimiento.html#bk-oksum", "bk-okmsg": "reserva-seguimiento.html#bk-okmsg", "bk-otra": "reserva-seguimiento.html#bk-otra"}};</script>
 <script>
 (function(){
   // ---------- icons (lucide) ----------
@@ -888,6 +932,176 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
     });
     etiquetas(); calcular();
   };
+  // ---------- utilidades comunes de las calculadoras
+  function tkNum(id){ var el = document.getElementById(id); if (!el) return 0; var v = parseFloat(String(el.value).replace(',', '.')); return isFinite(v) ? v : 0; }
+  function tkFmt(v, d){ return (Math.round(v * Math.pow(10, d||0)) / Math.pow(10, d||0)).toLocaleString('es-ES'); }
+  function tkModo(app, attr, cb){ app.querySelectorAll('['+attr+']').forEach(function(b){ b.addEventListener('click', function(){ app.querySelectorAll('['+attr+']').forEach(function(x){ x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); cb(b.getAttribute(attr)); }); }); }
+  function tkVivo(app, fn){ app.querySelectorAll('input,select').forEach(function(el){ el.addEventListener('input', fn); el.addEventListener('change', fn); }); }
+
+  window.__toolInit['calculadora-calorias'] = function(){
+    var app = document.getElementById('kc-app'); if (!app || app.__ok) return; app.__ok = true;
+    var sexo = 'm';
+    tkModo(app, 'data-sexo', function(v){ sexo = v; pintar(); }); tkVivo(app, pintar);
+    function pintar(){
+      var e = tkNum('kc-edad'), p = tkNum('kc-peso'), a = tkNum('kc-alt'), f = parseFloat(document.getElementById('kc-act').value), obj = document.getElementById('kc-obj').value, res = document.getElementById('kc-res');
+      if (e < 18 || e > 100) { res.innerHTML = '<div class="big">Para adultos de 18 años o más</div><p>En niños y adolescentes las necesidades dependen del crecimiento: consulta con su pediatra o con una dietista-nutricionista.</p>'; return; }
+      if (p < 30 || p > 250 || a < 130 || a > 220) { res.innerHTML = '<div class="big">Revisa el peso y la altura</div>'; return; }
+      var bmr = 10*p + 6.25*a - 5*e + (sexo === 'h' ? 5 : -161), tdee = bmr * f;
+      var meta = obj === 'perder' ? Math.max(bmr, tdee * 0.85) : obj === 'ganar' ? tdee * 1.10 : tdee;
+      meta = Math.round(meta / 10) * 10;
+      var gkg = obj === 'perder' ? 1.6 : obj === 'ganar' ? 1.8 : (f >= 1.55 ? 1.4 : 1.0);
+      var imc = p / Math.pow(a/100, 2), pRef = imc > 30 ? 25 * Math.pow(a/100, 2) * 1.1 : p;   // con obesidad, peso ajustado aproximado
+      var prot = Math.round(gkg * pRef), grasa = Math.round(meta * 0.30 / 9), hc = Math.max(0, Math.round((meta - prot*4 - grasa*9) / 4));
+      function barra(n, g, k, color){ var pc = Math.round(100 * g * k / meta); return '<div class="tk-mac"><span>'+n+'</span><b>'+g+' g</b><small>'+pc+' %</small><i><em style="width:'+pc+'%;background:'+color+'"></em></i></div>'; }
+      var txtObj = obj === 'perder' ? 'para perder grasa poco a poco' : obj === 'ganar' ? 'para ganar masa muscular' : 'para mantener tu peso';
+      res.innerHTML = '<div class="big"><b>'+tkFmt(meta)+' kcal</b> al día '+txtObj+'</div>'
+        + '<p>Gasto en reposo: <b>'+tkFmt(Math.round(bmr/10)*10)+' kcal</b> · Gasto diario con tu actividad: <b>'+tkFmt(Math.round(tdee/10)*10)+' kcal</b></p>'
+        + '<div class="tk-macs">' + barra('Proteínas', prot, 4, 'var(--primary)') + barra('Grasas', grasa, 9, 'var(--accent, #c9a25b)') + barra('Hidratos de carbono', hc, 4, 'var(--leaf)') + '</div>'
+        + '<p class="tk-nota">Proteína calculada con '+tkFmt(gkg,1)+' g por kilo'+(imc > 30 ? ' sobre un peso ajustado' : '')+'. '+(obj === 'perder' && meta <= bmr + 5 ? 'No bajamos de tu gasto en reposo: comer menos no acelera los resultados y sí la pérdida de músculo. ' : '')+'Si quieres una pauta adaptada a ti, <a href="'+(window.__MPA ? 'contacto.html#formulario' : '#contacto')+'">pide cita</a>.</p>';
+    }
+    pintar();
+  };
+
+  window.__toolInit['calculadora-proteinas'] = function(){
+    var app = document.getElementById('pr-app'); if (!app || app.__ok) return; app.__ok = true;
+    tkVivo(app, pintar);
+    // gramos de proteína por ración de alimentos habituales (USDA, aproximado)
+    var EJ = [['1 filete de pollo a la plancha (120 g)', 37], ['1 lata de atún al natural (56 g escurrido)', 14], ['2 huevos', 13], ['1 plato de lentejas cocidas (250 g)', 23], ['1 yogur natural (125 g)', 5], ['125 g de tofu firme', 20], ['1 vaso de leche (250 ml)', 8], ['1 puñado de almendras (30 g)', 6]];
+    function pintar(){
+      var p = tkNum('pr-peso'), e = tkNum('pr-edad'), r = document.getElementById('pr-perfil').value.split(',').map(parseFloat), c = parseInt(document.getElementById('pr-com').value, 10), res = document.getElementById('pr-res');
+      if (p < 30 || p > 250) { res.innerHTML = '<div class="big">Escribe tu peso</div>'; return; }
+      if (e >= 65 && r[0] < 1.0) r = [1.0, 1.2];
+      var lo = Math.round(p * r[0]), hi = Math.round(p * r[1]);
+      var html = '<div class="big"><b>'+lo+(hi > lo ? '–'+hi : '')+' g</b> de proteína al día</div>'
+        + '<p>Son <b>'+tkFmt(r[0],1)+(r[1] > r[0] ? '–'+tkFmt(r[1],1) : '')+' g por kilo</b>. Repartidos en '+c+' comidas: unos <b>'+Math.round(lo/c)+'–'+Math.round(hi/c)+' g en cada una</b>.</p>';
+      if (e >= 65 && document.getElementById('pr-perfil').selectedIndex < 2) html += '<p>Por tu edad hemos usado el rango para mayores de 65 años (1,0-1,2 g por kilo).</p>';
+      html += '<p class="tk-nota">Para hacerte una idea, cuánta proteína aporta:</p><ul class="tk-ej">' + EJ.map(function(x){ return '<li>'+x[0]+' <b>≈ '+x[1]+' g</b></li>'; }).join('') + '</ul>';
+      res.innerHTML = html;
+    }
+    pintar();
+  };
+
+  window.__toolInit['creatina'] = function(){
+    var app = document.getElementById('cr-app'); if (!app || app.__ok) return; app.__ok = true;
+    var pauta = 'normal';
+    tkModo(app, 'data-pauta', function(v){ pauta = v; pintar(); }); tkVivo(app, pintar);
+    function pintar(){
+      var p = tkNum('cr-peso'), res = document.getElementById('cr-res');
+      if (p < 35 || p > 200) { res.innerHTML = '<div class="big">Escribe tu peso</div>'; return; }
+      var mant = Math.min(5, Math.max(3, Math.round(p * 0.03 * 2) / 2));
+      var html = '<div class="big"><b>'+tkFmt(mant,1)+' g</b> de creatina monohidrato al día</div>';
+      if (pauta === 'carga') {
+        var carga = Math.round(p * 0.3);
+        html += '<p><b>Fase de carga (5-7 días):</b> '+carga+' g al día repartidos en 4 tomas de unos '+Math.round(carga/4)+' g. Después, pasa a <b>'+tkFmt(mant,1)+' g diarios</b> de mantenimiento.</p><p>La carga llena los músculos en una semana, pero puede dar molestias digestivas y más retención de agua al principio.</p>';
+      } else {
+        html += '<p>Una sola toma diaria, todos los días (también los de descanso). Con esta dosis los músculos se saturan en unas <b>3-4 semanas</b>.</p>';
+      }
+      html += '<p class="tk-nota">Equivale a una cucharadita rasa de las de café (unos 3-5 g); mejor pésala o usa el medidor del envase.</p>';
+      res.innerHTML = html;
+    }
+    pintar();
+  };
+
+  window.__toolInit['frutas-verduras-temporada'] = function(){
+    var app = document.getElementById('tp-app'); if (!app || app.__ok) return; app.__ok = true;
+    var D = leerJSON('datos-temporada'); if (!D) return;
+    var M = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+    var mes = new Date().getMonth() + 1, cont = document.getElementById('tp-meses');
+    cont.innerHTML = M.map(function(m, i){ return '<button type="button" class="tl-chip" data-mes="'+(i+1)+'" aria-pressed="'+(i+1 === mes)+'">'+m.slice(0,3)+'<span class="tp-largo">'+m.slice(3)+'</span></button>'; }).join('');
+    cont.addEventListener('click', function(e){ var b = e.target.closest('[data-mes]'); if (!b) return; mes = +b.getAttribute('data-mes'); cont.querySelectorAll('[data-mes]').forEach(function(x){ x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); pintarMes(); });
+    function pintarMes(){
+      var html = '<h2 class="tp-titulo">De temporada en '+M[mes-1].toLowerCase()+'</h2>';
+      Object.keys(D).forEach(function(g){
+        var L = Object.keys(D[g]).filter(function(n){ return D[g][n].indexOf(mes) >= 0; });
+        var nuevos = L.filter(function(n){ var prev = mes === 1 ? 12 : mes - 1; return D[g][n].indexOf(prev) < 0; });
+        html += '<h3 class="tp-sub">'+g+' <small>('+L.length+')</small></h3><ul class="tp-lista">' + L.map(function(n){ return '<li'+(nuevos.indexOf(n) >= 0 ? ' class="nuevo" title="Empieza este mes"' : '')+'>'+escH(n)+'</li>'; }).join('') + '</ul>';
+      });
+      html += '<p class="tk-nota"><span class="tp-dot"></span> Empiezan su temporada este mes.</p>';
+      document.getElementById('tp-mes').innerHTML = html;
+    }
+    document.getElementById('tp-q').addEventListener('input', function(){
+      var q = norm(this.value.trim()), out = document.getElementById('tp-busca');
+      if (q.length < 2) { out.innerHTML = ''; return; }
+      var hits = [];
+      Object.keys(D).forEach(function(g){ Object.keys(D[g]).forEach(function(n){ if (norm(n).indexOf(q) >= 0) hits.push([n, D[g][n]]); }); });
+      out.innerHTML = hits.length ? hits.map(function(h){ return '<div class="tp-fila"><b>'+escH(h[0])+'</b><div class="tp-barra">' + M.map(function(m, i){ return '<span class="'+(h[1].indexOf(i+1) >= 0 ? 'si' : '')+'" title="'+m+'">'+m.charAt(0)+'</span>'; }).join('') + '</div></div>'; }).join('') : '<p class="tk-nota">No lo encuentro en el calendario.</p>';
+    });
+    pintarMes();
+  };
+
+  window.__toolInit['lector-de-etiquetas'] = function(){
+    var app = document.getElementById('et-app'); if (!app || app.__ok) return; app.__ok = true;
+    var tipo = 'solido';
+    tkModo(app, 'data-tipo', function(v){ tipo = v; pintar(); }); tkVivo(app, pintar);
+    function val(id){ var el = document.getElementById('et-'+id); return el.value === '' ? null : tkNum('et-'+id); }
+    function nivel(v, bajo, alto){ return v === null ? null : v <= bajo ? 'bajo' : v > alto ? 'alto' : 'medio'; }
+    function pintar(){
+      var b = tipo === 'bebida', u = b ? '100 ml' : '100 g';
+      var g = val('grasa'), s = val('sat'), az = val('azuc'), sal = val('sal'), fib = val('fibra'), pr = val('prot'), kc = val('kcal'), hc = val('hc');
+      var L = [['Grasas', g, nivel(g, b?1.5:3, b?8.75:17.5)], ['Grasas saturadas', s, nivel(s, b?0.75:1.5, b?2.5:5)], ['Azúcares', az, nivel(az, b?2.5:5, b?11.25:22.5)], ['Sal', sal, nivel(sal, 0.3, b?0.75:1.5)]];
+      var res = document.getElementById('et-res');
+      if (L.every(function(x){ return x[1] === null; }) && fib === null && pr === null) { res.innerHTML = '<div class="cv-res"><div class="big">Escribe los datos de la etiqueta</div></div>'; return; }
+      var TXT = {bajo: 'Bajo', medio: 'Medio', alto: 'Alto'};
+      var html = '<div class="et-sem">' + L.map(function(x){ return '<div class="et-c '+(x[2]||'nd')+'"><span>'+x[0]+'</span><b>'+(x[1] === null ? '—' : tkFmt(x[1], 2)+' g')+'</b><em>'+(x[2] ? TXT[x[2]] : 'Sin dato')+'</em></div>'; }).join('') + '</div>';
+      var altos = L.filter(function(x){ return x[2] === 'alto'; }).map(function(x){ return x[0].toLowerCase(); });
+      var bajos = L.filter(function(x){ return x[2] === 'bajo'; }).length;
+      var resumen = altos.length ? 'Tiene un contenido <b>alto en '+altos.join(', ').replace(/, ([^,]*)$/, ' y $1')+'</b>: mejor para tomar de forma ocasional y en poca cantidad.' : (bajos === 4 ? 'Contenido <b>bajo</b> en grasas, saturadas, azúcares y sal.' : 'Ningún valor alto en los datos que has escrito.');
+      // declaraciones nutricionales (Reglamento CE 1924/2006)
+      var D = [];
+      if (g !== null) { if (g <= 0.5) D.push('Sin grasa'); else if (g <= (b ? 1.5 : 3)) D.push('Bajo contenido de grasa'); }
+      if (s !== null && s <= (b ? 0.75 : 1.5) && (!kc || s*9 <= kc*0.10)) D.push(s <= 0.1 ? 'Sin grasas saturadas' : 'Bajo contenido de grasas saturadas');
+      if (az !== null) { if (az <= 0.5) D.push('Sin azúcares'); else if (az <= (b ? 2.5 : 5)) D.push('Bajo contenido de azúcares'); }
+      if (sal !== null) { if (sal <= 0.0125) D.push('Sin sal'); else if (sal <= 0.1) D.push('Muy bajo contenido de sal'); else if (sal <= 0.3) D.push('Bajo contenido de sal'); }
+      if (fib !== null && !b) { if (fib >= 6) D.push('Alto contenido de fibra'); else if (fib >= 3) D.push('Fuente de fibra'); }
+      if (pr !== null && kc) { var pp = pr*4/kc; if (pp >= 0.20) D.push('Alto contenido de proteínas'); else if (pp >= 0.12) D.push('Fuente de proteínas'); }
+      if (kc !== null && kc <= (b ? 20 : 40)) D.push(b && kc <= 4 ? 'Sin aporte energético' : 'Valor energético bajo');
+      html += '<div class="cv-res"><p style="margin-top:0">'+resumen+'</p>';
+      if (az !== null && hc) html += '<p>El '+Math.round(100*az/hc)+' % de sus hidratos de carbono son azúcares.</p>';
+      if (D.length) html += '<p><b>Declaraciones que podría usar</b> según la normativa europea: '+D.join(' · ')+'.</p>';
+      html += '<p class="tk-nota">Valores por '+u+'. Revisa también la lista de ingredientes: cuanto más corta y reconocible, mejor.</p></div>';
+      res.innerHTML = html;
+    }
+    pintar();
+  };
+
+  window.__toolInit['test-hambre-emocional'] = function(){
+    var app = document.getElementById('hb-app'); if (!app || app.__ok) return; app.__ok = true;
+    var R = {};
+    app.querySelectorAll('[data-p]').forEach(function(b){ b.addEventListener('click', function(){
+      var p = b.getAttribute('data-p'); R[p] = +b.getAttribute('data-v');
+      app.querySelectorAll('[data-p="'+p+'"]').forEach(function(x){ x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+      pintar(); }); });
+    function pintar(){
+      var n = Object.keys(R).length, res = document.getElementById('hb-res');
+      if (n < 10) { res.innerHTML = '<div class="big">Te quedan '+(10-n)+' '+(10-n === 1 ? 'pregunta' : 'preguntas')+'</div>'; return; }
+      var s = 0; Object.keys(R).forEach(function(k){ s += R[k]; });
+      var t, d;
+      if (s <= 3) { t = 'Parece hambre física'; d = 'Lo que describes encaja con el hambre de verdad: tu cuerpo te pide energía. Come algo completo y con calma: una comida con proteína, verdura o fruta y un cereal integral te dejará satisfecha/o más tiempo.'; }
+      else if (s <= 6) { t = 'Una mezcla de hambre física y emocional'; d = 'Hay señales de hambre del cuerpo y también de que las emociones están influyendo. Prueba a parar unos minutos y preguntarte qué necesitas: puede que sea comer, o descansar, moverte o hablar con alguien.'; }
+      else { t = 'Se parece mucho al hambre emocional'; d = 'Lo que describes encaja con comer para calmar una emoción. Es algo muy humano y no tienes por qué sentir culpa. Mira las ideas de abajo y, si te pasa a menudo o te hace sentir mal, una dietista-nutricionista y un psicólogo pueden ayudarte a manejarlo.'; }
+      res.innerHTML = '<div class="big"><b>'+t+'</b></div><p>'+d+'</p><p class="tk-nota">'+s+' de 10 señales de hambre emocional. Es un test orientativo, no un diagnóstico.</p>';
+    }
+    pintar();
+  };
+
+  window.__toolInit['calculadora-agua'] = function(){
+    var app = document.getElementById('ag-app'); if (!app || app.__ok) return; app.__ok = true;
+    var sexo = 'm';
+    tkModo(app, 'data-sexo', function(v){ sexo = v; document.getElementById('ag-emb-l').hidden = v === 'h'; if (v === 'h') document.getElementById('ag-emb').value = '0'; pintar(); });
+    tkVivo(app, pintar);
+    function pintar(){
+      var base = sexo === 'h' ? 2500 : 2000, emb = +document.getElementById('ag-emb').value, min = Math.max(0, tkNum('ag-min')), calor = +document.getElementById('ag-calor').value;
+      var total = base + emb, bebida = total * 0.8 + min / 60 * 500 + calor;
+      bebida = Math.round(bebida / 50) * 50;
+      var vasos = Math.round(bebida / 250);
+      document.getElementById('ag-res').innerHTML = '<div class="big">Unos <b>'+tkFmt(bebida/1000, 1)+' litros</b> en bebidas al día</div>'
+        + '<p>Son unos <b>'+vasos+' vasos</b> de 250 ml. <span class="ag-vasos" aria-hidden="true">'+new Array(Math.min(vasos, 20)+1).join('<i></i>')+'</span></p>'
+        + '<p>En total necesitas unos '+tkFmt(total/1000, 1)+' litros de agua'+(min || calor ? ' más lo que pierdes con el sudor' : '')+'; alrededor de un 20 % ya te llega con la comida.</p>'
+        + (min >= 60 ? '<p class="tk-nota">En ejercicios de más de una hora, sobre todo con calor, puede hacer falta reponer también sales (sodio).</p>' : '');
+    }
+    pintar();
+  };
+
   window.__toolInit['recetas-con-lo-que-tengo'] = function(){
     var app = document.getElementById('re-app'); if (!app || app.__ok) return; app.__ok = true;
     var D = leerJSON('datos-recetas'); if (!D) return;
@@ -1017,6 +1231,13 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
     sibo:['dieta-sibo','tips','Guía: dieta para el SIBO','Qué comer y qué evitar'],
     calorias:['calorias-alimentos','hero','Qué aporta cada alimento','Calorías y nutrientes'],
     recetas:['recetas-con-lo-que-tengo','online','¿Qué cocino con lo que tengo?','Recetas con tus ingredientes'],
+    kcal:['calculadora-calorias','bio','Calculadora de calorías y macros','Cuántas calorías necesito al día'],
+    prot:['calculadora-proteinas','climb','¿Cuánta proteína necesito?','Calcula tus gramos al día'],
+    creatina:['creatina','climb','Creatina','Cuánta tomar, usos y beneficios'],
+    temporada:['frutas-verduras-temporada','tips','Frutas y verduras de temporada','Calendario mes a mes'],
+    etiquetas:['lector-de-etiquetas','tips','Lector de etiquetas','¿Mucho azúcar, sal o grasa?'],
+    hambre:['test-hambre-emocional','hero','Test: ¿hambre real o emocional?','10 preguntas'],
+    agua:['calculadora-agua','online','¿Cuánta agua beber al día?','Calculadora de hidratación'],
     conversor:['conversor-crudo-cocido','hero','Conversor de crudo a cocido','Arroz, pasta, legumbres, carne…'],
     nutrientes:['alimentos-ricos-en-proteinas-vitaminas','tips','Tabla: alimentos ricos en proteínas y vitaminas','B12, B6, C, omega 3 y más']
   };
@@ -1336,8 +1557,8 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
   // ---------- routing ----------
   var pages = [].slice.call(document.querySelectorAll('[data-page]'));
   var names = pages.map(function(p){ return p.getAttribute('data-page'); });
-  var ALIAS = {'conversor':'conversor-crudo-cocido','crudo-cocido':'conversor-crudo-cocido','proteinas':'alimentos-ricos-en-proteinas-vitaminas','vitaminas':'alimentos-ricos-en-proteinas-vitaminas','tabla-nutrientes':'alimentos-ricos-en-proteinas-vitaminas','calorias':'calorias-alimentos','recetas':'recetas-con-lo-que-tengo','herramienta':'herramientas','sibo':'dieta-sibo','perdida-de-peso':'perdida-de-peso-valladolid','patologias-digestivas':'patologias-digestivas-valladolid','vegana':'alimentacion-vegetariana-vegana-valladolid','infantil':'nutricion-infantil-valladolid','nutricion-infantil':'nutricion-infantil-valladolid','oncologica':'nutricion-oncologica-valladolid','nutricion-oncologica':'nutricion-oncologica-valladolid','reserva':'contacto','cita':'contacto','reservar':'contacto','servicios':'dietista-nutricionista-en-valladolid','online':'nutricionista-online','asesoria':'asesoria-externa','colaboraciones':'publicaciones','cursos':'cursos-talleres','blog':'blog-nutricion','todos-los-servicios':'nuestros-servicios','nutricion-deportiva':'nutricion-deportiva-valladolid','privacidad':'proteccion-de-datos'};
-  var NAVMAP = {'conversor-crudo-cocido':'herramientas','alimentos-ricos-en-proteinas-vitaminas':'blog-nutricion','calorias-alimentos':'herramientas','recetas-con-lo-que-tengo':'herramientas','dieta-fodmap':'blog-nutricion','dieta-sibo':'blog-nutricion','perdida-de-peso-valladolid':'dietista-nutricionista-en-valladolid','patologias-digestivas-valladolid':'dietista-nutricionista-en-valladolid','alimentacion-vegetariana-vegana-valladolid':'dietista-nutricionista-en-valladolid','nutricion-infantil-valladolid':'dietista-nutricionista-en-valladolid','nutricion-oncologica-valladolid':'dietista-nutricionista-en-valladolid','nuestros-servicios':'dietista-nutricionista-en-valladolid','nutricion-deportiva-valladolid':'dietista-nutricionista-en-valladolid','tips':'blog-nutricion'};
+  var ALIAS = {'calorias-diarias':'calculadora-calorias','macros':'calculadora-calorias','proteina':'calculadora-proteinas','temporada':'frutas-verduras-temporada','etiquetas':'lector-de-etiquetas','hambre-emocional':'test-hambre-emocional','agua':'calculadora-agua','conversor':'conversor-crudo-cocido','crudo-cocido':'conversor-crudo-cocido','proteinas':'alimentos-ricos-en-proteinas-vitaminas','vitaminas':'alimentos-ricos-en-proteinas-vitaminas','tabla-nutrientes':'alimentos-ricos-en-proteinas-vitaminas','calorias':'calorias-alimentos','recetas':'recetas-con-lo-que-tengo','herramienta':'herramientas','sibo':'dieta-sibo','perdida-de-peso':'perdida-de-peso-valladolid','patologias-digestivas':'patologias-digestivas-valladolid','vegana':'alimentacion-vegetariana-vegana-valladolid','infantil':'nutricion-infantil-valladolid','nutricion-infantil':'nutricion-infantil-valladolid','oncologica':'nutricion-oncologica-valladolid','nutricion-oncologica':'nutricion-oncologica-valladolid','reserva':'contacto','cita':'contacto','reservar':'contacto','servicios':'dietista-nutricionista-en-valladolid','online':'nutricionista-online','asesoria':'asesoria-externa','colaboraciones':'publicaciones','cursos':'cursos-talleres','blog':'blog-nutricion','todos-los-servicios':'nuestros-servicios','nutricion-deportiva':'nutricion-deportiva-valladolid','privacidad':'proteccion-de-datos'};
+  var NAVMAP = {'calculadora-calorias':'herramientas','calculadora-proteinas':'herramientas','creatina':'herramientas','frutas-verduras-temporada':'herramientas','lector-de-etiquetas':'herramientas','test-hambre-emocional':'herramientas','calculadora-agua':'herramientas','conversor-crudo-cocido':'herramientas','alimentos-ricos-en-proteinas-vitaminas':'blog-nutricion','calorias-alimentos':'herramientas','recetas-con-lo-que-tengo':'herramientas','dieta-fodmap':'blog-nutricion','dieta-sibo':'blog-nutricion','perdida-de-peso-valladolid':'dietista-nutricionista-en-valladolid','patologias-digestivas-valladolid':'dietista-nutricionista-en-valladolid','alimentacion-vegetariana-vegana-valladolid':'dietista-nutricionista-en-valladolid','nutricion-infantil-valladolid':'dietista-nutricionista-en-valladolid','nutricion-oncologica-valladolid':'dietista-nutricionista-en-valladolid','nuestros-servicios':'dietista-nutricionista-en-valladolid','nutricion-deportiva-valladolid':'dietista-nutricionista-en-valladolid','tips':'blog-nutricion'};
   var current = null;
   var MPA = window.__MPA || null;
   // Versión publicada por páginas: los enlaces #seccion pasan a ser páginas reales (seccion.html)

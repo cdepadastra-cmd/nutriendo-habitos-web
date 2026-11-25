@@ -524,6 +524,50 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
 .nt-mas{display:block;margin:1rem auto 0;border:1px solid var(--primary);background:transparent;color:var(--primary);border-radius:999px;padding:.55rem 1.3rem;font:inherit;font-size:.9rem;cursor:pointer}
 .nt-mas:hover{background:var(--primary);color:var(--primary-fg)}
 #nt-app{margin-top:1.5rem}
+.tk-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;align-items:end}
+.tk-grid .tk-ancho{grid-column:span 2}
+.tk-grid1{grid-template-columns:1fr}
+.et-grid{margin-top:.4rem}
+@media(max-width:860px){.tk-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.tk-grid{grid-template-columns:1fr}.tk-grid .tk-ancho{grid-column:auto}}
+.tk-grid .nt-modo{display:flex;height:2.8rem}.tk-grid .nt-modo button{flex:1 1 auto;white-space:nowrap}
+.tk-app .cv-f select{padding-right:2.2rem;text-overflow:ellipsis}
+.tk-macs{display:grid;gap:.55rem;margin:.9rem 0 .3rem}
+.tk-mac{display:grid;grid-template-columns:10.5rem 4.5rem 3rem 1fr;gap:.6rem;align-items:center;font-size:.92rem}
+.tk-mac b{text-align:right;font-variant-numeric:tabular-nums}.tk-mac small{color:var(--muted-fg);font-variant-numeric:tabular-nums}
+.tk-mac i{display:block;height:8px;border-radius:4px;background:rgba(0,0,0,.08);overflow:hidden}.tk-mac em{display:block;height:100%;border-radius:4px}
+@media(max-width:480px){.tk-mac{grid-template-columns:1fr auto auto;}.tk-mac i{grid-column:1/-1}}
+.tk-nota{font-size:.85rem!important;opacity:.85}
+.tk-ej{margin:.3rem 0 0;padding-left:1.1rem;font-size:.9rem;columns:2;column-gap:2rem}
+@media(max-width:640px){.tk-ej{columns:1}}
+.tk-aviso{border-left:3px solid var(--primary);padding-left:.8rem}
+.tp-meses{display:grid;grid-template-columns:repeat(12,1fr);gap:.35rem}
+.tp-meses .tl-chip{justify-content:center;padding-left:.3rem;padding-right:.3rem}
+.tp-largo{display:none}
+@media(max-width:760px){.tp-meses{grid-template-columns:repeat(6,1fr)}}
+.tp-titulo{font-family:var(--font-display);font-size:1.5rem;margin:1.3rem 0 .4rem;color:var(--primary)}
+.tp-sub{font-size:1rem;margin:1rem 0 .5rem}.tp-sub small{color:var(--muted-fg);font-weight:400}
+.tp-lista{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:.4rem}
+.tp-lista li{background:var(--secondary);color:var(--secondary-fg);border-radius:999px;padding:.3rem .8rem;font-size:.88rem}
+.tp-lista li.nuevo{box-shadow:inset 0 0 0 2px var(--primary)}
+.tp-dot{display:inline-block;width:.9rem;height:.9rem;border-radius:50%;box-shadow:inset 0 0 0 2px var(--primary);vertical-align:-2px}
+.tp-q{margin-top:1.5rem}
+.tp-fila{display:grid;grid-template-columns:9rem 1fr;gap:.8rem;align-items:center;margin:.6rem 0}
+.tp-barra{display:grid;grid-template-columns:repeat(12,1fr);gap:2px}
+.tp-barra span{text-align:center;font-size:.72rem;padding:.3rem 0;border-radius:4px;background:var(--muted);color:var(--muted-fg)}
+.tp-barra span.si{background:var(--primary);color:var(--primary-fg)}
+@media(max-width:480px){.tp-fila{grid-template-columns:1fr}}
+.et-sem{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;margin-top:1.2rem}
+@media(max-width:640px){.et-sem{grid-template-columns:1fr 1fr}}
+.et-c{border-radius:var(--radius);padding:.8rem .9rem;display:grid;gap:.15rem;background:var(--muted);color:var(--foreground)}
+.et-c span{font-size:.8rem}.et-c b{font-size:1.3rem;font-variant-numeric:tabular-nums}.et-c em{font-style:normal;font-weight:600;font-size:.85rem}
+.et-c.bajo{background:#dcefd6;color:#24531c}.et-c.medio{background:#fbecc4;color:#6b4b00}.et-c.alto{background:#f8d3cd;color:#8a1f12}
+.hb-lista{margin:0;padding-left:1.3rem;display:grid;gap:.7rem}
+.hb-lista li{display:flex;justify-content:space-between;gap:1rem;align-items:center;font-size:.95rem;line-height:1.45}
+.hb-lista .nt-modo{flex:0 0 auto;height:2.4rem}.hb-lista .nt-modo button{min-width:3.6rem}
+@media(max-width:560px){.hb-lista li{flex-direction:column;align-items:flex-start;gap:.4rem}}
+.ag-vasos{display:inline-flex;flex-wrap:wrap;gap:3px;vertical-align:middle;margin-left:.4rem}
+.ag-vasos i{display:inline-block;width:10px;height:16px;border-radius:0 0 3px 3px;background:var(--primary);opacity:.75}
 .cv-grid{display:grid;grid-template-columns:2fr 1fr;gap:1rem;align-items:end}
 @media(max-width:640px){.cv-grid:not(.cv-grid2){grid-template-columns:1fr}}
 @media(max-width:480px){.cv-grid{grid-template-columns:1fr}}
@@ -1333,6 +1377,13 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
   <section class="page-hero" data-hero="tips" data-crumb="Herramientas" data-ey="Herramientas gratuitas" data-h1="Herramientas de nutrición" data-lead="Herramientas sencillas y gratuitas para comer mejor en el día a día: qué aporta cada alimento, qué alimentos tienen más proteínas y vitaminas, cuánto pesa en crudo lo que te pautan en cocido y qué cocinar con lo que tienes en casa."></section>
   <div class="wrap editorial">
     <div class="tl-hub">
+      <a class="tl-hubcard" href="#calculadora-calorias"><span class="card-icon sq" data-ic2="gauge"></span><h2>Calculadora de calorías y macros</h2><p>Cuántas calorías necesitas al día según tu edad, peso, actividad y objetivo, y cómo repartir proteínas, grasas e hidratos.</p><span class="tl-go">Calcular <svg class="i" viewBox="0 0 24 24" data-ic="arrow"></svg></span></a>
+      <a class="tl-hubcard" href="#calculadora-proteinas"><span class="card-icon sq" data-ic2="activity"></span><h2>¿Cuánta proteína necesito al día?</h2><p>Tus gramos de proteína según tu peso, tu edad y tu actividad, y cómo repartirlos en las comidas.</p><span class="tl-go">Calcular <svg class="i" viewBox="0 0 24 24" data-ic="arrow"></svg></span></a>
+      <a class="tl-hubcard" href="#creatina"><span class="card-icon sq" data-ic2="mountain"></span><h2>Creatina: cuánta tomar</h2><p>Para qué sirve, qué beneficios tiene según la ciencia y cuántos gramos necesitas al día.</p><span class="tl-go">Ver la guía <svg class="i" viewBox="0 0 24 24" data-ic="arrow"></svg></span></a>
+      <a class="tl-hubcard" href="#frutas-verduras-temporada"><span class="card-icon sq" data-ic2="salad"></span><h2>Frutas y verduras de temporada</h2><p>Qué está de temporada cada mes en España y cuándo es el mejor momento de cada fruta y verdura.</p><span class="tl-go">Ver el calendario <svg class="i" viewBox="0 0 24 24" data-ic="arrow"></svg></span></a>
+      <a class="tl-hubcard" href="#lector-de-etiquetas"><span class="card-icon sq" data-ic2="clip"></span><h2>Lector de etiquetas</h2><p>Copia los datos de la etiqueta y descubre si el producto tiene mucho azúcar, sal o grasa.</p><span class="tl-go">Analizar una etiqueta <svg class="i" viewBox="0 0 24 24" data-ic="arrow"></svg></span></a>
+      <a class="tl-hubcard" href="#test-hambre-emocional"><span class="card-icon sq" data-ic2="heart"></span><h2>Test: ¿hambre real o emocional?</h2><p>10 preguntas para saber si tus ganas de comer vienen del cuerpo o de las emociones, con ideas para gestionarlo.</p><span class="tl-go">Hacer el test <svg class="i" viewBox="0 0 24 24" data-ic="arrow"></svg></span></a>
+      <a class="tl-hubcard" href="#calculadora-agua"><span class="card-icon sq" data-ic2="drop"></span><h2>¿Cuánta agua beber al día?</h2><p>Calcula cuánta agua necesitas según tu sexo, el ejercicio, el calor, el embarazo o la lactancia.</p><span class="tl-go">Calcular <svg class="i" viewBox="0 0 24 24" data-ic="arrow"></svg></span></a>
       <a class="tl-hubcard" href="#calorias-alimentos"><span class="card-icon sq" data-ic2="apple"></span><h2>Qué aporta cada alimento</h2><p>Calorías, proteínas, hidratos, fibra y grasas de casi 190 alimentos habituales, por 100 g y por ración. Busca por nombre o por grupo: carnes, pescados, verduras, frutas, legumbres…</p><span class="tl-go">Abrir la herramienta <svg class="i" viewBox="0 0 24 24" data-ic="arrow"></svg></span></a>
       <a class="tl-hubcard" href="#recetas-con-lo-que-tengo"><span class="card-icon sq" data-ic2="chef"></span><h2>¿Qué cocino con lo que tengo?</h2><p>Escribe o marca los ingredientes que tienes en la nevera y te propongo recetas sencillas y saludables de Nutriendo Hábitos, con los ingredientes y el paso a paso.</p><span class="tl-go">Abrir la herramienta <svg class="i" viewBox="0 0 24 24" data-ic="arrow"></svg></span></a>
       <a class="tl-hubcard" href="#conversor-crudo-cocido"><span class="card-icon sq" data-ic2="utensils"></span><h2>Conversor de crudo a cocido</h2><p>¿Cuánto arroz, pasta o legumbre tengo que pesar en seco para tener 150 g cocidos? ¿Cuánto pierde el pollo a la plancha? Calcúlalo al momento, también para varias personas.</p><span class="tl-go">Abrir el conversor <svg class="i" viewBox="0 0 24 24" data-ic="arrow"></svg></span></a>
@@ -1472,6 +1523,183 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
   </div>
   <script type="application/json" id="datos-conversor">[["Arroz blanco", "Cereales y pasta", 2.7, "hervido y escurrido"], ["Arroz integral", "Cereales y pasta", 2.9, "hervido"], ["Pasta (macarrones, espaguetis…)", "Cereales y pasta", 2.3, "hervida y escurrida"], ["Pasta integral", "Cereales y pasta", 2.3, "hervida y escurrida"], ["Quinoa", "Cereales y pasta", 3.1, "hervida"], ["Cuscús", "Cereales y pasta", 2.4, "con el mismo volumen de agua que de cuscús"], ["Lentejas", "Legumbres", 2.9, "cocidas"], ["Garbanzos", "Legumbres", 2.3, "cocidos"], ["Alubias blancas", "Legumbres", 2.4, "cocidas"], ["Alubias rojas o pintas", "Legumbres", 2.7, "cocidas"], ["Pechuga de pollo", "Carnes y pescados", 0.75, "a la plancha o al horno"], ["Pechuga de pavo", "Carnes y pescados", 0.8, "a la plancha o al horno"], ["Carne picada de ternera", "Carnes y pescados", 0.75, "a la sartén"], ["Solomillo de cerdo", "Carnes y pescados", 0.8, "a la plancha o al horno"], ["Lomo de cerdo", "Carnes y pescados", 0.75, "a la plancha o al horno"], ["Merluza, pescadilla o bacalao fresco", "Carnes y pescados", 0.8, "a la plancha o al horno"], ["Salmón", "Carnes y pescados", 0.9, "a la plancha o al horno"], ["Gambas y langostinos", "Carnes y pescados", 0.85, "cocidos o a la plancha"]]</script>
   <div data-cta data-next="calorias,nutrientes,recetas"></div>
+</div>
+
+<!-- ================= HERRAMIENTA: CALCULADORA DE CALORÍAS Y MACROS ================= -->
+<div data-page="calculadora-calorias" hidden>
+  <section class="page-hero" data-hero="bio" data-crumb="Calculadora de calorías y macros" data-ey="Herramienta gratuita" data-h1="Calculadora de calorías y macros: cuántas calorías necesito al día" data-lead="Calcula una estimación de tus calorías diarias y de cuánta proteína, grasa e hidratos de carbono te corresponden según tu edad, tu peso, tu actividad y tu objetivo."></section>
+  <div class="wrap editorial">
+    <div class="tl-box tk-app" id="kc-app">
+      <div class="tk-grid">
+        <div class="cv-f"><span>Sexo</span><div class="nt-modo" role="group" aria-label="Sexo"><button type="button" data-sexo="m" aria-pressed="true">Mujer</button><button type="button" data-sexo="h" aria-pressed="false">Hombre</button></div></div>
+        <label class="cv-f">Edad (años)<input id="kc-edad" type="number" inputmode="numeric" min="18" max="100" value="35"></label>
+        <label class="cv-f">Peso (kg)<input id="kc-peso" type="number" inputmode="decimal" min="30" max="250" step="0.1" value="65"></label>
+        <label class="cv-f">Altura (cm)<input id="kc-alt" type="number" inputmode="numeric" min="130" max="220" value="165"></label>
+        <label class="cv-f tk-ancho">Actividad física<select id="kc-act">
+          <option value="1.2">Sedentaria: trabajo sentado y casi sin ejercicio</option>
+          <option value="1.375" selected>Ligera: caminas a diario o haces ejercicio 1-3 días por semana</option>
+          <option value="1.55">Moderada: ejercicio 3-5 días por semana</option>
+          <option value="1.725">Alta: ejercicio intenso 6-7 días por semana</option>
+          <option value="1.9">Muy alta: trabajo físico duro o entrenas dos veces al día</option></select></label>
+        <label class="cv-f tk-ancho">Objetivo<select id="kc-obj">
+          <option value="perder">Perder grasa poco a poco</option>
+          <option value="mantener" selected>Mantener mi peso</option>
+          <option value="ganar">Ganar masa muscular (con entrenamiento de fuerza)</option></select></label>
+      </div>
+      <div class="cv-res" id="kc-res" aria-live="polite"></div>
+      <p class="tl-src">Cálculo con la fórmula de Mifflin-St Jeor (gasto en reposo) multiplicada por el factor de actividad. Para perder grasa se resta un 15 % y para ganar masa muscular se suma un 10 %, sin bajar nunca del gasto en reposo. Proteína según el objetivo (1,0 a 1,8 g por kilo), grasa en torno al 30 % de las calorías y el resto, hidratos de carbono. Es una estimación para adultos sanos: no sustituye a una valoración individual.</p>
+      <p class="tl-src tk-aviso">Si tienes o has tenido una relación difícil con la comida, mejor no uses calculadoras de calorías por tu cuenta: una consulta con una dietista-nutricionista y, si hace falta, con psicología, te ayudará más que cualquier cifra.</p>
+    </div>
+    <div class="lead-rule"></div>
+    <div><article class="stmt"><div class="left"><span class="card-icon sq" data-ic2="gauge"></span><h3 class="card-title">Qué significa cada cifra</h3></div><div class="oc small"><p>El <strong>gasto en reposo</strong> es lo que tu cuerpo gasta solo por estar vivo: respirar, mantener la temperatura, el corazón, el cerebro. Al multiplicarlo por tu nivel de actividad sale tu <strong>gasto diario</strong>, una estimación de las calorías con las que tu peso se mantendría estable.</p><p>Las fórmulas aciertan bien en la mayoría de personas, pero pueden fallar un 10 % arriba o abajo. Tómalas como punto de partida y ajusta según cómo evoluciones en 3-4 semanas.</p></div></article><article class="stmt"><div class="left"><span class="card-icon sq" data-ic2="scale"></span><h3 class="card-title">Perder grasa sin pasar hambre</h3></div><div class="oc small"><p>Un recorte moderado (alrededor de un 15 %) permite perder grasa poco a poco sin perder tanta masa muscular ni energía. Las dietas muy bajas en calorías suelen acabar en efecto rebote. Prioriza la <strong>proteína</strong>, las <strong>verduras</strong> y la fibra, que sacian, y combina con <strong>ejercicio de fuerza</strong>.</p><p>En consulta medimos tu composición corporal con bioimpedancia para ver si lo que pierdes es grasa y no músculo. <a href="#perdida-de-peso-valladolid">Más sobre pérdida de peso</a>.</p></div></article><article class="stmt"><div class="left"><span class="card-icon sq" data-ic2="activity"></span><h3 class="card-title">Las calorías no lo son todo</h3></div><div class="oc small"><p>Dos dietas con las mismas calorías pueden ser muy distintas para tu salud. Más que contar, importa <strong>qué comes</strong>: alimentos poco procesados, legumbres, frutas, verduras, cereales integrales, frutos secos, pescado y aceite de oliva. Usa la calculadora para orientarte, no para obsesionarte.</p></div></article></div>
+    <section class="faq" aria-labelledby="faq-kc">
+      <h2 class="bar-h2" id="faq-kc">Preguntas frecuentes</h2>
+      <div class="faq-list"><details><summary>¿Cuántas calorías necesita una mujer al día?</summary><div class="oc small"><p>Depende de la edad, el tamaño y la actividad: muchas mujeres adultas se mueven entre 1.700 y 2.300 kcal al día. Una mujer de 35 años, 65 kg, 165 cm y actividad ligera gasta en torno a 1.900 kcal.</p></div></details><details><summary>¿Cuántas calorías necesita un hombre al día?</summary><div class="oc small"><p>En la mayoría de hombres adultos, entre 2.200 y 3.000 kcal al día. Un hombre de 35 años, 80 kg, 178 cm y actividad ligera gasta unas 2.500 kcal.</p></div></details><details><summary>¿Qué son los macros?</summary><div class="oc small"><p>Los macronutrientes: proteínas, grasas e hidratos de carbono. Cada gramo de proteína o de hidratos aporta unas 4 kcal y cada gramo de grasa unas 9 kcal. El reparto ideal depende de tu objetivo y de tu actividad.</p></div></details><details><summary>¿Sirve la calculadora en el embarazo o para menores?</summary><div class="oc small"><p>No. En el embarazo, la lactancia, la infancia, la adolescencia o con enfermedades que afectan al peso, las necesidades son distintas y conviene una valoración individual.</p></div></details><details><summary>¿Cada cuánto debo recalcular?</summary><div class="oc small"><p>Si tu peso cambia más de 3-4 kg o cambias mucho tu nivel de actividad, vuelve a calcularlo. Y si en 3-4 semanas no ves el cambio que esperas, ajusta unas 100-200 kcal.</p></div></details></div>
+    </section>
+  </div>
+  <div data-cta data-next="prot,agua,nutrientes"></div>
+</div>
+
+<!-- ================= HERRAMIENTA: CALCULADORA DE PROTEÍNAS ================= -->
+<div data-page="calculadora-proteinas" hidden>
+  <section class="page-hero" data-hero="climb" data-crumb="Calculadora de proteínas" data-ey="Herramienta gratuita" data-h1="¿Cuánta proteína necesito al día? Calculadora" data-lead="Calcula cuántos gramos de proteína necesitas al día según tu peso, tu edad y tu actividad, y cómo repartirlos en las comidas con alimentos de verdad."></section>
+  <div class="wrap editorial">
+    <div class="tl-box tk-app" id="pr-app">
+      <div class="tk-grid">
+        <label class="cv-f">Peso (kg)<input id="pr-peso" type="number" inputmode="decimal" min="30" max="250" step="0.1" value="65"></label>
+        <label class="cv-f">Edad (años)<input id="pr-edad" type="number" inputmode="numeric" min="18" max="100" value="35"></label>
+        <label class="cv-f">Comidas al día<select id="pr-com"><option>3</option><option selected>4</option><option>5</option></select></label>
+        <label class="cv-f tk-ancho">Tu situación<select id="pr-perfil">
+          <option value="0.8,1.0">Adulto con poca actividad física</option>
+          <option value="1.0,1.2" selected>Actividad moderada (caminar a diario, deporte 2-3 días)</option>
+          <option value="1.2,1.6">Deporte de resistencia (correr, ciclismo, trail, natación)</option>
+          <option value="1.6,2.0">Entrenamiento de fuerza o quiero ganar músculo</option>
+          <option value="1.2,1.6">Perder grasa conservando el músculo</option>
+          <option value="1.0,1.2">Mayor de 65 años, sano</option>
+          <option value="1.2,1.5">Mayor de 65 años con enfermedad o tras un ingreso</option>
+          <option value="1.0,1.5">En tratamiento oncológico</option></select></label>
+      </div>
+      <div class="cv-res" id="pr-res" aria-live="polite"></div>
+      <p class="tl-src">Rangos orientativos en gramos por kilo de peso corporal: 0,83 g/kg para adultos (EFSA), 1,0-1,2 g/kg para mayores de 65 años y 1,2-1,5 g/kg si hay enfermedad (ESPEN), 1,4-2,0 g/kg en personas que entrenan (International Society of Sports Nutrition) y 1,0-1,5 g/kg en el paciente oncológico (ESPEN). Con obesidad, enfermedad renal, embarazo o lactancia las necesidades cambian: consulta con un profesional.</p>
+    </div>
+    <div class="lead-rule"></div>
+    <div><article class="stmt"><div class="left"><span class="card-icon sq" data-ic2="heart"></span><h3 class="card-title">Para qué sirve la proteína</h3></div><div class="oc small"><p>La proteína forma y repara músculos, huesos, piel, uñas, defensas y hormonas. No se almacena como la grasa, por eso conviene tomarla <strong>repartida a lo largo del día</strong>: unos 20-40 g en cada comida principal aprovechan mejor que todo de golpe en la cena.</p></div></article><article class="stmt"><div class="left"><span class="card-icon sq" data-ic2="activity"></span><h3 class="card-title">Si entrenas</h3></div><div class="oc small"><p>El ejercicio, sobre todo el de fuerza, aumenta las necesidades. Una comida o tentempié con proteína en las 2 horas tras entrenar ayuda a recuperar. No hacen falta batidos: un yogur, unos huevos, legumbres o un bocadillo de pollo sirven igual. <a href="#nutricion-deportiva-valladolid">Nutrición deportiva</a>.</p></div></article><article class="stmt"><div class="left"><span class="card-icon sq" data-ic2="leaf"></span><h3 class="card-title">Proteína vegetal</h3></div><div class="oc small"><p>Las legumbres, el tofu, la soja texturizada, el tempeh, el seitán, los frutos secos y las semillas aportan mucha proteína. Combinadas a lo largo del día con cereales cubren todos los aminoácidos. Si sigues una dieta vegana, apunta a la parte alta del rango. <a href="#alimentos-ricos-en-proteinas-vitaminas">Tabla de alimentos ricos en proteínas</a>.</p></div></article><article class="stmt"><div class="left"><span class="card-icon sq" data-ic2="stetho"></span><h3 class="card-title">Mayores y enfermedad</h3></div><div class="oc small"><p>A partir de los 65 años se pierde músculo más fácilmente y hace falta algo más de proteína para mantenerlo, junto con ejercicio de fuerza. En el tratamiento oncológico es clave para no perder masa muscular. <a href="#nutricion-oncologica-valladolid">Nutrición oncológica</a>.</p></div></article></div>
+    <section class="faq" aria-labelledby="faq-pr">
+      <h2 class="bar-h2" id="faq-pr">Preguntas frecuentes</h2>
+      <div class="faq-list"><details><summary>¿Cuánta proteína necesito al día?</summary><div class="oc small"><p>Un adulto con poca actividad necesita unos 0,8 g por kilo de peso al día: unos 55 g si pesas 70 kg. Si haces deporte, eres mayor de 65 años o estás en tratamiento por una enfermedad, la cantidad sube a 1,0-2,0 g por kilo.</p></div></details><details><summary>¿Es malo tomar demasiada proteína?</summary><div class="oc small"><p>En personas sanas, tomar hasta unos 2 g por kilo al día no ha demostrado ser perjudicial. Si tienes enfermedad renal, la cantidad la debe pautar tu médico o tu nutricionista.</p></div></details><details><summary>¿Necesito batidos de proteína?</summary><div class="oc small"><p>Casi nunca. Con comida normal se cubre sin problema. Los batidos pueden ser prácticos si entrenas mucho y te cuesta llegar, pero no son imprescindibles.</p></div></details><details><summary>¿Qué alimentos tienen más proteína?</summary><div class="oc small"><p>Carne, pescado, huevos, lácteos y quesos, legumbres, tofu, soja texturizada, frutos secos y semillas. En nuestra tabla puedes ordenarlos por proteína por 100 g o por ración.</p></div></details></div>
+    </section>
+  </div>
+  <div data-cta data-next="creatina,kcal,nutrientes"></div>
+</div>
+
+<!-- ================= HERRAMIENTA: CREATINA ================= -->
+<div data-page="creatina" hidden>
+  <section class="page-hero" data-hero="climb" data-crumb="Creatina" data-ey="Guía y calculadora" data-h1="Creatina: cuánta tomar al día, para qué sirve y beneficios" data-lead="Qué es la creatina, para qué sirve, qué dice la ciencia de sus beneficios y cuánta necesitas al día según tu peso, con o sin fase de carga."></section>
+  <div class="wrap editorial">
+    <div class="tl-box tk-app" id="cr-app">
+      <div class="tk-grid">
+        <label class="cv-f">Peso (kg)<input id="cr-peso" type="number" inputmode="decimal" min="35" max="200" step="0.1" value="70"></label>
+        <div class="cv-f tk-ancho"><span>¿Cómo quieres empezar?</span><div class="nt-modo" role="group" aria-label="Pauta"><button type="button" data-pauta="normal" aria-pressed="true">Dosis diaria (recomendado)</button><button type="button" data-pauta="carga" aria-pressed="false">Con fase de carga</button></div></div>
+      </div>
+      <div class="cv-res" id="cr-res" aria-live="polite"></div>
+      <p class="tl-src">Pautas de la International Society of Sports Nutrition (Kreider et al., 2017): mantenimiento de 3-5 g al día (unos 0,03 g por kilo) o fase de carga de 0,3 g por kilo al día durante 5-7 días repartidos en 4 tomas, seguida de mantenimiento. La declaración de salud autorizada en la UE se refiere a una toma diaria de 3 g.</p>
+    </div>
+    <div class="lead-rule"></div>
+    <div><article class="stmt"><div class="left"><span class="card-icon sq" data-ic2="activity"></span><h3 class="card-title">Qué es la creatina</h3></div><div class="oc small"><p>Es una sustancia que fabrica el propio cuerpo (en el hígado y el riñón) a partir de aminoácidos y que también tomamos con la <strong>carne y el pescado</strong>. Se guarda sobre todo en los músculos, donde sirve de <strong>reserva rápida de energía</strong> para esfuerzos cortos e intensos: un sprint, un bloque de escalada, una serie de pesas.</p><p>Una dieta con carne y pescado aporta alrededor de 1-2 g al día. Las personas vegetarianas y veganas suelen tener las reservas más bajas, y por eso notan más el efecto del suplemento.</p></div></article><article class="stmt"><div class="left"><span class="card-icon sq" data-ic2="mountain"></span><h3 class="card-title">Para qué sirve y beneficios</h3></div><div class="oc small"><p>Es uno de los suplementos deportivos con <strong>más evidencia científica</strong>. Está demostrado que:</p><ul><li>Mejora el rendimiento en <strong>esfuerzos cortos e intensos repetidos</strong> (fuerza, sprints, deportes de equipo, escalada). Es una declaración de salud autorizada en la UE con 3 g al día.</li><li>Junto con <strong>entrenamiento de fuerza</strong>, ayuda a ganar fuerza y masa muscular, también en mayores de 55 años (declaración autorizada en la UE).</li><li>Puede ayudar a recuperar entre sesiones intensas.</li></ul><p>Se investiga su papel en la salud del cerebro, la memoria o la recuperación de lesiones, pero todavía no hay conclusiones firmes.</p></div></article><article class="stmt"><div class="left"><span class="card-icon sq" data-ic2="clip"></span><h3 class="card-title">Cómo tomarla</h3></div><div class="oc small"><p>La forma más estudiada, eficaz y barata es el <strong>monohidrato de creatina</strong>. Otras formas (clorhidrato, «Kre-alkalyn», etc.) no han demostrado ser mejores. Busca un producto que solo contenga creatina monohidrato.</p><ul><li>Tómala <strong>todos los días</strong>, también los de descanso: lo que cuenta es la constancia, no la hora.</li><li>Puedes disolverla en agua, en zumo o en un yogur, o tomarla con una comida.</li><li>La fase de carga no es necesaria: con 3-5 g diarios los músculos se llenan en 3-4 semanas.</li></ul></div></article><article class="stmt"><div class="left"><span class="card-icon sq" data-ic2="stetho"></span><h3 class="card-title">Seguridad y precauciones</h3></div><div class="oc small"><p>En adultos sanos, las dosis habituales son <strong>seguras</strong>, también a largo plazo. Ten en cuenta que:</p><ul><li>Es normal ganar <strong>1-2 kg al principio</strong>: es agua que el músculo retiene, no grasa.</li><li>Dosis altas de golpe pueden dar molestias digestivas: repártelas.</li><li>Sube la <strong>creatinina en los análisis</strong> sin que eso signifique daño renal: avisa a tu médico si te haces una analítica.</li><li>Si tienes enfermedad renal, estás embarazada o en lactancia, o en menores de edad, no la tomes sin supervisión.</li></ul></div></article></div>
+    <section class="faq" aria-labelledby="faq-cr">
+      <h2 class="bar-h2" id="faq-cr">Preguntas frecuentes</h2>
+      <div class="faq-list"><details><summary>¿Cuánta creatina hay que tomar al día?</summary><div class="oc small"><p>Entre 3 y 5 g al día de monohidrato de creatina, unos 0,03 g por kilo de peso. Una persona de 70 kg tiene suficiente con 3 g diarios.</p></div></details><details><summary>¿Hace falta la fase de carga?</summary><div class="oc small"><p>No. La carga (unos 20 g al día durante 5-7 días) llena los músculos en una semana; sin carga, con 3-5 g diarios se llega al mismo punto en 3-4 semanas y con menos molestias.</p></div></details><details><summary>¿La creatina engorda o retiene líquidos?</summary><div class="oc small"><p>No aporta calorías apreciables. Los primeros días puede subir 1-2 kg el peso porque el músculo guarda más agua, que no es grasa.</p></div></details><details><summary>¿Es buena la creatina para mujeres?</summary><div class="oc small"><p>Sí. Los beneficios en fuerza, rendimiento y masa muscular se observan también en mujeres, con la misma dosis de 3-5 g al día.</p></div></details><details><summary>¿Daña el riñón?</summary><div class="oc small"><p>En personas sanas, los estudios no han encontrado daño renal con las dosis recomendadas. Sí eleva la creatinina de los análisis, por eso conviene avisar al médico. Con enfermedad renal, no la tomes sin supervisión.</p></div></details><details><summary>¿Cuándo es mejor tomarla, antes o después de entrenar?</summary><div class="oc small"><p>Da igual: importa más tomarla todos los días. Muchas personas la toman después de entrenar o con una comida por comodidad.</p></div></details></div>
+    </section>
+  </div>
+  <div data-cta data-next="prot,kcal,agua"></div>
+</div>
+
+<!-- ================= HERRAMIENTA: CALENDARIO DE TEMPORADA ================= -->
+<div data-page="frutas-verduras-temporada" hidden>
+  <section class="page-hero" data-hero="tips" data-crumb="Frutas y verduras de temporada" data-ey="Calendario" data-h1="Frutas y verduras de temporada: calendario mes a mes" data-lead="Qué frutas, verduras y hortalizas están de temporada en España cada mes. Elige el mes o busca un alimento para ver cuándo está en su mejor momento."></section>
+  <div class="wrap editorial">
+    <div class="tl-box tk-app" id="tp-app">
+      <div class="tp-meses" id="tp-meses" role="group" aria-label="Mes"></div>
+      <div id="tp-mes" aria-live="polite"></div>
+      <label class="search-box tl-search tp-q" for="tp-q"><svg class="i" viewBox="0 0 24 24" data-ic="search"></svg><input id="tp-q" type="search" placeholder="¿Cuándo es temporada de…? (ej. cereza)" aria-label="Buscar fruta o verdura" autocomplete="off"></label>
+      <div id="tp-busca" aria-live="polite"></div>
+      <p class="tl-src">Calendario orientativo para el conjunto de España, elaborado a partir de los calendarios de temporada de la OCU y del Ministerio de Agricultura. Algunas hortalizas (tomate, pimiento, pepino, calabacín…) se cultivan todo el año en invernadero; su mejor momento al aire libre es el verano. En Castilla y León muchas frutas de hueso, la judía verde o el tomate de huerta llegan algo más tarde que en el sur.</p>
+    </div>
+    <script type="application/json" id="datos-temporada">{"Frutas": {"Aguacate": [1, 2, 3, 4, 5, 10, 11, 12], "Albaricoque": [4, 5, 6, 7, 8, 9], "Breva": [6, 7], "Caqui": [1, 9, 10, 11, 12], "Cereza": [4, 5, 6, 7, 8], "Chirimoya": [1, 9, 10, 11, 12], "Ciruela": [5, 6, 7, 8, 9], "Frambuesa": [1, 2, 3, 4, 10, 11, 12], "Fresa y fresón": [1, 2, 3, 4, 5], "Granada": [9, 10, 11], "Higo": [6, 7, 8, 9, 10], "Kiwi": [1, 2, 3, 4, 9, 10, 11, 12], "Limón": [1, 2, 3, 4, 5, 6, 10, 11, 12], "Mandarina": [1, 2, 3, 4, 5, 9, 10, 11, 12], "Mango": [7, 8, 9, 10, 11], "Manzana": [1, 2, 3, 4, 9, 10, 11, 12], "Melocotón": [4, 5, 6, 7, 8, 9, 10], "Melón": [5, 6, 7, 8, 9], "Membrillo": [7, 8, 9, 10], "Naranja": [1, 2, 3, 4, 5, 6, 10, 11, 12], "Nectarina": [4, 5, 6, 7, 8, 9, 10], "Níspero": [3, 4, 5, 6], "Paraguaya": [5, 6, 7, 8], "Pera": [1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12], "Plátano": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], "Pomelo": [1, 2, 3, 4, 5, 11, 12], "Sandía": [5, 6, 7, 8, 9], "Uva": [8, 9, 10, 11, 12]}, "Verduras y hortalizas": {"Acelga": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], "Ajo": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], "Alcachofa": [1, 2, 3, 4, 5, 6, 10, 11, 12], "Apio": [1, 2, 3, 4, 11, 12], "Berenjena": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], "Brócoli": [1, 2, 3, 4, 5, 6, 9, 10, 11, 12], "Calabacín": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], "Calabaza": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], "Cardo": [1, 2, 10, 11, 12], "Cebolla": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], "Col lombarda": [1, 2, 3, 10, 11, 12], "Coliflor": [1, 2, 3, 4, 5, 6, 9, 10, 11, 12], "Endibia": [1, 9, 10, 11, 12], "Escarola": [1, 2, 3, 4, 5, 6, 10, 11, 12], "Espárrago verde": [3, 4, 5, 6, 9], "Espinaca": [1, 2, 3, 4, 5, 6, 9, 10, 11, 12], "Guisante": [1, 2, 3, 4, 5, 6, 7], "Haba": [1, 2, 3, 4, 5, 6, 11], "Judía verde": [7, 8, 9, 10, 11, 12], "Lechuga": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], "Nabo": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], "Pepino": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], "Pimiento": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], "Puerro": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], "Rábano": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], "Remolacha": [7, 8, 9, 10, 11, 12], "Repollo": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], "Tomate": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], "Zanahoria": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]}}</script>
+    <div class="lead-rule"></div>
+    <div><article class="stmt"><div class="left"><span class="card-icon sq" data-ic2="salad"></span><h3 class="card-title">Por qué comer de temporada</h3></div><div class="oc small"><p>La fruta y la verdura de temporada se recogen en su punto, así que <strong>saben mejor</strong>, suelen ser <strong>más baratas</strong> y, si son de cerca, viajan menos. Variar con las estaciones también hace que tu alimentación sea más variada a lo largo del año.</p></div></article><article class="stmt"><div class="left"><span class="card-icon sq" data-ic2="chef"></span><h3 class="card-title">Ideas para cocinarlas</h3></div><div class="oc small"><p>Cuando tengas la lista del mes, prueba nuestra herramienta <a href="#recetas-con-lo-que-tengo">¿Qué cocino con lo que tengo?</a>: escribe las verduras que hayas comprado y te propone recetas sencillas.</p></div></article><article class="stmt"><div class="left"><span class="card-icon sq" data-ic2="apple"></span><h3 class="card-title">Cuánta fruta y verdura</h3></div><div class="oc small"><p>Lo recomendado son al menos <strong>5 raciones al día</strong> entre frutas, verduras y hortalizas: por ejemplo, 3 piezas de fruta y 2 raciones de verdura (una de ellas en crudo, en ensalada).</p></div></article></div>
+    <section class="faq" aria-labelledby="faq-tp">
+      <h2 class="bar-h2" id="faq-tp">Preguntas frecuentes</h2>
+      <div class="faq-list"><details><summary>¿Qué fruta es de temporada en invierno?</summary><div class="oc small"><p>Los cítricos (naranja, mandarina, limón, pomelo), el kiwi, la manzana, la pera, el caqui, la chirimoya y el aguacate.</p></div></details><details><summary>¿Qué verduras son de temporada en invierno?</summary><div class="oc small"><p>La alcachofa, el cardo, la coliflor, el brócoli, la col lombarda, el repollo, la escarola, la endibia, la espinaca, el puerro, el apio y la acelga.</p></div></details><details><summary>¿Qué frutas son de temporada en verano?</summary><div class="oc small"><p>El melón, la sandía, el melocotón, la nectarina, la paraguaya, el albaricoque, la ciruela, la cereza, el higo y, al final del verano, la uva.</p></div></details><details><summary>¿Las frutas y verduras de temporada son más nutritivas?</summary><div class="oc small"><p>Recogidas en su punto y consumidas pronto conservan mejor algunas vitaminas, como la C. Pero cualquier fruta o verdura suma: congeladas o fuera de temporada también son buena opción.</p></div></details></div>
+    </section>
+  </div>
+  <div data-cta data-next="recetas,etiquetas,nutrientes"></div>
+</div>
+
+<!-- ================= HERRAMIENTA: LECTOR DE ETIQUETAS ================= -->
+<div data-page="lector-de-etiquetas" hidden>
+  <section class="page-hero" data-hero="tips" data-crumb="Lector de etiquetas" data-ey="Herramienta gratuita" data-h1="Lector de etiquetas nutricionales: ¿tiene mucho azúcar, sal o grasa?" data-lead="Copia los datos «por 100 g» de la etiqueta y descubre al momento si el producto tiene mucho, poco o un nivel medio de grasa, grasas saturadas, azúcares y sal, y qué declaraciones podría usar."></section>
+  <div class="wrap editorial">
+    <div class="tl-box tk-app" id="et-app">
+      <div class="tk-grid tk-grid1"><div class="cv-f"><span>El producto es</span><div class="nt-modo" role="group" aria-label="Tipo de producto"><button type="button" data-tipo="solido" aria-pressed="true">Alimento (por 100 g)</button><button type="button" data-tipo="bebida" aria-pressed="false">Bebida (por 100 ml)</button></div></div></div>
+      <p class="cv-help">Escribe lo que pone en la tabla nutricional, en la columna «por 100 g» o «por 100 ml». Puedes dejar en blanco lo que no tengas.</p>
+      <div class="tk-grid et-grid"><label class="cv-f">Valor energético (kcal)<input id="et-kcal" type="number" inputmode="decimal" min="0" max="900" step="1" placeholder="—"></label><label class="cv-f">Grasas (g)<input id="et-grasa" type="number" inputmode="decimal" min="0" max="900" step="0.1" placeholder="—"></label><label class="cv-f">… de las cuales saturadas (g)<input id="et-sat" type="number" inputmode="decimal" min="0" max="900" step="0.1" placeholder="—"></label><label class="cv-f">Hidratos de carbono (g)<input id="et-hc" type="number" inputmode="decimal" min="0" max="900" step="0.1" placeholder="—"></label><label class="cv-f">… de los cuales azúcares (g)<input id="et-azuc" type="number" inputmode="decimal" min="0" max="900" step="0.1" placeholder="—"></label><label class="cv-f">Fibra (g)<input id="et-fibra" type="number" inputmode="decimal" min="0" max="900" step="0.1" placeholder="—"></label><label class="cv-f">Proteínas (g)<input id="et-prot" type="number" inputmode="decimal" min="0" max="900" step="0.1" placeholder="—"></label><label class="cv-f">Sal (g)<input id="et-sal" type="number" inputmode="decimal" min="0" max="900" step="0.01" placeholder="—"></label></div>
+      <div id="et-res" aria-live="polite"></div>
+      <p class="tl-src">Semáforo según los criterios de la Food Standards Agency del Reino Unido (por 100 g: grasa alta &gt; 17,5 g y baja ≤ 3 g; saturadas alta &gt; 5 g y baja ≤ 1,5 g; azúcares alta &gt; 22,5 g y baja ≤ 5 g; sal alta &gt; 1,5 g y baja ≤ 0,3 g; en bebidas, la mitad salvo la sal, alta &gt; 0,75 g). Declaraciones nutricionales según el Reglamento (CE) 1924/2006. Es una ayuda para comparar productos, no una valoración completa del alimento.</p>
+    </div>
+    <div class="lead-rule"></div>
+    <div><article class="stmt"><div class="left"><span class="card-icon sq" data-ic2="clip"></span><h3 class="card-title">Cómo leer una etiqueta en 30 segundos</h3></div><div class="oc small"><ol><li><strong>Lista de ingredientes</strong>: van ordenados de más a menos cantidad. Si el azúcar o la harina refinada aparecen entre los primeros, mal empezamos. Cuanto más corta, mejor.</li><li><strong>Tabla nutricional por 100 g</strong>: es la que sirve para comparar productos entre sí. Mira sobre todo azúcares, sal, grasas saturadas y fibra.</li><li><strong>Ración</strong>: si la etiqueta da valores «por ración», comprueba cuánto es esa ración; a veces es mucho menos de lo que te comes.</li></ol></div></article><article class="stmt"><div class="left"><span class="card-icon sq" data-ic2="apple"></span><h3 class="card-title">El azúcar se esconde con muchos nombres</h3></div><div class="oc small"><p>Jarabe de glucosa, glucosa-fructosa, dextrosa, sacarosa, maltosa, miel, sirope de agave, concentrado de zumo de fruta, panela… Todos son azúcares añadidos. La OMS recomienda que no superen el <strong>10 % de las calorías</strong> del día, y mejor por debajo del 5 % (unos 25 g).</p></div></article><article class="stmt"><div class="left"><span class="card-icon sq" data-ic2="heart"></span><h3 class="card-title">Sal y sodio</h3></div><div class="oc small"><p>Si la etiqueta da el <strong>sodio</strong> en lugar de la sal, multiplícalo por 2,5 para saber la sal. Lo recomendable es no pasar de <strong>5 g de sal al día</strong> entre todo lo que comes. Los embutidos, quesos curados, panes, salsas, snacks y platos preparados son las principales fuentes.</p></div></article></div>
+    <section class="faq" aria-labelledby="faq-et">
+      <h2 class="bar-h2" id="faq-et">Preguntas frecuentes</h2>
+      <div class="faq-list"><details><summary>¿Cuánto azúcar es mucho en un alimento?</summary><div class="oc small"><p>Más de 22,5 g de azúcares por 100 g se considera alto, y 5 g o menos, bajo. En bebidas, alto es más de 11,25 g por 100 ml.</p></div></details><details><summary>¿Cuánta sal es mucha?</summary><div class="oc small"><p>Más de 1,5 g de sal por 100 g es alto, y 0,3 g o menos, bajo. Para pasar de sodio a sal, multiplica por 2,5.</p></div></details><details><summary>¿Qué significa «sin azúcares añadidos»?</summary><div class="oc small"><p>Que no se ha añadido ningún azúcar ni ingrediente usado para endulzar, aunque el producto puede tener azúcares propios de la fruta o la leche. Si los tiene, la etiqueta debe indicarlo.</p></div></details><details><summary>¿Qué es el Nutri-Score?</summary><div class="oc small"><p>Una etiqueta frontal con letras de la A (verde) a la E (rojo) que resume la calidad nutricional del producto dentro de su categoría. Es útil para comparar productos parecidos, pero no sirve para comparar, por ejemplo, un aceite con un refresco.</p></div></details></div>
+    </section>
+  </div>
+  <div data-cta data-next="temporada,kcal,nutrientes"></div>
+</div>
+
+<!-- ================= HERRAMIENTA: TEST HAMBRE REAL O EMOCIONAL ================= -->
+<div data-page="test-hambre-emocional" hidden>
+  <section class="page-hero" data-hero="hero" data-crumb="Test: ¿hambre real o emocional?" data-ey="Test gratuito" data-h1="Test: ¿tengo hambre real o hambre emocional?" data-lead="Responde 10 preguntas sobre la última vez que te entraron ganas de comer y descubre si se parece más al hambre física o al hambre emocional, con ideas para gestionarla."></section>
+  <div class="wrap editorial">
+    <div class="tl-box tk-app" id="hb-app">
+      <p class="cv-help" style="margin-top:0">Piensa en la última vez que te entraron ganas de comer y marca lo que te pasó.</p>
+      <ol class="hb-lista" id="hb-lista"><li><span>El hambre me ha llegado de golpe, de repente.</span><div class="nt-modo" role="group" aria-label="Respuesta"><button type="button" data-p="0" data-v="1" aria-pressed="false">Sí</button><button type="button" data-p="0" data-v="0" aria-pressed="false">No</button></div></li><li><span>Me apetece algo muy concreto (dulce, salado, chocolate…) y no me vale otra cosa.</span><div class="nt-modo" role="group" aria-label="Respuesta"><button type="button" data-p="1" data-v="1" aria-pressed="false">Sí</button><button type="button" data-p="1" data-v="0" aria-pressed="false">No</button></div></li><li><span>Hace menos de 2-3 horas que hice una comida completa.</span><div class="nt-modo" role="group" aria-label="Respuesta"><button type="button" data-p="2" data-v="1" aria-pressed="false">Sí</button><button type="button" data-p="2" data-v="0" aria-pressed="false">No</button></div></li><li><span>Antes de que me entraran las ganas me sentía estresada/o, aburrida/o, triste, cansada/o o nerviosa/o.</span><div class="nt-modo" role="group" aria-label="Respuesta"><button type="button" data-p="3" data-v="1" aria-pressed="false">Sí</button><button type="button" data-p="3" data-v="0" aria-pressed="false">No</button></div></li><li><span>Siento las ganas más «en la cabeza» que en el estómago (no me suenan las tripas ni noto el estómago vacío).</span><div class="nt-modo" role="group" aria-label="Respuesta"><button type="button" data-p="4" data-v="1" aria-pressed="false">Sí</button><button type="button" data-p="4" data-v="0" aria-pressed="false">No</button></div></li><li><span>Siento que tiene que ser ya, que no puedo esperar.</span><div class="nt-modo" role="group" aria-label="Respuesta"><button type="button" data-p="5" data-v="1" aria-pressed="false">Sí</button><button type="button" data-p="5" data-v="0" aria-pressed="false">No</button></div></li><li><span>Cuando como así, sigo comiendo aunque ya esté lleno/a.</span><div class="nt-modo" role="group" aria-label="Respuesta"><button type="button" data-p="6" data-v="1" aria-pressed="false">Sí</button><button type="button" data-p="6" data-v="0" aria-pressed="false">No</button></div></li><li><span>Suelo comer rápido, de pie, delante de una pantalla o sin darme cuenta de lo que como.</span><div class="nt-modo" role="group" aria-label="Respuesta"><button type="button" data-p="7" data-v="1" aria-pressed="false">Sí</button><button type="button" data-p="7" data-v="0" aria-pressed="false">No</button></div></li><li><span>Después me siento culpable o mal conmigo mismo/a.</span><div class="nt-modo" role="group" aria-label="Respuesta"><button type="button" data-p="8" data-v="1" aria-pressed="false">Sí</button><button type="button" data-p="8" data-v="0" aria-pressed="false">No</button></div></li><li><span>Me pasa con frecuencia, varias veces por semana.</span><div class="nt-modo" role="group" aria-label="Respuesta"><button type="button" data-p="9" data-v="1" aria-pressed="false">Sí</button><button type="button" data-p="9" data-v="0" aria-pressed="false">No</button></div></li></ol>
+      <div class="cv-res" id="hb-res" aria-live="polite"></div>
+      <p class="tl-src">Test orientativo basado en las diferencias descritas entre el hambre física y el hambre emocional. No es un diagnóstico. Tus respuestas no se guardan ni se envían: todo se calcula en tu dispositivo.</p>
+    </div>
+    <div class="lead-rule"></div>
+    <div><article class="stmt"><div class="left"><span class="card-icon sq" data-ic2="activity"></span><h3 class="card-title">Hambre física</h3></div><div class="oc small"><ul><li>Aparece <strong>poco a poco</strong> y unas horas después de comer.</li><li>Se nota en el cuerpo: estómago vacío, ruidos, flojera, falta de concentración.</li><li>Te vale casi <strong>cualquier comida</strong>.</li><li>Puede esperar un rato.</li><li>Se calma cuando estás saciada/o y no deja culpa.</li></ul></div></article><article class="stmt"><div class="left"><span class="card-icon sq" data-ic2="heart"></span><h3 class="card-title">Hambre emocional</h3></div><div class="oc small"><ul><li>Llega <strong>de golpe</strong>, a menudo tras una emoción: estrés, aburrimiento, tristeza, cansancio, ansiedad… o también alegría.</li><li>Pide algo <strong>concreto</strong>, casi siempre dulce o salado y muy apetecible.</li><li>Parece <strong>urgente</strong>.</li><li>No se calma al llenarte.</li><li>A veces deja culpa después.</li></ul><p>Comer por emociones de vez en cuando es <strong>normal</strong>: la comida también es placer, consuelo y celebración. Se vuelve un problema cuando es la única forma de gestionar lo que sientes o te hace sentir mal.</p></div></article><article class="stmt"><div class="left"><span class="card-icon sq" data-ic2="leaf"></span><h3 class="card-title">Ideas para cuando aparece</h3></div><div class="oc small"><ol><li><strong>Para y ponle nombre</strong>: ¿qué siento ahora mismo? ¿Hambre, cansancio, aburrimiento, enfado?</li><li><strong>Espera 10 minutos</strong> haciendo otra cosa: beber agua, salir a caminar, llamar a alguien, ducharte. Si sigue ahí y es hambre, come.</li><li>Si decides comer, hazlo <strong>sentada/o, en un plato y sin pantallas</strong>, saboreándolo y sin castigarte después.</li><li>Haz <strong>comidas regulares y completas</strong>: llegar con mucha hambre a la tarde dispara los picoteos.</li><li>Cuida el <strong>sueño</strong>: dormir poco aumenta el apetito por dulces y ultraprocesados.</li></ol></div></article></div>
+    <section class="faq" aria-labelledby="faq-hb">
+      <h2 class="bar-h2" id="faq-hb">Preguntas frecuentes</h2>
+      <div class="faq-list"><details><summary>¿Cómo sé si tengo hambre real o emocional?</summary><div class="oc small"><p>El hambre real aparece poco a poco, se nota en el estómago, te vale cualquier comida y puede esperar. La emocional llega de golpe, pide algo concreto, parece urgente y no se calma al llenarte.</p></div></details><details><summary>¿Qué hago si como por ansiedad?</summary><div class="oc small"><p>Intenta identificar qué la desencadena, date unos minutos antes de comer y busca otras formas de calmarte. Si te pasa a menudo o te genera malestar, pedir ayuda a una dietista-nutricionista y a un psicólogo marca la diferencia.</p></div></details><details><summary>¿Es malo comer por emociones?</summary><div class="oc small"><p>No siempre. Comer algo rico en un día malo o en una celebración es normal. Preocupa cuando es frecuente, se pierde el control o aparecen culpa, atracones o conductas para compensar.</p></div></details></div>
+    </section>
+    <p class="tl-src tk-aviso">Si sientes que pierdes el control con la comida, tienes atracones, compensas lo que comes o la comida te genera mucho malestar, no lo afrontes en soledad: habla con tu médico de cabecera o con profesionales especializados en trastornos de la conducta alimentaria. Pedir ayuda es el primer paso.</p>
+  </div>
+  <div data-cta data-next="kcal,agua,recetas"></div>
+</div>
+
+<!-- ================= HERRAMIENTA: CALCULADORA DE AGUA ================= -->
+<div data-page="calculadora-agua" hidden>
+  <section class="page-hero" data-hero="online" data-crumb="Calculadora de agua" data-ey="Herramienta gratuita" data-h1="¿Cuánta agua beber al día? Calculadora" data-lead="Calcula cuánta agua necesitas al día según tu sexo, tu actividad física, el calor y si estás embarazada o dando el pecho, y cuántos vasos son."></section>
+  <div class="wrap editorial">
+    <div class="tl-box tk-app" id="ag-app">
+      <div class="tk-grid">
+        <div class="cv-f"><span>Sexo</span><div class="nt-modo" role="group" aria-label="Sexo"><button type="button" data-sexo="m" aria-pressed="true">Mujer</button><button type="button" data-sexo="h" aria-pressed="false">Hombre</button></div></div>
+        <label class="cv-f">Ejercicio hoy (minutos)<input id="ag-min" type="number" inputmode="numeric" min="0" max="600" step="5" value="0"></label>
+        <label class="cv-f">Calor<select id="ag-calor"><option value="0">Temperatura normal</option><option value="500">Día de calor o mucho sudor</option></select></label>
+        <label class="cv-f" id="ag-emb-l">Embarazo o lactancia<select id="ag-emb"><option value="0">No</option><option value="300">Embarazada</option><option value="700">Dando el pecho</option></select></label>
+      </div>
+      <div class="cv-res" id="ag-res" aria-live="polite"></div>
+      <p class="tl-src">Ingesta adecuada de agua de la EFSA para adultos: 2,0 litros al día en mujeres y 2,5 litros en hombres, contando el agua de bebidas y alimentos (alrededor del 20 % llega con la comida); +300 ml en el embarazo y +700 ml en la lactancia. Para el ejercicio se suman unos 500 ml por hora, y 500 ml en días de calor. Con enfermedad renal o cardíaca, sigue las indicaciones de tu médico.</p>
+    </div>
+    <div class="lead-rule"></div>
+    <div><article class="stmt"><div class="left"><span class="card-icon sq" data-ic2="drop"></span><h3 class="card-title">Señales de que bebes poco</h3></div><div class="oc small"><p>La forma más sencilla de saberlo es mirar el <strong>color de la orina</strong>: amarillo pálido es lo ideal; oscura y escasa indica que te falta líquido. Otras señales son la sed, la boca seca, el dolor de cabeza, el cansancio o el estreñimiento.</p></div></article><article class="stmt"><div class="left"><span class="card-icon sq" data-ic2="apple"></span><h3 class="card-title">No todo tiene que ser agua</h3></div><div class="oc small"><p>Cuentan también la leche, las infusiones, el café o el té con moderación, los caldos y la fruta y la verdura, que tienen mucha agua (la sandía, el pepino, la naranja o el tomate tienen más de un 90 %). Lo que no conviene es hidratarse con refrescos, zumos o bebidas energéticas.</p></div></article><article class="stmt"><div class="left"><span class="card-icon sq" data-ic2="activity"></span><h3 class="card-title">Si haces deporte</h3></div><div class="oc small"><p>Bebe antes, durante (en esfuerzos de más de una hora) y después. En entrenos largos o con calor, además de agua puede hacer falta reponer sales. En consulta calculamos tu pauta de hidratación con tu tasa de sudor. <a href="#nutricion-deportiva-valladolid">Nutrición deportiva</a>.</p></div></article></div>
+    <section class="faq" aria-labelledby="faq-ag">
+      <h2 class="bar-h2" id="faq-ag">Preguntas frecuentes</h2>
+      <div class="faq-list"><details><summary>¿Cuánta agua hay que beber al día?</summary><div class="oc small"><p>La EFSA recomienda unos 2 litros de agua al día en mujeres y 2,5 litros en hombres, contando la de la comida. En bebidas, eso son aproximadamente 1,6 litros (6-7 vasos) para ellas y 2 litros (8 vasos) para ellos.</p></div></details><details><summary>¿Hay que beber aunque no tengas sed?</summary><div class="oc small"><p>En adultos sanos, la sed suele ser buena guía. Las personas mayores la notan menos, así que conviene que beban a lo largo del día aunque no tengan sed, igual que en días de calor o deporte.</p></div></details><details><summary>¿Se puede beber demasiada agua?</summary><div class="oc small"><p>Es raro, pero beber cantidades muy grandes en poco tiempo, sobre todo en pruebas de resistencia sin reponer sales, puede bajar el sodio en sangre. Bebe según tu sed y tu sudor, sin forzarte.</p></div></details><details><summary>¿El café y las infusiones cuentan?</summary><div class="oc small"><p>Sí. Aunque la cafeína tiene un ligero efecto diurético, el café y el té en cantidades normales también hidratan.</p></div></details></div>
+    </section>
+  </div>
+  <div data-cta data-next="kcal,prot,creatina"></div>
 </div>
 
 <!-- ================= HERRAMIENTA: QUÉ COCINO CON LO QUE TENGO ================= -->
@@ -1832,6 +2060,176 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
     });
     etiquetas(); calcular();
   };
+  // ---------- utilidades comunes de las calculadoras
+  function tkNum(id){ var el = document.getElementById(id); if (!el) return 0; var v = parseFloat(String(el.value).replace(',', '.')); return isFinite(v) ? v : 0; }
+  function tkFmt(v, d){ return (Math.round(v * Math.pow(10, d||0)) / Math.pow(10, d||0)).toLocaleString('es-ES'); }
+  function tkModo(app, attr, cb){ app.querySelectorAll('['+attr+']').forEach(function(b){ b.addEventListener('click', function(){ app.querySelectorAll('['+attr+']').forEach(function(x){ x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); cb(b.getAttribute(attr)); }); }); }
+  function tkVivo(app, fn){ app.querySelectorAll('input,select').forEach(function(el){ el.addEventListener('input', fn); el.addEventListener('change', fn); }); }
+
+  window.__toolInit['calculadora-calorias'] = function(){
+    var app = document.getElementById('kc-app'); if (!app || app.__ok) return; app.__ok = true;
+    var sexo = 'm';
+    tkModo(app, 'data-sexo', function(v){ sexo = v; pintar(); }); tkVivo(app, pintar);
+    function pintar(){
+      var e = tkNum('kc-edad'), p = tkNum('kc-peso'), a = tkNum('kc-alt'), f = parseFloat(document.getElementById('kc-act').value), obj = document.getElementById('kc-obj').value, res = document.getElementById('kc-res');
+      if (e < 18 || e > 100) { res.innerHTML = '<div class="big">Para adultos de 18 años o más</div><p>En niños y adolescentes las necesidades dependen del crecimiento: consulta con su pediatra o con una dietista-nutricionista.</p>'; return; }
+      if (p < 30 || p > 250 || a < 130 || a > 220) { res.innerHTML = '<div class="big">Revisa el peso y la altura</div>'; return; }
+      var bmr = 10*p + 6.25*a - 5*e + (sexo === 'h' ? 5 : -161), tdee = bmr * f;
+      var meta = obj === 'perder' ? Math.max(bmr, tdee * 0.85) : obj === 'ganar' ? tdee * 1.10 : tdee;
+      meta = Math.round(meta / 10) * 10;
+      var gkg = obj === 'perder' ? 1.6 : obj === 'ganar' ? 1.8 : (f >= 1.55 ? 1.4 : 1.0);
+      var imc = p / Math.pow(a/100, 2), pRef = imc > 30 ? 25 * Math.pow(a/100, 2) * 1.1 : p;   // con obesidad, peso ajustado aproximado
+      var prot = Math.round(gkg * pRef), grasa = Math.round(meta * 0.30 / 9), hc = Math.max(0, Math.round((meta - prot*4 - grasa*9) / 4));
+      function barra(n, g, k, color){ var pc = Math.round(100 * g * k / meta); return '<div class="tk-mac"><span>'+n+'</span><b>'+g+' g</b><small>'+pc+' %</small><i><em style="width:'+pc+'%;background:'+color+'"></em></i></div>'; }
+      var txtObj = obj === 'perder' ? 'para perder grasa poco a poco' : obj === 'ganar' ? 'para ganar masa muscular' : 'para mantener tu peso';
+      res.innerHTML = '<div class="big"><b>'+tkFmt(meta)+' kcal</b> al día '+txtObj+'</div>'
+        + '<p>Gasto en reposo: <b>'+tkFmt(Math.round(bmr/10)*10)+' kcal</b> · Gasto diario con tu actividad: <b>'+tkFmt(Math.round(tdee/10)*10)+' kcal</b></p>'
+        + '<div class="tk-macs">' + barra('Proteínas', prot, 4, 'var(--primary)') + barra('Grasas', grasa, 9, 'var(--accent, #c9a25b)') + barra('Hidratos de carbono', hc, 4, 'var(--leaf)') + '</div>'
+        + '<p class="tk-nota">Proteína calculada con '+tkFmt(gkg,1)+' g por kilo'+(imc > 30 ? ' sobre un peso ajustado' : '')+'. '+(obj === 'perder' && meta <= bmr + 5 ? 'No bajamos de tu gasto en reposo: comer menos no acelera los resultados y sí la pérdida de músculo. ' : '')+'Si quieres una pauta adaptada a ti, <a href="'+(window.__MPA ? 'contacto.html#formulario' : '#contacto')+'">pide cita</a>.</p>';
+    }
+    pintar();
+  };
+
+  window.__toolInit['calculadora-proteinas'] = function(){
+    var app = document.getElementById('pr-app'); if (!app || app.__ok) return; app.__ok = true;
+    tkVivo(app, pintar);
+    // gramos de proteína por ración de alimentos habituales (USDA, aproximado)
+    var EJ = [['1 filete de pollo a la plancha (120 g)', 37], ['1 lata de atún al natural (56 g escurrido)', 14], ['2 huevos', 13], ['1 plato de lentejas cocidas (250 g)', 23], ['1 yogur natural (125 g)', 5], ['125 g de tofu firme', 20], ['1 vaso de leche (250 ml)', 8], ['1 puñado de almendras (30 g)', 6]];
+    function pintar(){
+      var p = tkNum('pr-peso'), e = tkNum('pr-edad'), r = document.getElementById('pr-perfil').value.split(',').map(parseFloat), c = parseInt(document.getElementById('pr-com').value, 10), res = document.getElementById('pr-res');
+      if (p < 30 || p > 250) { res.innerHTML = '<div class="big">Escribe tu peso</div>'; return; }
+      if (e >= 65 && r[0] < 1.0) r = [1.0, 1.2];
+      var lo = Math.round(p * r[0]), hi = Math.round(p * r[1]);
+      var html = '<div class="big"><b>'+lo+(hi > lo ? '–'+hi : '')+' g</b> de proteína al día</div>'
+        + '<p>Son <b>'+tkFmt(r[0],1)+(r[1] > r[0] ? '–'+tkFmt(r[1],1) : '')+' g por kilo</b>. Repartidos en '+c+' comidas: unos <b>'+Math.round(lo/c)+'–'+Math.round(hi/c)+' g en cada una</b>.</p>';
+      if (e >= 65 && document.getElementById('pr-perfil').selectedIndex < 2) html += '<p>Por tu edad hemos usado el rango para mayores de 65 años (1,0-1,2 g por kilo).</p>';
+      html += '<p class="tk-nota">Para hacerte una idea, cuánta proteína aporta:</p><ul class="tk-ej">' + EJ.map(function(x){ return '<li>'+x[0]+' <b>≈ '+x[1]+' g</b></li>'; }).join('') + '</ul>';
+      res.innerHTML = html;
+    }
+    pintar();
+  };
+
+  window.__toolInit['creatina'] = function(){
+    var app = document.getElementById('cr-app'); if (!app || app.__ok) return; app.__ok = true;
+    var pauta = 'normal';
+    tkModo(app, 'data-pauta', function(v){ pauta = v; pintar(); }); tkVivo(app, pintar);
+    function pintar(){
+      var p = tkNum('cr-peso'), res = document.getElementById('cr-res');
+      if (p < 35 || p > 200) { res.innerHTML = '<div class="big">Escribe tu peso</div>'; return; }
+      var mant = Math.min(5, Math.max(3, Math.round(p * 0.03 * 2) / 2));
+      var html = '<div class="big"><b>'+tkFmt(mant,1)+' g</b> de creatina monohidrato al día</div>';
+      if (pauta === 'carga') {
+        var carga = Math.round(p * 0.3);
+        html += '<p><b>Fase de carga (5-7 días):</b> '+carga+' g al día repartidos en 4 tomas de unos '+Math.round(carga/4)+' g. Después, pasa a <b>'+tkFmt(mant,1)+' g diarios</b> de mantenimiento.</p><p>La carga llena los músculos en una semana, pero puede dar molestias digestivas y más retención de agua al principio.</p>';
+      } else {
+        html += '<p>Una sola toma diaria, todos los días (también los de descanso). Con esta dosis los músculos se saturan en unas <b>3-4 semanas</b>.</p>';
+      }
+      html += '<p class="tk-nota">Equivale a una cucharadita rasa de las de café (unos 3-5 g); mejor pésala o usa el medidor del envase.</p>';
+      res.innerHTML = html;
+    }
+    pintar();
+  };
+
+  window.__toolInit['frutas-verduras-temporada'] = function(){
+    var app = document.getElementById('tp-app'); if (!app || app.__ok) return; app.__ok = true;
+    var D = leerJSON('datos-temporada'); if (!D) return;
+    var M = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+    var mes = new Date().getMonth() + 1, cont = document.getElementById('tp-meses');
+    cont.innerHTML = M.map(function(m, i){ return '<button type="button" class="tl-chip" data-mes="'+(i+1)+'" aria-pressed="'+(i+1 === mes)+'">'+m.slice(0,3)+'<span class="tp-largo">'+m.slice(3)+'</span></button>'; }).join('');
+    cont.addEventListener('click', function(e){ var b = e.target.closest('[data-mes]'); if (!b) return; mes = +b.getAttribute('data-mes'); cont.querySelectorAll('[data-mes]').forEach(function(x){ x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); pintarMes(); });
+    function pintarMes(){
+      var html = '<h2 class="tp-titulo">De temporada en '+M[mes-1].toLowerCase()+'</h2>';
+      Object.keys(D).forEach(function(g){
+        var L = Object.keys(D[g]).filter(function(n){ return D[g][n].indexOf(mes) >= 0; });
+        var nuevos = L.filter(function(n){ var prev = mes === 1 ? 12 : mes - 1; return D[g][n].indexOf(prev) < 0; });
+        html += '<h3 class="tp-sub">'+g+' <small>('+L.length+')</small></h3><ul class="tp-lista">' + L.map(function(n){ return '<li'+(nuevos.indexOf(n) >= 0 ? ' class="nuevo" title="Empieza este mes"' : '')+'>'+escH(n)+'</li>'; }).join('') + '</ul>';
+      });
+      html += '<p class="tk-nota"><span class="tp-dot"></span> Empiezan su temporada este mes.</p>';
+      document.getElementById('tp-mes').innerHTML = html;
+    }
+    document.getElementById('tp-q').addEventListener('input', function(){
+      var q = norm(this.value.trim()), out = document.getElementById('tp-busca');
+      if (q.length < 2) { out.innerHTML = ''; return; }
+      var hits = [];
+      Object.keys(D).forEach(function(g){ Object.keys(D[g]).forEach(function(n){ if (norm(n).indexOf(q) >= 0) hits.push([n, D[g][n]]); }); });
+      out.innerHTML = hits.length ? hits.map(function(h){ return '<div class="tp-fila"><b>'+escH(h[0])+'</b><div class="tp-barra">' + M.map(function(m, i){ return '<span class="'+(h[1].indexOf(i+1) >= 0 ? 'si' : '')+'" title="'+m+'">'+m.charAt(0)+'</span>'; }).join('') + '</div></div>'; }).join('') : '<p class="tk-nota">No lo encuentro en el calendario.</p>';
+    });
+    pintarMes();
+  };
+
+  window.__toolInit['lector-de-etiquetas'] = function(){
+    var app = document.getElementById('et-app'); if (!app || app.__ok) return; app.__ok = true;
+    var tipo = 'solido';
+    tkModo(app, 'data-tipo', function(v){ tipo = v; pintar(); }); tkVivo(app, pintar);
+    function val(id){ var el = document.getElementById('et-'+id); return el.value === '' ? null : tkNum('et-'+id); }
+    function nivel(v, bajo, alto){ return v === null ? null : v <= bajo ? 'bajo' : v > alto ? 'alto' : 'medio'; }
+    function pintar(){
+      var b = tipo === 'bebida', u = b ? '100 ml' : '100 g';
+      var g = val('grasa'), s = val('sat'), az = val('azuc'), sal = val('sal'), fib = val('fibra'), pr = val('prot'), kc = val('kcal'), hc = val('hc');
+      var L = [['Grasas', g, nivel(g, b?1.5:3, b?8.75:17.5)], ['Grasas saturadas', s, nivel(s, b?0.75:1.5, b?2.5:5)], ['Azúcares', az, nivel(az, b?2.5:5, b?11.25:22.5)], ['Sal', sal, nivel(sal, 0.3, b?0.75:1.5)]];
+      var res = document.getElementById('et-res');
+      if (L.every(function(x){ return x[1] === null; }) && fib === null && pr === null) { res.innerHTML = '<div class="cv-res"><div class="big">Escribe los datos de la etiqueta</div></div>'; return; }
+      var TXT = {bajo: 'Bajo', medio: 'Medio', alto: 'Alto'};
+      var html = '<div class="et-sem">' + L.map(function(x){ return '<div class="et-c '+(x[2]||'nd')+'"><span>'+x[0]+'</span><b>'+(x[1] === null ? '—' : tkFmt(x[1], 2)+' g')+'</b><em>'+(x[2] ? TXT[x[2]] : 'Sin dato')+'</em></div>'; }).join('') + '</div>';
+      var altos = L.filter(function(x){ return x[2] === 'alto'; }).map(function(x){ return x[0].toLowerCase(); });
+      var bajos = L.filter(function(x){ return x[2] === 'bajo'; }).length;
+      var resumen = altos.length ? 'Tiene un contenido <b>alto en '+altos.join(', ').replace(/, ([^,]*)$/, ' y $1')+'</b>: mejor para tomar de forma ocasional y en poca cantidad.' : (bajos === 4 ? 'Contenido <b>bajo</b> en grasas, saturadas, azúcares y sal.' : 'Ningún valor alto en los datos que has escrito.');
+      // declaraciones nutricionales (Reglamento CE 1924/2006)
+      var D = [];
+      if (g !== null) { if (g <= 0.5) D.push('Sin grasa'); else if (g <= (b ? 1.5 : 3)) D.push('Bajo contenido de grasa'); }
+      if (s !== null && s <= (b ? 0.75 : 1.5) && (!kc || s*9 <= kc*0.10)) D.push(s <= 0.1 ? 'Sin grasas saturadas' : 'Bajo contenido de grasas saturadas');
+      if (az !== null) { if (az <= 0.5) D.push('Sin azúcares'); else if (az <= (b ? 2.5 : 5)) D.push('Bajo contenido de azúcares'); }
+      if (sal !== null) { if (sal <= 0.0125) D.push('Sin sal'); else if (sal <= 0.1) D.push('Muy bajo contenido de sal'); else if (sal <= 0.3) D.push('Bajo contenido de sal'); }
+      if (fib !== null && !b) { if (fib >= 6) D.push('Alto contenido de fibra'); else if (fib >= 3) D.push('Fuente de fibra'); }
+      if (pr !== null && kc) { var pp = pr*4/kc; if (pp >= 0.20) D.push('Alto contenido de proteínas'); else if (pp >= 0.12) D.push('Fuente de proteínas'); }
+      if (kc !== null && kc <= (b ? 20 : 40)) D.push(b && kc <= 4 ? 'Sin aporte energético' : 'Valor energético bajo');
+      html += '<div class="cv-res"><p style="margin-top:0">'+resumen+'</p>';
+      if (az !== null && hc) html += '<p>El '+Math.round(100*az/hc)+' % de sus hidratos de carbono son azúcares.</p>';
+      if (D.length) html += '<p><b>Declaraciones que podría usar</b> según la normativa europea: '+D.join(' · ')+'.</p>';
+      html += '<p class="tk-nota">Valores por '+u+'. Revisa también la lista de ingredientes: cuanto más corta y reconocible, mejor.</p></div>';
+      res.innerHTML = html;
+    }
+    pintar();
+  };
+
+  window.__toolInit['test-hambre-emocional'] = function(){
+    var app = document.getElementById('hb-app'); if (!app || app.__ok) return; app.__ok = true;
+    var R = {};
+    app.querySelectorAll('[data-p]').forEach(function(b){ b.addEventListener('click', function(){
+      var p = b.getAttribute('data-p'); R[p] = +b.getAttribute('data-v');
+      app.querySelectorAll('[data-p="'+p+'"]').forEach(function(x){ x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+      pintar(); }); });
+    function pintar(){
+      var n = Object.keys(R).length, res = document.getElementById('hb-res');
+      if (n < 10) { res.innerHTML = '<div class="big">Te quedan '+(10-n)+' '+(10-n === 1 ? 'pregunta' : 'preguntas')+'</div>'; return; }
+      var s = 0; Object.keys(R).forEach(function(k){ s += R[k]; });
+      var t, d;
+      if (s <= 3) { t = 'Parece hambre física'; d = 'Lo que describes encaja con el hambre de verdad: tu cuerpo te pide energía. Come algo completo y con calma: una comida con proteína, verdura o fruta y un cereal integral te dejará satisfecha/o más tiempo.'; }
+      else if (s <= 6) { t = 'Una mezcla de hambre física y emocional'; d = 'Hay señales de hambre del cuerpo y también de que las emociones están influyendo. Prueba a parar unos minutos y preguntarte qué necesitas: puede que sea comer, o descansar, moverte o hablar con alguien.'; }
+      else { t = 'Se parece mucho al hambre emocional'; d = 'Lo que describes encaja con comer para calmar una emoción. Es algo muy humano y no tienes por qué sentir culpa. Mira las ideas de abajo y, si te pasa a menudo o te hace sentir mal, una dietista-nutricionista y un psicólogo pueden ayudarte a manejarlo.'; }
+      res.innerHTML = '<div class="big"><b>'+t+'</b></div><p>'+d+'</p><p class="tk-nota">'+s+' de 10 señales de hambre emocional. Es un test orientativo, no un diagnóstico.</p>';
+    }
+    pintar();
+  };
+
+  window.__toolInit['calculadora-agua'] = function(){
+    var app = document.getElementById('ag-app'); if (!app || app.__ok) return; app.__ok = true;
+    var sexo = 'm';
+    tkModo(app, 'data-sexo', function(v){ sexo = v; document.getElementById('ag-emb-l').hidden = v === 'h'; if (v === 'h') document.getElementById('ag-emb').value = '0'; pintar(); });
+    tkVivo(app, pintar);
+    function pintar(){
+      var base = sexo === 'h' ? 2500 : 2000, emb = +document.getElementById('ag-emb').value, min = Math.max(0, tkNum('ag-min')), calor = +document.getElementById('ag-calor').value;
+      var total = base + emb, bebida = total * 0.8 + min / 60 * 500 + calor;
+      bebida = Math.round(bebida / 50) * 50;
+      var vasos = Math.round(bebida / 250);
+      document.getElementById('ag-res').innerHTML = '<div class="big">Unos <b>'+tkFmt(bebida/1000, 1)+' litros</b> en bebidas al día</div>'
+        + '<p>Son unos <b>'+vasos+' vasos</b> de 250 ml. <span class="ag-vasos" aria-hidden="true">'+new Array(Math.min(vasos, 20)+1).join('<i></i>')+'</span></p>'
+        + '<p>En total necesitas unos '+tkFmt(total/1000, 1)+' litros de agua'+(min || calor ? ' más lo que pierdes con el sudor' : '')+'; alrededor de un 20 % ya te llega con la comida.</p>'
+        + (min >= 60 ? '<p class="tk-nota">En ejercicios de más de una hora, sobre todo con calor, puede hacer falta reponer también sales (sodio).</p>' : '');
+    }
+    pintar();
+  };
+
   window.__toolInit['recetas-con-lo-que-tengo'] = function(){
     var app = document.getElementById('re-app'); if (!app || app.__ok) return; app.__ok = true;
     var D = leerJSON('datos-recetas'); if (!D) return;
@@ -1961,6 +2359,13 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
     sibo:['dieta-sibo','tips','Guía: dieta para el SIBO','Qué comer y qué evitar'],
     calorias:['calorias-alimentos','hero','Qué aporta cada alimento','Calorías y nutrientes'],
     recetas:['recetas-con-lo-que-tengo','online','¿Qué cocino con lo que tengo?','Recetas con tus ingredientes'],
+    kcal:['calculadora-calorias','bio','Calculadora de calorías y macros','Cuántas calorías necesito al día'],
+    prot:['calculadora-proteinas','climb','¿Cuánta proteína necesito?','Calcula tus gramos al día'],
+    creatina:['creatina','climb','Creatina','Cuánta tomar, usos y beneficios'],
+    temporada:['frutas-verduras-temporada','tips','Frutas y verduras de temporada','Calendario mes a mes'],
+    etiquetas:['lector-de-etiquetas','tips','Lector de etiquetas','¿Mucho azúcar, sal o grasa?'],
+    hambre:['test-hambre-emocional','hero','Test: ¿hambre real o emocional?','10 preguntas'],
+    agua:['calculadora-agua','online','¿Cuánta agua beber al día?','Calculadora de hidratación'],
     conversor:['conversor-crudo-cocido','hero','Conversor de crudo a cocido','Arroz, pasta, legumbres, carne…'],
     nutrientes:['alimentos-ricos-en-proteinas-vitaminas','tips','Tabla: alimentos ricos en proteínas y vitaminas','B12, B6, C, omega 3 y más']
   };
@@ -2280,8 +2685,8 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
   // ---------- routing ----------
   var pages = [].slice.call(document.querySelectorAll('[data-page]'));
   var names = pages.map(function(p){ return p.getAttribute('data-page'); });
-  var ALIAS = {'conversor':'conversor-crudo-cocido','crudo-cocido':'conversor-crudo-cocido','proteinas':'alimentos-ricos-en-proteinas-vitaminas','vitaminas':'alimentos-ricos-en-proteinas-vitaminas','tabla-nutrientes':'alimentos-ricos-en-proteinas-vitaminas','calorias':'calorias-alimentos','recetas':'recetas-con-lo-que-tengo','herramienta':'herramientas','sibo':'dieta-sibo','perdida-de-peso':'perdida-de-peso-valladolid','patologias-digestivas':'patologias-digestivas-valladolid','vegana':'alimentacion-vegetariana-vegana-valladolid','infantil':'nutricion-infantil-valladolid','nutricion-infantil':'nutricion-infantil-valladolid','oncologica':'nutricion-oncologica-valladolid','nutricion-oncologica':'nutricion-oncologica-valladolid','reserva':'contacto','cita':'contacto','reservar':'contacto','servicios':'dietista-nutricionista-en-valladolid','online':'nutricionista-online','asesoria':'asesoria-externa','colaboraciones':'publicaciones','cursos':'cursos-talleres','blog':'blog-nutricion','todos-los-servicios':'nuestros-servicios','nutricion-deportiva':'nutricion-deportiva-valladolid','privacidad':'proteccion-de-datos'};
-  var NAVMAP = {'conversor-crudo-cocido':'herramientas','alimentos-ricos-en-proteinas-vitaminas':'blog-nutricion','calorias-alimentos':'herramientas','recetas-con-lo-que-tengo':'herramientas','dieta-fodmap':'blog-nutricion','dieta-sibo':'blog-nutricion','perdida-de-peso-valladolid':'dietista-nutricionista-en-valladolid','patologias-digestivas-valladolid':'dietista-nutricionista-en-valladolid','alimentacion-vegetariana-vegana-valladolid':'dietista-nutricionista-en-valladolid','nutricion-infantil-valladolid':'dietista-nutricionista-en-valladolid','nutricion-oncologica-valladolid':'dietista-nutricionista-en-valladolid','nuestros-servicios':'dietista-nutricionista-en-valladolid','nutricion-deportiva-valladolid':'dietista-nutricionista-en-valladolid','tips':'blog-nutricion'};
+  var ALIAS = {'calorias-diarias':'calculadora-calorias','macros':'calculadora-calorias','proteina':'calculadora-proteinas','temporada':'frutas-verduras-temporada','etiquetas':'lector-de-etiquetas','hambre-emocional':'test-hambre-emocional','agua':'calculadora-agua','conversor':'conversor-crudo-cocido','crudo-cocido':'conversor-crudo-cocido','proteinas':'alimentos-ricos-en-proteinas-vitaminas','vitaminas':'alimentos-ricos-en-proteinas-vitaminas','tabla-nutrientes':'alimentos-ricos-en-proteinas-vitaminas','calorias':'calorias-alimentos','recetas':'recetas-con-lo-que-tengo','herramienta':'herramientas','sibo':'dieta-sibo','perdida-de-peso':'perdida-de-peso-valladolid','patologias-digestivas':'patologias-digestivas-valladolid','vegana':'alimentacion-vegetariana-vegana-valladolid','infantil':'nutricion-infantil-valladolid','nutricion-infantil':'nutricion-infantil-valladolid','oncologica':'nutricion-oncologica-valladolid','nutricion-oncologica':'nutricion-oncologica-valladolid','reserva':'contacto','cita':'contacto','reservar':'contacto','servicios':'dietista-nutricionista-en-valladolid','online':'nutricionista-online','asesoria':'asesoria-externa','colaboraciones':'publicaciones','cursos':'cursos-talleres','blog':'blog-nutricion','todos-los-servicios':'nuestros-servicios','nutricion-deportiva':'nutricion-deportiva-valladolid','privacidad':'proteccion-de-datos'};
+  var NAVMAP = {'calculadora-calorias':'herramientas','calculadora-proteinas':'herramientas','creatina':'herramientas','frutas-verduras-temporada':'herramientas','lector-de-etiquetas':'herramientas','test-hambre-emocional':'herramientas','calculadora-agua':'herramientas','conversor-crudo-cocido':'herramientas','alimentos-ricos-en-proteinas-vitaminas':'blog-nutricion','calorias-alimentos':'herramientas','recetas-con-lo-que-tengo':'herramientas','dieta-fodmap':'blog-nutricion','dieta-sibo':'blog-nutricion','perdida-de-peso-valladolid':'dietista-nutricionista-en-valladolid','patologias-digestivas-valladolid':'dietista-nutricionista-en-valladolid','alimentacion-vegetariana-vegana-valladolid':'dietista-nutricionista-en-valladolid','nutricion-infantil-valladolid':'dietista-nutricionista-en-valladolid','nutricion-oncologica-valladolid':'dietista-nutricionista-en-valladolid','nuestros-servicios':'dietista-nutricionista-en-valladolid','nutricion-deportiva-valladolid':'dietista-nutricionista-en-valladolid','tips':'blog-nutricion'};
   var current = null;
   var MPA = window.__MPA || null;
   // Versión publicada por páginas: los enlaces #seccion pasan a ser páginas reales (seccion.html)

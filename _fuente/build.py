@@ -54,6 +54,20 @@ PAGINAS = {
     'recetas-con-lo-que-tengo': ('recetas-con-lo-que-tengo.html',
         '¿Qué cocino con lo que tengo en casa? Recetas saludables | Nutriendo Hábitos',
         'Marca los ingredientes que tienes en la nevera y encuentra recetas sencillas y saludables con el paso a paso: legumbres, verduras, pescado, huevos y más.', '0.7'),
+    'calculadora-calorias': ('calculadora-calorias.html', 'Calculadora de calorías y macros: cuántas calorías necesito al día | Nutriendo Hábitos',
+        'Calcula gratis cuántas calorías necesitas al día y tu reparto de proteínas, grasas e hidratos según tu edad, peso, actividad y objetivo. Por una dietista-nutricionista.', '0.8'),
+    'calculadora-proteinas': ('calculadora-proteinas.html', '¿Cuánta proteína necesito al día? Calculadora | Nutriendo Hábitos',
+        'Calcula cuántos gramos de proteína necesitas al día según tu peso, tu edad y tu actividad, y cómo repartirlos en las comidas.', '0.8'),
+    'creatina': ('creatina.html', 'Creatina: cuánta tomar al día, para qué sirve y beneficios | Nutriendo Hábitos',
+        'Qué es la creatina, para qué sirve, beneficios según la ciencia, efectos y cuántos gramos tomar al día según tu peso. Calculadora con o sin fase de carga.', '0.8'),
+    'frutas-verduras-temporada': ('frutas-verduras-temporada.html', 'Frutas y verduras de temporada: calendario mes a mes | Nutriendo Hábitos',
+        'Calendario de frutas, verduras y hortalizas de temporada en España mes a mes. Busca cualquier alimento y descubre cuándo está en su mejor momento.', '0.8'),
+    'lector-de-etiquetas': ('lector-de-etiquetas.html', 'Lector de etiquetas nutricionales: azúcar, sal y grasa | Nutriendo Hábitos',
+        'Copia los datos de la etiqueta y descubre si un producto tiene mucho azúcar, sal o grasa, con semáforo nutricional y declaraciones según la normativa europea.', '0.7'),
+    'test-hambre-emocional': ('test-hambre-emocional.html', 'Test: ¿hambre real o hambre emocional? | Nutriendo Hábitos',
+        'Test gratuito de 10 preguntas para saber si tienes hambre física o emocional, con las diferencias entre ambas e ideas para gestionar el hambre emocional.', '0.7'),
+    'calculadora-agua': ('calculadora-agua.html', '¿Cuánta agua beber al día? Calculadora | Nutriendo Hábitos',
+        'Calcula cuánta agua necesitas beber al día según tu sexo, tu ejercicio, el calor, el embarazo o la lactancia, y cuántos vasos son.', '0.7'),
     'conversor-crudo-cocido': ('conversor-crudo-cocido.html',
         'Conversor de crudo a cocido: arroz, pasta, cuscús y legumbres | Nutriendo Hábitos',
         'Calcula cuánto pesa en seco el arroz, la pasta, el cuscús o las legumbres que te pautan en cocido, y cuánto pierden la carne y el pescado al cocinarlos. También para varias personas.', '0.7'),
@@ -103,7 +117,7 @@ ALIAS = {'servicios': 'dietista-nutricionista-en-valladolid', 'online': 'nutrici
          'privacidad': 'proteccion-de-datos', 'reserva': 'contacto', 'cita': 'contacto', 'reservar': 'contacto',
          'oncologica': 'nutricion-oncologica-valladolid', 'nutricion-oncologica': 'nutricion-oncologica-valladolid',
          'perdida-de-peso': 'perdida-de-peso-valladolid', 'patologias-digestivas': 'patologias-digestivas-valladolid',
-         'vegana': 'alimentacion-vegetariana-vegana-valladolid', 'fodmap': 'dieta-fodmap', 'calorias': 'calorias-alimentos', 'recetas': 'recetas-con-lo-que-tengo', 'herramienta': 'herramientas', 'sibo': 'dieta-sibo', 'conversor': 'conversor-crudo-cocido', 'crudo-cocido': 'conversor-crudo-cocido', 'proteinas': 'alimentos-ricos-en-proteinas-vitaminas', 'vitaminas': 'alimentos-ricos-en-proteinas-vitaminas', 'tabla-nutrientes': 'alimentos-ricos-en-proteinas-vitaminas',
+         'vegana': 'alimentacion-vegetariana-vegana-valladolid', 'fodmap': 'dieta-fodmap', 'calorias': 'calorias-alimentos', 'recetas': 'recetas-con-lo-que-tengo', 'herramienta': 'herramientas', 'sibo': 'dieta-sibo', 'calorias-diarias': 'calculadora-calorias', 'macros': 'calculadora-calorias', 'proteina': 'calculadora-proteinas', 'temporada': 'frutas-verduras-temporada', 'etiquetas': 'lector-de-etiquetas', 'hambre-emocional': 'test-hambre-emocional', 'agua': 'calculadora-agua', 'conversor': 'conversor-crudo-cocido', 'crudo-cocido': 'conversor-crudo-cocido', 'proteinas': 'alimentos-ricos-en-proteinas-vitaminas', 'vitaminas': 'alimentos-ricos-en-proteinas-vitaminas', 'tabla-nutrientes': 'alimentos-ricos-en-proteinas-vitaminas',
          'infantil': 'nutricion-infantil-valladolid', 'nutricion-infantil': 'nutricion-infantil-valladolid'}
 FILES = {k: v[0] for k, v in PAGINAS.items()}
 FILES_JS = {k: ('./' if v == 'index.html' else v) for k, v in FILES.items()}
@@ -117,7 +131,7 @@ for m in re.finditer(r'<div data-page="([^"]+)"', SRC):
 NAV = [('inicio', 'Inicio'), ('dietista-nutricionista-en-valladolid', 'Servicios'), ('nutricionista-online', 'Online'),
        ('asesoria-externa', 'Asesoría externa'), ('publicaciones', 'Colaboraciones'), ('cursos-talleres', 'Cursos/Talleres'),
        ('blog-nutricion', 'Blog'), ('herramientas', 'Herramientas'), ('contacto', 'Contacto')]
-NAVMAP = {'conversor-crudo-cocido': 'herramientas', 'alimentos-ricos-en-proteinas-vitaminas': 'blog-nutricion', 'calorias-alimentos': 'herramientas', 'recetas-con-lo-que-tengo': 'herramientas', 'dieta-fodmap': 'blog-nutricion', 'dieta-sibo': 'blog-nutricion', 'perdida-de-peso-valladolid': 'dietista-nutricionista-en-valladolid', 'patologias-digestivas-valladolid': 'dietista-nutricionista-en-valladolid',
+NAVMAP = {'calculadora-calorias': 'herramientas', 'calculadora-proteinas': 'herramientas', 'creatina': 'herramientas', 'frutas-verduras-temporada': 'herramientas', 'lector-de-etiquetas': 'herramientas', 'test-hambre-emocional': 'herramientas', 'calculadora-agua': 'herramientas', 'conversor-crudo-cocido': 'herramientas', 'alimentos-ricos-en-proteinas-vitaminas': 'blog-nutricion', 'calorias-alimentos': 'herramientas', 'recetas-con-lo-que-tengo': 'herramientas', 'dieta-fodmap': 'blog-nutricion', 'dieta-sibo': 'blog-nutricion', 'perdida-de-peso-valladolid': 'dietista-nutricionista-en-valladolid', 'patologias-digestivas-valladolid': 'dietista-nutricionista-en-valladolid',
           'alimentacion-vegetariana-vegana-valladolid': 'dietista-nutricionista-en-valladolid', 'nutricion-infantil-valladolid': 'dietista-nutricionista-en-valladolid', 'nutricion-oncologica-valladolid': 'dietista-nutricionista-en-valladolid', 'nuestros-servicios': 'dietista-nutricionista-en-valladolid',
           'nutricion-deportiva-valladolid': 'dietista-nutricionista-en-valladolid', 'tips': 'blog-nutricion'}
 
@@ -231,7 +245,7 @@ SERVICIOS = {
     'nutricionista-online': 'Consulta de nutrición online',
 }
 
-GUIAS = {'dieta-fodmap': '2026-11-02', 'dieta-sibo': '2026-11-08', 'alimentos-ricos-en-proteinas-vitaminas': '2026-11-24'}
+GUIAS = {'creatina': '2026-11-25', 'dieta-fodmap': '2026-11-02', 'dieta-sibo': '2026-11-08', 'alimentos-ricos-en-proteinas-vitaminas': '2026-11-24'}
 
 def jsonld(slug: str, url: str, titulo: str, desc: str, seg: str) -> str:
     graph = [NEGOCIO, ANDREA, WEB,
@@ -346,6 +360,13 @@ Contacto: teléfono y WhatsApp 669 87 70 52 · nutricion.arguello@gmail.com · r
 - [Tabla: alimentos ricos en proteínas, vitamina B12, B6, C, D y omega 3, ordenable por nutriente]({BASE}alimentos-ricos-en-proteinas-vitaminas.html)
 - [Herramienta: calorías y nutrientes de los alimentos (datos USDA FoodData Central)]({BASE}calorias-alimentos.html)
 - [Herramienta: conversor de crudo a cocido (arroz, pasta, legumbres, carne y pescado)]({BASE}conversor-crudo-cocido.html)
+- [Calculadora de calorías y macros diarios]({BASE}calculadora-calorias.html)
+- [Calculadora: ¿cuánta proteína necesito al día?]({BASE}calculadora-proteinas.html)
+- [Creatina: cuánta tomar al día, usos y beneficios]({BASE}creatina.html)
+- [Calendario de frutas y verduras de temporada en España]({BASE}frutas-verduras-temporada.html)
+- [Lector de etiquetas nutricionales: azúcar, sal y grasa]({BASE}lector-de-etiquetas.html)
+- [Test: ¿hambre real o hambre emocional?]({BASE}test-hambre-emocional.html)
+- [Calculadora: ¿cuánta agua beber al día?]({BASE}calculadora-agua.html)
 - [Herramienta: ¿qué cocino con lo que tengo? Recetas saludables por ingredientes]({BASE}recetas-con-lo-que-tengo.html)
 - [Consulta de nutrición online]({BASE}nutricionista-online.html)
 
