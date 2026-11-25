@@ -355,7 +355,16 @@ _seg = _seg.replace('<div data-page="alimentacion-cancer-quimioterapia" hidden>'
     '<div data-page="alimentacion-cancer-quimioterapia" data-titulo="Alimentación durante la quimioterapia y el tratamiento del cáncer | Nutriendo Hábitos" data-desc="Consejos prácticos para comer bien durante la quimioterapia: falta de apetito, náuseas, cambios de sabor, boca seca y mitos sobre la alimentación y el cáncer." hidden>', 1)
 ARTS.append(('alimentacion-cancer-quimioterapia', '', '', _seg.rstrip() + '\n'))
 
+# Orden del índice: primero los que pidió Jairo (25-11-2026), después los extra
+PEDIDOS = ['dieta-gastritis', 'dieta-estrenimiento', 'hinchazon-abdominal', 'dieta-hernia-de-hiato-reflujo',
+           'dieta-mediterranea-menu-semanal', 'ayuno-intermitente', 'dieta-cetogenica', 'dieta-antiinflamatoria',
+           'cenas-saludables-rapidas', 'desayunos-saludables', 'almuerzos-meriendas-saludables-ninos',
+           'dieta-vegana-nutrientes', 'alimentacion-cancer-quimioterapia']
+
 if __name__ == '__main__':
-    out = '<!-- GENERADO por borradores/articulos.py: no editar a mano -->\n' + '\n'.join(a[3] for a in ARTS)
+    pos = {s_: i for i, s_ in enumerate(PEDIDOS)}
+    orden = sorted(ARTS, key=lambda a: pos.get(a[0], 100 + [x[0] for x in ARTS].index(a[0])))
+    segs = [a[3].replace(f'<div data-page="{a[0]}" ', f'<div data-page="{a[0]}" data-grupo="{"pedido" if a[0] in pos else "extra"}" ', 1) for a in orden]
+    out = '<!-- GENERADO por borradores/articulos.py: no editar a mano -->\n' + '\n'.join(segs)
     (AQUI.parent / 'borradores.html').write_text(out, encoding='utf-8')
     print(len(ARTS), 'borradores')

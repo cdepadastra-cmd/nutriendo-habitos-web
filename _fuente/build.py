@@ -340,14 +340,14 @@ if MODO == 'definitiva' and (AQUI / 'borradores.html').exists():
     borr = []
     for i, st in enumerate(bstarts):
         seg = bsrc[st:(bstarts[i + 1] if i + 1 < len(bstarts) else len(bsrc))].rstrip() + '\n'
-        m = re.match(r'<div data-page="([^"]+)" data-titulo="([^"]*)" data-desc="([^"]*)" hidden>', seg)
-        slug, titulo, desc = m.group(1), html.unescape(m.group(2)), html.unescape(m.group(3))
+        m = re.match(r'<div data-page="([^"]+)" (?:data-grupo="([^"]*)" )?data-titulo="([^"]*)" data-desc="([^"]*)" hidden>', seg)
+        slug, grupo, titulo, desc = m.group(1), m.group(2) or 'extra', html.unescape(m.group(3)), html.unescape(m.group(4))
         seg = seg.replace(m.group(0), f'<div data-page="{slug}">', 1)
-        borr.append((slug, titulo, desc, seg))
+        borr.append((slug, titulo, desc, seg, grupo))
     bslugs = {b[0] for b in borr}
     DOUT = OUT / CARPETA_BORRADORES
     DOUT.mkdir()
-    for slug, titulo, desc, seg in borr:
+    for slug, titulo, desc, seg, _g in borr:
         segmentos[slug] = seg
         seg = hero_estatico(seg)
         seg = re.sub(r'href="#(' + '|'.join(map(re.escape, bslugs)) + r')"', lambda mm: f'href="{CARPETA_BORRADORES}/{mm.group(1)}.html"', seg)
@@ -377,11 +377,13 @@ if MODO == 'definitiva' and (AQUI / 'borradores.html').exists():
         cuerpo = lazy(reescribir_enlaces(cuerpo, slug))
         aviso = f'<div class="borrador-aviso">BORRADOR sin publicar · no compartas este enlace · <a href="{CARPETA_BORRADORES}/">ver todos los borradores</a></div>'
         (DOUT / f'{slug}.html').write_text(head + extra + '\n</head>\n<body>\n' + aviso + '\n' + cuerpo.strip() + '\n</body>\n</html>\n', encoding='utf-8')
-    lista = ''.join(f'<li><a href="{s_}.html">{html.escape(t.split("|")[0].strip())}</a><br><small>{html.escape(d)}</small></li>' for s_, t, d, _ in borr)
+    def _li(g): return ''.join(f'<li><a href="{s_}.html">{html.escape(t.split("|")[0].strip())}</a><br><small>{html.escape(d)}</small></li>' for s_, t, d, _, gg in borr if gg == g)
+    npd = sum(1 for b_ in borr if b_[4] == 'pedido')
+    lista = f'<h2>Los que pediste ({npd})</h2><ol>{_li("pedido")}</ol><h2>Extra, propuestos por Claude ({len(borr) - npd})</h2><ol>{_li("extra")}</ol>'
     (DOUT / 'index.html').write_text(f"""<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex, nofollow, noarchive"><meta name="referrer" content="no-referrer"><title>Borradores · Nutriendo Hábitos</title>
-<style>body{{font:16px/1.5 system-ui,sans-serif;max-width:46rem;margin:2rem auto;padding:0 1rem;color:#2b2b2b;background:#faf8f3}}h1{{color:#56704F}}li{{margin:.8rem 0}}a{{color:#56704F;font-weight:600}}small{{color:#666}}</style></head>
-<body><h1>Borradores pendientes de revisión</h1><p>{len(borr)} artículos sin publicar. No tienen enlaces desde la web, Google no los indexa y no están en el mapa del sitio. No compartas esta dirección.</p><ol>{lista}</ol></body></html>
+<style>body{{font:16px/1.5 system-ui,sans-serif;max-width:46rem;margin:2rem auto;padding:0 1rem;color:#2b2b2b;background:#faf8f3}}h1,h2{{color:#56704F}}h2{{font-size:1.2rem;margin-top:2rem}}li{{margin:.8rem 0}}a{{color:#56704F;font-weight:600}}small{{color:#666}}</style></head>
+<body><h1>Borradores pendientes de revisión</h1><p>{len(borr)} artículos sin publicar. No tienen enlaces desde la web, Google no los indexa y no están en el mapa del sitio. No compartas esta dirección.</p>{lista}</body></html>
 """, encoding='utf-8')
     (DOUT / '.htaccess').write_text('Options -Indexes\n<IfModule mod_headers.c>\n  Header set X-Robots-Tag "noindex, nofollow, noarchive"\n  Header set Referrer-Policy "no-referrer"\n</IfModule>\n', encoding='utf-8')
 
