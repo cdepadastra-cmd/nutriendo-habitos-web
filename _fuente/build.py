@@ -63,7 +63,7 @@ PAGINAS = {
     'frutas-verduras-temporada': ('frutas-verduras-temporada.html', 'Frutas y verduras de temporada: calendario mes a mes | Nutriendo Hábitos',
         'Calendario de frutas, verduras y hortalizas de temporada en España mes a mes. Busca cualquier alimento y descubre cuándo está en su mejor momento.', '0.8'),
     'lector-de-etiquetas': ('lector-de-etiquetas.html', 'Lector de etiquetas nutricionales: azúcar, sal y grasa | Nutriendo Hábitos',
-        'Copia los datos de la etiqueta y descubre si un producto tiene mucho azúcar, sal o grasa, con semáforo nutricional y declaraciones según la normativa europea.', '0.7'),
+        'Haz una foto a la etiqueta o copia sus datos y descubre si un producto tiene mucho azúcar, sal o grasa, con semáforo nutricional y declaraciones según la normativa europea.', '0.7'),
     'test-hambre-emocional': ('test-hambre-emocional.html', 'Test: ¿hambre real o hambre emocional? | Nutriendo Hábitos',
         'Test gratuito de 10 preguntas para saber si tienes hambre física o emocional, con las diferencias entre ambas e ideas para gestionar el hambre emocional.', '0.7'),
     'calculadora-agua': ('calculadora-agua.html', '¿Cuánta agua beber al día? Calculadora | Nutriendo Hábitos',

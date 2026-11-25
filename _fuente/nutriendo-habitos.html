@@ -528,6 +528,11 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
 .tk-grid .tk-ancho{grid-column:span 2}
 .tk-grid1{grid-template-columns:1fr}
 .et-grid{margin-top:.4rem}
+.et-foto{margin:1.2rem 0 .4rem;padding:1rem 1.1rem;border:1px dashed var(--primary);border-radius:var(--radius);display:flex;gap:1rem;align-items:center;flex-wrap:wrap}
+.et-boton{cursor:pointer;display:inline-flex;gap:.5rem;align-items:center}
+.et-boton .i{width:1.2rem;height:1.2rem;fill:none;stroke:currentColor;stroke-width:1.8}
+.et-estado{margin:0;flex:1 1 16rem;font-size:.88rem;color:var(--muted-fg)}
+.et-leido{box-shadow:0 0 0 3px var(--leaf)!important}
 @media(max-width:860px){.tk-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:480px){.tk-grid{grid-template-columns:1fr}.tk-grid .tk-ancho{grid-column:auto}}
 .tk-grid .nt-modo{display:flex;height:2.8rem}.tk-grid .nt-modo button{flex:1 1 auto;white-space:nowrap}
@@ -1381,7 +1386,7 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
       <a class="tl-hubcard" href="#calculadora-proteinas"><span class="card-icon sq" data-ic2="activity"></span><h2>¿Cuánta proteína necesito al día?</h2><p>Tus gramos de proteína según tu peso, tu edad y tu actividad, y cómo repartirlos en las comidas.</p><span class="tl-go">Calcular <svg class="i" viewBox="0 0 24 24" data-ic="arrow"></svg></span></a>
       <a class="tl-hubcard" href="#creatina"><span class="card-icon sq" data-ic2="mountain"></span><h2>Creatina: cuánta tomar</h2><p>Para qué sirve, qué beneficios tiene según la ciencia y cuántos gramos necesitas al día.</p><span class="tl-go">Ver la guía <svg class="i" viewBox="0 0 24 24" data-ic="arrow"></svg></span></a>
       <a class="tl-hubcard" href="#frutas-verduras-temporada"><span class="card-icon sq" data-ic2="salad"></span><h2>Frutas y verduras de temporada</h2><p>Qué está de temporada cada mes en España y cuándo es el mejor momento de cada fruta y verdura.</p><span class="tl-go">Ver el calendario <svg class="i" viewBox="0 0 24 24" data-ic="arrow"></svg></span></a>
-      <a class="tl-hubcard" href="#lector-de-etiquetas"><span class="card-icon sq" data-ic2="clip"></span><h2>Lector de etiquetas</h2><p>Copia los datos de la etiqueta y descubre si el producto tiene mucho azúcar, sal o grasa.</p><span class="tl-go">Analizar una etiqueta <svg class="i" viewBox="0 0 24 24" data-ic="arrow"></svg></span></a>
+      <a class="tl-hubcard" href="#lector-de-etiquetas"><span class="card-icon sq" data-ic2="clip"></span><h2>Lector de etiquetas</h2><p>Haz una foto o copia los datos de la etiqueta y descubre si el producto tiene mucho azúcar, sal o grasa.</p><span class="tl-go">Analizar una etiqueta <svg class="i" viewBox="0 0 24 24" data-ic="arrow"></svg></span></a>
       <a class="tl-hubcard" href="#test-hambre-emocional"><span class="card-icon sq" data-ic2="heart"></span><h2>Test: ¿hambre real o emocional?</h2><p>10 preguntas para saber si tus ganas de comer vienen del cuerpo o de las emociones, con ideas para gestionarlo.</p><span class="tl-go">Hacer el test <svg class="i" viewBox="0 0 24 24" data-ic="arrow"></svg></span></a>
       <a class="tl-hubcard" href="#calculadora-agua"><span class="card-icon sq" data-ic2="drop"></span><h2>¿Cuánta agua beber al día?</h2><p>Calcula cuánta agua necesitas según tu sexo, el ejercicio, el calor, el embarazo o la lactancia.</p><span class="tl-go">Calcular <svg class="i" viewBox="0 0 24 24" data-ic="arrow"></svg></span></a>
       <a class="tl-hubcard" href="#calorias-alimentos"><span class="card-icon sq" data-ic2="apple"></span><h2>Qué aporta cada alimento</h2><p>Calorías, proteínas, hidratos, fibra y grasas de casi 190 alimentos habituales, por 100 g y por ración. Busca por nombre o por grupo: carnes, pescados, verduras, frutas, legumbres…</p><span class="tl-go">Abrir la herramienta <svg class="i" viewBox="0 0 24 24" data-ic="arrow"></svg></span></a>
@@ -1621,7 +1626,7 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
     <div class="tl-box tk-app" id="tp-app">
       <div class="tp-meses" id="tp-meses" role="group" aria-label="Mes"></div>
       <div id="tp-mes" aria-live="polite"></div>
-      <label class="search-box tl-search tp-q" for="tp-q"><svg class="i" viewBox="0 0 24 24" data-ic="search"></svg><input id="tp-q" type="search" placeholder="¿Cuándo es temporada de…? (ej. cereza)" aria-label="Buscar fruta o verdura" autocomplete="off"></label>
+      <label class="search-box tl-search tp-q" for="tp-q"><svg class="i" viewBox="0 0 24 24" data-ic="search"></svg><input id="tp-q" type="search" placeholder="Busca una fruta o verdura (ej. naranjas) o un mes" aria-label="Buscar fruta o verdura" autocomplete="off"></label>
       <div id="tp-busca" aria-live="polite"></div>
       <p class="tl-src">Calendario orientativo para el conjunto de España, elaborado a partir de los calendarios de temporada de la OCU y del Ministerio de Agricultura. Algunas hortalizas (tomate, pimiento, pepino, calabacín…) se cultivan todo el año en invernadero; su mejor momento al aire libre es el verano. En Castilla y León muchas frutas de hueso, la judía verde o el tomate de huerta llegan algo más tarde que en el sur.</p>
     </div>
@@ -1638,11 +1643,14 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
 
 <!-- ================= HERRAMIENTA: LECTOR DE ETIQUETAS ================= -->
 <div data-page="lector-de-etiquetas" hidden>
-  <section class="page-hero" data-hero="tips" data-crumb="Lector de etiquetas" data-ey="Herramienta gratuita" data-h1="Lector de etiquetas nutricionales: ¿tiene mucho azúcar, sal o grasa?" data-lead="Copia los datos «por 100 g» de la etiqueta y descubre al momento si el producto tiene mucho, poco o un nivel medio de grasa, grasas saturadas, azúcares y sal, y qué declaraciones podría usar."></section>
+  <section class="page-hero" data-hero="tips" data-crumb="Lector de etiquetas" data-ey="Herramienta gratuita" data-h1="Lector de etiquetas nutricionales: ¿tiene mucho azúcar, sal o grasa?" data-lead="Haz una foto a la etiqueta o copia sus datos «por 100 g» y descubre al momento si el producto tiene mucho, poco o un nivel medio de grasa, grasas saturadas, azúcares y sal, y qué declaraciones podría usar."></section>
   <div class="wrap editorial">
     <div class="tl-box tk-app" id="et-app">
       <div class="tk-grid tk-grid1"><div class="cv-f"><span>El producto es</span><div class="nt-modo" role="group" aria-label="Tipo de producto"><button type="button" data-tipo="solido" aria-pressed="true">Alimento (por 100 g)</button><button type="button" data-tipo="bebida" aria-pressed="false">Bebida (por 100 ml)</button></div></div></div>
-      <p class="cv-help">Escribe lo que pone en la tabla nutricional, en la columna «por 100 g» o «por 100 ml». Puedes dejar en blanco lo que no tengas.</p>
+      <div class="et-foto"><label class="btn btn-primary et-boton" for="et-img"><svg class="i" viewBox="0 0 24 24"><path d="M3 8a2 2 0 0 1 2-2h2l2-2h6l2 2h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="3.5"/></svg> Hacer una foto a la etiqueta</label>
+        <input id="et-img" type="file" accept="image/*" capture="environment" hidden>
+        <p class="et-estado" id="et-estado" aria-live="polite">Haz una foto a la <b>tabla de información nutricional</b>, recta y bien iluminada, y rellenamos los datos solos. La foto se lee en tu propio dispositivo: no se envía a ningún sitio.</p></div>
+      <p class="cv-help">O escribe tú lo que pone en la tabla nutricional, en la columna «por 100 g» o «por 100 ml». Puedes dejar en blanco lo que no tengas.</p>
       <div class="tk-grid et-grid"><label class="cv-f">Valor energético (kcal)<input id="et-kcal" type="number" inputmode="decimal" min="0" max="900" step="1" placeholder="—"></label><label class="cv-f">Grasas (g)<input id="et-grasa" type="number" inputmode="decimal" min="0" max="900" step="0.1" placeholder="—"></label><label class="cv-f">… de las cuales saturadas (g)<input id="et-sat" type="number" inputmode="decimal" min="0" max="900" step="0.1" placeholder="—"></label><label class="cv-f">Hidratos de carbono (g)<input id="et-hc" type="number" inputmode="decimal" min="0" max="900" step="0.1" placeholder="—"></label><label class="cv-f">… de los cuales azúcares (g)<input id="et-azuc" type="number" inputmode="decimal" min="0" max="900" step="0.1" placeholder="—"></label><label class="cv-f">Fibra (g)<input id="et-fibra" type="number" inputmode="decimal" min="0" max="900" step="0.1" placeholder="—"></label><label class="cv-f">Proteínas (g)<input id="et-prot" type="number" inputmode="decimal" min="0" max="900" step="0.1" placeholder="—"></label><label class="cv-f">Sal (g)<input id="et-sal" type="number" inputmode="decimal" min="0" max="900" step="0.01" placeholder="—"></label></div>
       <div id="et-res" aria-live="polite"></div>
       <p class="tl-src">Semáforo según los criterios de la Food Standards Agency del Reino Unido (por 100 g: grasa alta &gt; 17,5 g y baja ≤ 3 g; saturadas alta &gt; 5 g y baja ≤ 1,5 g; azúcares alta &gt; 22,5 g y baja ≤ 5 g; sal alta &gt; 1,5 g y baja ≤ 0,3 g; en bebidas, la mitad salvo la sal, alta &gt; 0,75 g). Declaraciones nutricionales según el Reglamento (CE) 1924/2006. Es una ayuda para comparar productos, no una valoración completa del alimento.</p>
@@ -1651,7 +1659,7 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
     <div><article class="stmt"><div class="left"><span class="card-icon sq" data-ic2="clip"></span><h3 class="card-title">Cómo leer una etiqueta en 30 segundos</h3></div><div class="oc small"><ol><li><strong>Lista de ingredientes</strong>: van ordenados de más a menos cantidad. Si el azúcar o la harina refinada aparecen entre los primeros, mal empezamos. Cuanto más corta, mejor.</li><li><strong>Tabla nutricional por 100 g</strong>: es la que sirve para comparar productos entre sí. Mira sobre todo azúcares, sal, grasas saturadas y fibra.</li><li><strong>Ración</strong>: si la etiqueta da valores «por ración», comprueba cuánto es esa ración; a veces es mucho menos de lo que te comes.</li></ol></div></article><article class="stmt"><div class="left"><span class="card-icon sq" data-ic2="apple"></span><h3 class="card-title">El azúcar se esconde con muchos nombres</h3></div><div class="oc small"><p>Jarabe de glucosa, glucosa-fructosa, dextrosa, sacarosa, maltosa, miel, sirope de agave, concentrado de zumo de fruta, panela… Todos son azúcares añadidos. La OMS recomienda que no superen el <strong>10 % de las calorías</strong> del día, y mejor por debajo del 5 % (unos 25 g).</p></div></article><article class="stmt"><div class="left"><span class="card-icon sq" data-ic2="heart"></span><h3 class="card-title">Sal y sodio</h3></div><div class="oc small"><p>Si la etiqueta da el <strong>sodio</strong> en lugar de la sal, multiplícalo por 2,5 para saber la sal. Lo recomendable es no pasar de <strong>5 g de sal al día</strong> entre todo lo que comes. Los embutidos, quesos curados, panes, salsas, snacks y platos preparados son las principales fuentes.</p></div></article></div>
     <section class="faq" aria-labelledby="faq-et">
       <h2 class="bar-h2" id="faq-et">Preguntas frecuentes</h2>
-      <div class="faq-list"><details><summary>¿Cuánto azúcar es mucho en un alimento?</summary><div class="oc small"><p>Más de 22,5 g de azúcares por 100 g se considera alto, y 5 g o menos, bajo. En bebidas, alto es más de 11,25 g por 100 ml.</p></div></details><details><summary>¿Cuánta sal es mucha?</summary><div class="oc small"><p>Más de 1,5 g de sal por 100 g es alto, y 0,3 g o menos, bajo. Para pasar de sodio a sal, multiplica por 2,5.</p></div></details><details><summary>¿Qué significa «sin azúcares añadidos»?</summary><div class="oc small"><p>Que no se ha añadido ningún azúcar ni ingrediente usado para endulzar, aunque el producto puede tener azúcares propios de la fruta o la leche. Si los tiene, la etiqueta debe indicarlo.</p></div></details><details><summary>¿Qué es el Nutri-Score?</summary><div class="oc small"><p>Una etiqueta frontal con letras de la A (verde) a la E (rojo) que resume la calidad nutricional del producto dentro de su categoría. Es útil para comparar productos parecidos, pero no sirve para comparar, por ejemplo, un aceite con un refresco.</p></div></details></div>
+      <div class="faq-list"><details><summary>¿Cuánto azúcar es mucho en un alimento?</summary><div class="oc small"><p>Más de 22,5 g de azúcares por 100 g se considera alto, y 5 g o menos, bajo. En bebidas, alto es más de 11,25 g por 100 ml.</p></div></details><details><summary>¿Cuánta sal es mucha?</summary><div class="oc small"><p>Más de 1,5 g de sal por 100 g es alto, y 0,3 g o menos, bajo. Para pasar de sodio a sal, multiplica por 2,5.</p></div></details><details><summary>¿Qué significa «sin azúcares añadidos»?</summary><div class="oc small"><p>Que no se ha añadido ningún azúcar ni ingrediente usado para endulzar, aunque el producto puede tener azúcares propios de la fruta o la leche. Si los tiene, la etiqueta debe indicarlo.</p></div></details><details><summary>¿Cómo funciona la lectura con la cámara?</summary><div class="oc small"><p>Al hacer la foto, un lector de texto gratuito (Tesseract) reconoce la tabla nutricional directamente en tu móvil u ordenador: la imagen no se sube a ningún servidor. Funciona mejor con la foto recta, cerca y con buena luz. Revisa siempre los números, porque con letra pequeña o brillos puede equivocarse.</p></div></details><details><summary>¿Qué es el Nutri-Score?</summary><div class="oc small"><p>Una etiqueta frontal con letras de la A (verde) a la E (rojo) que resume la calidad nutricional del producto dentro de su categoría. Es útil para comparar productos parecidos, pero no sirve para comparar, por ejemplo, un aceite con un refresco.</p></div></details></div>
     </section>
   </div>
   <div data-cta data-next="temporada,kcal,nutrientes"></div>
@@ -2150,8 +2158,13 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
     document.getElementById('tp-q').addEventListener('input', function(){
       var q = norm(this.value.trim()), out = document.getElementById('tp-busca');
       if (q.length < 2) { out.innerHTML = ''; return; }
+      // ¿ha escrito un mes? -> mostrar ese mes
+      var mi = M.map(function(m){ return norm(m); }).findIndex(function(m){ return q.length >= 3 && m.indexOf(q) === 0; });
+      if (mi >= 0) { mes = mi + 1; cont.querySelectorAll('[data-mes]').forEach(function(x){ x.setAttribute('aria-pressed', +x.getAttribute('data-mes') === mes ? 'true' : 'false'); }); pintarMes(); out.innerHTML = '<p class="tk-nota">Mostrando lo que está de temporada en '+M[mi].toLowerCase()+' (arriba).</p>'; return; }
+      // plurales y varias palabras: «naranjas», «judías verdes», «tomates cherry»
+      var cand = q.split(/\s+/).map(function(w){ return w.length > 4 ? w.replace(/es$/, '').replace(/s$/, '') : w.replace(/s$/, ''); }).filter(function(w){ return w.length >= 2; });
       var hits = [];
-      Object.keys(D).forEach(function(g){ Object.keys(D[g]).forEach(function(n){ if (norm(n).indexOf(q) >= 0) hits.push([n, D[g][n]]); }); });
+      Object.keys(D).forEach(function(g){ Object.keys(D[g]).forEach(function(n){ var nn = norm(n); if (nn.indexOf(q) >= 0 || cand.every(function(w){ return nn.indexOf(w) >= 0; })) hits.push([n, D[g][n]]); }); });
       out.innerHTML = hits.length ? hits.map(function(h){ return '<div class="tp-fila"><b>'+escH(h[0])+'</b><div class="tp-barra">' + M.map(function(m, i){ return '<span class="'+(h[1].indexOf(i+1) >= 0 ? 'si' : '')+'" title="'+m+'">'+m.charAt(0)+'</span>'; }).join('') + '</div></div>'; }).join('') : '<p class="tk-nota">No lo encuentro en el calendario.</p>';
     });
     pintarMes();
@@ -2161,6 +2174,54 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
     var app = document.getElementById('et-app'); if (!app || app.__ok) return; app.__ok = true;
     var tipo = 'solido';
     tkModo(app, 'data-tipo', function(v){ tipo = v; pintar(); }); tkVivo(app, pintar);
+    // ---------- lectura de la etiqueta con la cámara (OCR gratuito en el navegador con Tesseract.js; la imagen no sale del dispositivo)
+    var ocr = null;
+    function cargarOCR(){
+      if (ocr) return ocr;
+      ocr = new Promise(function(ok, ko){ var sc = document.createElement('script'); sc.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js'; sc.onload = function(){ ok(window.Tesseract); }; sc.onerror = function(){ ocr = null; ko(new Error('red')); }; document.head.appendChild(sc); });
+      return ocr;
+    }
+    function prepararImagen(file){
+      return new Promise(function(ok, ko){
+        var img = new Image(), url = URL.createObjectURL(file);
+        img.onload = function(){ var esc = Math.min(1, 2000 / Math.max(img.width, img.height)); if (Math.max(img.width, img.height) < 1000) esc = 1000 / Math.max(img.width, img.height);
+          var c = document.createElement('canvas'); c.width = Math.round(img.width * esc); c.height = Math.round(img.height * esc);
+          var x = c.getContext('2d'); x.filter = 'grayscale(1) contrast(1.35)'; x.drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(url); ok(c); };
+        img.onerror = function(){ ko(new Error('img')); }; img.src = url;
+      });
+    }
+    function leerTexto(t){
+      t = t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[|]/g, ' ');
+      t = t.replace(/(^|[\s<(])o([.,]\d)/g, '$10$2').replace(/(\d)\s*[.,]\s*(\d)/g, '$1.$2');
+      var L = t.split(/\n+/), r = {};
+      function num(linea, clave){ var i = linea.search(clave); if (i < 0) return null; var resto = linea.slice(i).replace(clave, ''); var m = resto.match(/<?\s*(\d+(?:\.\d+)?)/); return m ? parseFloat(m[1]) : null; }
+      var kc = t.match(/(\d+(?:\.\d+)?)\s*kcal/); if (kc) r.kcal = parseFloat(kc[1]);
+      L.forEach(function(l){
+        if (/saturad/.test(l)) { if (r.sat == null) r.sat = num(l, /saturad\w*/); return; }
+        if (/azucar|azuca/.test(l)) { if (r.azuc == null) r.azuc = num(l, /azuca\w*/); return; }
+        if (/grasa|lipido/.test(l) && !/monoinsat|poliinsat|trans/.test(l)) { if (r.grasa == null) r.grasa = num(l, /(grasas?|lipidos?)( totales)?/); return; }
+        if (/hidratos|carbohidrat/.test(l)) { if (r.hc == null) r.hc = num(l, /(hidratos( de carbono)?|carbohidratos)/); return; }
+        if (/fibra/.test(l)) { if (r.fibra == null) r.fibra = num(l, /fibra( alimentaria)?/); return; }
+        if (/prote/.test(l)) { if (r.prot == null) r.prot = num(l, /prote\w*/); return; }
+        if (/\bsal\b/.test(l)) { if (r.sal == null) r.sal = num(l, /\bsal\b/); return; }
+        if (/sodio/.test(l)) { var so = num(l, /sodio/); if (so != null) r.sodio = so; }
+      });
+      if (r.sal == null && r.sodio != null) r.sal = Math.round(r.sodio * (r.sodio > 20 ? 0.0025 : 2.5) * 100) / 100;   // mg o g de sodio -> g de sal
+      return r;
+    }
+    document.getElementById('et-img').addEventListener('change', function(){
+      var f = this.files && this.files[0], est = document.getElementById('et-estado'); if (!f) return;
+      est.innerHTML = 'Preparando el lector… (la primera vez tarda unos segundos)';
+      Promise.all([cargarOCR(), prepararImagen(f)]).then(function(res){
+        var T = res[0];
+        return T.recognize(res[1], 'spa', { logger: function(m){ if (m.status === 'recognizing text') est.textContent = 'Leyendo la etiqueta… ' + Math.round(100 * m.progress) + ' %'; } });
+      }).then(function(out){
+        var v = leerTexto(out.data.text || ''), n = 0;
+        ['kcal','grasa','sat','hc','azuc','fibra','prot','sal'].forEach(function(k){ var el = document.getElementById('et-'+k); el.classList.remove('et-leido'); if (v[k] != null && isFinite(v[k])) { el.value = v[k]; el.classList.add('et-leido'); n++; } });
+        est.innerHTML = n ? '<b>He leído '+n+' de 8 datos.</b> Revisa que coinciden con la etiqueta (columna por 100 g) y corrige lo que haga falta.' : 'No he podido leer la tabla. Prueba con una foto más cercana, recta y con buena luz, o escribe los datos a mano.';
+        pintar(); this.value = '';
+      }.bind(this)).catch(function(){ est.textContent = 'No se ha podido cargar el lector. Comprueba la conexión a internet o escribe los datos a mano.'; });
+    });
     function val(id){ var el = document.getElementById('et-'+id); return el.value === '' ? null : tkNum('et-'+id); }
     function nivel(v, bajo, alto){ return v === null ? null : v <= bajo ? 'bajo' : v > alto ? 'alto' : 'medio'; }
     function pintar(){
