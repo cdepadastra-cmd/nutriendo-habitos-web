@@ -622,7 +622,11 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
 @media(max-width:640px){.cv-grid2{grid-template-columns:1fr 1fr}.cv-usar{grid-column:1/-1}}
 .cv-usar{margin:0;height:2.8rem}
 .cv-mio-res{margin:.6rem 0 0;color:var(--secondary-fg)}
-.cv-tab td:not(:first-child),.cv-tab th:not(:first-child){text-align:right;white-space:nowrap}
+.cv-tab th,.cv-tab td{vertical-align:middle}
+.cv-tab td:not(:first-child){text-align:right;white-space:nowrap}
+.cv-tab th:not(:first-child){text-align:right;white-space:normal;min-width:4.8rem}
+@media(max-width:480px){.cv-tab{font-size:.82rem}.cv-tab th,.cv-tab td{padding:.45rem .35rem}.cv-tab td:first-child,.cv-tab th:first-child{min-width:7rem}}
+.cv-tab td:first-child,.cv-tab th:first-child{min-width:9rem;word-break:normal;overflow-wrap:normal;hyphens:manual}
 @media(max-width:640px){.nt-app .tl-chips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:.3rem;margin-right:-1.4rem;padding-right:1.4rem}.nt-app .tl-chip{flex:0 0 auto}.nt-ctrl{gap:.6rem}.nt-sel{flex:1 1 100%}.nt-sel select{width:100%}.nt-tab{font-size:.8rem}}
 .tl-list{display:grid;gap:.5rem}
 .tl-item{border:1px solid var(--border);border-radius:1rem;background:var(--background);overflow:hidden}

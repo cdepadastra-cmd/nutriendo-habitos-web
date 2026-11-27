@@ -622,7 +622,11 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
 @media(max-width:640px){.cv-grid2{grid-template-columns:1fr 1fr}.cv-usar{grid-column:1/-1}}
 .cv-usar{margin:0;height:2.8rem}
 .cv-mio-res{margin:.6rem 0 0;color:var(--secondary-fg)}
-.cv-tab td:not(:first-child),.cv-tab th:not(:first-child){text-align:right;white-space:nowrap}
+.cv-tab th,.cv-tab td{vertical-align:middle}
+.cv-tab td:not(:first-child){text-align:right;white-space:nowrap}
+.cv-tab th:not(:first-child){text-align:right;white-space:normal;min-width:4.8rem}
+@media(max-width:480px){.cv-tab{font-size:.82rem}.cv-tab th,.cv-tab td{padding:.45rem .35rem}.cv-tab td:first-child,.cv-tab th:first-child{min-width:7rem}}
+.cv-tab td:first-child,.cv-tab th:first-child{min-width:9rem;word-break:normal;overflow-wrap:normal;hyphens:manual}
 @media(max-width:640px){.nt-app .tl-chips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:.3rem;margin-right:-1.4rem;padding-right:1.4rem}.nt-app .tl-chip{flex:0 0 auto}.nt-ctrl{gap:.6rem}.nt-sel{flex:1 1 100%}.nt-sel select{width:100%}.nt-tab{font-size:.8rem}}
 .tl-list{display:grid;gap:.5rem}
 .tl-item{border:1px solid var(--border);border-radius:1rem;background:var(--background);overflow:hidden}
@@ -710,7 +714,7 @@ footer.site{border-top:1px solid var(--border);background:var(--secondary)}
     </div>
     <div class="band"><h2>Tabla rápida de equivalencias</h2>
       <div class="oc" style="max-width:46rem"><p>Cuánto pesa una vez cocinado lo que pesas en crudo, y cuánto tienes que pesar en crudo para tener 100 g cocinados.</p>
-        <div class="nt-wrap" style="margin-top:1rem"><table class="tl-tab cv-tab"><thead><tr><th>Alimento</th><th>100 g en crudo dan…</th><th>Para 100 g cocinados, pesa en crudo…</th></tr></thead><tbody><tr><td>Arroz blanco</td><td>270 g</td><td>37 g</td></tr><tr><td>Arroz integral</td><td>290 g</td><td>34 g</td></tr><tr><td>Pasta (macarrones, espaguetis…)</td><td>230 g</td><td>43 g</td></tr><tr><td>Pasta integral</td><td>230 g</td><td>43 g</td></tr><tr><td>Quinoa</td><td>310 g</td><td>32 g</td></tr><tr><td>Cuscús</td><td>240 g</td><td>42 g</td></tr><tr><td>Lentejas</td><td>290 g</td><td>34 g</td></tr><tr><td>Garbanzos</td><td>230 g</td><td>43 g</td></tr><tr><td>Alubias blancas</td><td>240 g</td><td>42 g</td></tr><tr><td>Alubias rojas o pintas</td><td>270 g</td><td>37 g</td></tr><tr><td>Pechuga de pollo</td><td>75 g</td><td>133 g</td></tr><tr><td>Pechuga de pavo</td><td>80 g</td><td>125 g</td></tr><tr><td>Carne picada de ternera</td><td>75 g</td><td>133 g</td></tr><tr><td>Solomillo de cerdo</td><td>80 g</td><td>125 g</td></tr><tr><td>Lomo de cerdo</td><td>75 g</td><td>133 g</td></tr><tr><td>Merluza, pescadilla o bacalao fresco</td><td>80 g</td><td>125 g</td></tr><tr><td>Salmón</td><td>90 g</td><td>111 g</td></tr><tr><td>Gambas y langostinos</td><td>85 g</td><td>118 g</td></tr></tbody></table></div>
+        <div class="nt-wrap" style="margin-top:1rem"><table class="tl-tab cv-tab"><thead><tr><th>Alimento</th><th>100 g crudo pesan cocinado</th><th>Crudo para 100 g cocinado</th></tr></thead><tbody><tr><td>Arroz blanco</td><td>270 g</td><td>37 g</td></tr><tr><td>Arroz integral</td><td>290 g</td><td>34 g</td></tr><tr><td>Pasta (macarrones, espaguetis…)</td><td>230 g</td><td>43 g</td></tr><tr><td>Pasta integral</td><td>230 g</td><td>43 g</td></tr><tr><td>Quinoa</td><td>310 g</td><td>32 g</td></tr><tr><td>Cuscús</td><td>240 g</td><td>42 g</td></tr><tr><td>Lentejas</td><td>290 g</td><td>34 g</td></tr><tr><td>Garbanzos</td><td>230 g</td><td>43 g</td></tr><tr><td>Alubias blancas</td><td>240 g</td><td>42 g</td></tr><tr><td>Alubias rojas o pintas</td><td>270 g</td><td>37 g</td></tr><tr><td>Pechuga de pollo</td><td>75 g</td><td>133 g</td></tr><tr><td>Pechuga de pavo</td><td>80 g</td><td>125 g</td></tr><tr><td>Carne picada de ternera</td><td>75 g</td><td>133 g</td></tr><tr><td>Solomillo de cerdo</td><td>80 g</td><td>125 g</td></tr><tr><td>Lomo de cerdo</td><td>75 g</td><td>133 g</td></tr><tr><td>Merluza, pescadilla o bacalao fresco</td><td>80 g</td><td>125 g</td></tr><tr><td>Salmón</td><td>90 g</td><td>111 g</td></tr><tr><td>Gambas y langostinos</td><td>85 g</td><td>118 g</td></tr></tbody></table></div>
       </div></div>
     <div class="lead-rule"></div>
     <div>
